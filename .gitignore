@@ -7,3 +7,4 @@ riderModule.iml
 appsettings.Development.json
 appsettings.json
 logs/
+Migrations/

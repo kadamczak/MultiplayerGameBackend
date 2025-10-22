@@ -20,7 +20,7 @@ try
     
     if (app.Environment.IsDevelopment())
     {
-        // todo
+        // swagger?
     }
     
     app.UseHttpsRedirection();
