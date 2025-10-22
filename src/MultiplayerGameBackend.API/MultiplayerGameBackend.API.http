@@ -126,7 +126,7 @@ POST {{API_HostAddress}}/v1/users/0199ecd7-ff74-7e95-95b5-539c4f54d23b/roles
 Content-Type: application/json
 
 {
-  "RoleName": "Adminek"
+  "RoleName": "Admineek"
 }
 
 
