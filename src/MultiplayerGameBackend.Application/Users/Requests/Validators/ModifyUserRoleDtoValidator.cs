@@ -8,10 +8,9 @@ public class ModifyUserRoleDtoValidator : AbstractValidator<ModifyUserRoleDto>
 {
     public ModifyUserRoleDtoValidator()
     {
-        var availableRoles = UserRoles.AllRoles;
-        
         RuleFor(x => x.RoleName)
             .NotEmpty().WithMessage("Role is required.")
-            .Must(role => availableRoles.Contains(role)).WithMessage($"Role must be one of the following: {string.Join(", ", availableRoles)}");
+            .Must(UserRoles.IsValidRole)
+            .WithMessage($"Role must be one of the following: {string.Join(", ", UserRoles.AllRoles)}");
     }
 }

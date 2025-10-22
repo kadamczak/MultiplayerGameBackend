@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Items;
-using MultiplayerGameBackend.Application.Items.Requests.Validators;
 using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
 
@@ -17,6 +16,8 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<IUserContext, UserContext>();
         services.AddHttpContextAccessor();
+        
+        services.AddHostedService<RefreshTokenCleanupService>();
         
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<IUserService, UserService>();

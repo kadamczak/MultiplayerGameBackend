@@ -50,6 +50,10 @@ public class ItemService(ILogger<ItemService> logger,
             throw new ConflictException(nameof(dto.Name), dto.Name);
         
         var item = itemMapper.Map(dto);
+        
+        item.Name = item.Name.Trim();
+        item.Description = item.Description.Trim();
+        
         dbContext.Items.Add(item);
         await dbContext.SaveChangesAsync(cancellationToken);
         return item.Id;
@@ -62,8 +66,9 @@ public class ItemService(ILogger<ItemService> logger,
         var item = await dbContext.Items.FindAsync([id], cancellationToken)
             ?? throw new NotFoundException(nameof(id), id.ToString());
         
-        item.Name = dto.Name;
-        item.Description = dto.Description;
+        item.Name = dto.Name.Trim();
+        item.Description = dto.Description.Trim();
+        
         await dbContext.SaveChangesAsync(cancellationToken);
     }
     

@@ -46,6 +46,16 @@ Content-Type: application/json
 
 ###
 
+POST {{API_HostAddress}}/v1/items
+Content-Type: application/json
+
+{
+  "Name": "             ",
+  "Description": "    "
+}
+
+###
+
 PATCH {{API_HostAddress}}/v1/items/4
 Content-Type: application/json
 
@@ -94,9 +104,10 @@ Content-Type: application/json
 
 POST {{API_HostAddress}}/v1/identity/login
 Content-Type: application/json
+X-Client-Type: Browser
 
 {
-    "Email": "author@test.com",
+    "userName": "author3",
     "Password": "Password1!"
 }
 
