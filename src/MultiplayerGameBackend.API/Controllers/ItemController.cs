@@ -1,18 +1,17 @@
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MultiplayerGameBackend.Application.Items.Queries.GetItemById;
+using MultiplayerGameBackend.Application.Items;
 using MultiplayerGameBackend.Application.Items.ReadDtos;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/items")]
-public class ItemController(IMediator mediator) : ControllerBase
+public class ItemController(IItemService itemService) : ControllerBase
 {
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ItemReadDto?>> GetById(int id)
+    public async Task<ActionResult<ItemReadDto?>> GetById(int id, CancellationToken cancellationToken)
     {
-        var item = await mediator.Send(new GetItemByIdQuery(id));
-        return Ok(item);
+        var item = await itemService.GetById(id, cancellationToken);
+        return item is null ? NotFound() : Ok(item);
     }
 }

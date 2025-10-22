@@ -7,3 +7,13 @@ Accept: application/json
 
 GET {{API_HostAddress}}/v1/items/1
 Accept: application/json
+
+###
+
+GET {{API_HostAddress}}/v1/items/2
+Accept: application/json
+
+###
+
+GET {{API_HostAddress}}/v1/items/0
+Accept: application/json
