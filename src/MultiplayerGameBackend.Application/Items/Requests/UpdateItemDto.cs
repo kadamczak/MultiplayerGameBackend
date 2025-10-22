@@ -1,6 +1,6 @@
-namespace MultiplayerGameBackend.Application.Items.Responses;
+namespace MultiplayerGameBackend.Application.Items.Requests;
 
-public class ReadItemDto
+public class UpdateItemDto
 {
     public int Id { get; set; }
     public required string Name { get; set; }

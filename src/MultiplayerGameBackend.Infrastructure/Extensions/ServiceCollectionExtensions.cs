@@ -22,9 +22,7 @@ public static class ServiceCollectionExtensions
         //     .AddClaimsPrincipalFactory<RestaurantsUserClaimsPrincipalFactory>()
         //     .AddEntityFrameworkStores<RestaurantsDbContext>();
 
-        services.AddScoped<IMultiplayerGameSeeder, MultiplayerGameSeeder>();
-        //services.AddScoped<IRestaurantsRepository, RestaurantsRepository>();
-        
         services.AddScoped<IMultiplayerGameDbContext, MultiplayerGameDbContext>();
+        services.AddScoped<IMultiplayerGameSeeder, MultiplayerGameSeeder>();
     }
 }

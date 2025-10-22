@@ -1,7 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.Application.Items;
-using MultiplayerGameBackend.Application.Items.ReadDtos;
+using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.Items.Requests;
 
 namespace MultiplayerGameBackend.API.Controllers;
@@ -9,7 +9,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 [ApiController]
 [Route("v1/items")]
 public class ItemController(IItemService itemService,
-    IValidator<CreateItemDto> createItemDtoValidator) : ControllerBase
+    IValidator<CreateItemDto> createItemDtoValidator,
+    IValidator<UpdateItemDto> updateItemDtoValidator) : ControllerBase
 {
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +33,7 @@ public class ItemController(IItemService itemService,
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)] // In case of duplicate item name
-    public async Task<ActionResult<int>> Create([FromBody] CreateItemDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromBody] CreateItemDto dto, CancellationToken cancellationToken)
     {
         var validationResult = await createItemDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
@@ -41,11 +42,27 @@ public class ItemController(IItemService itemService,
         var createdId = await itemService.Create(dto, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = createdId }, null);
     }
+    
+    [HttpPatch("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update([FromRoute] int id, UpdateItemDto dto, CancellationToken cancellationToken)
+    {
+        dto.Id = id;
+        
+        var validationResult = await updateItemDtoValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.ToDictionary());
+        
+        await itemService.Update(dto, cancellationToken);
+        return NoContent();
+    }
 
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> Delete(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var operationCompleted = await itemService.Delete(id, cancellationToken);
         return operationCompleted ? NoContent() : NotFound();

@@ -18,12 +18,10 @@ Accept: application/json
 GET {{API_HostAddress}}/v1/items/0
 Accept: application/json
 
-
 ###
 
 GET {{API_HostAddress}}/v1/items
 Accept: application/json
-
 
 ###
 
@@ -31,7 +29,7 @@ POST {{API_HostAddress}}/v1/items
 Content-Type: application/json
 
 {
-  "Name": "Green Staff 3",
+  "Name": "Green Staff 4",
   "Description": "Is green?"
 }
 
@@ -47,6 +45,26 @@ Content-Type: application/json
 
 ###
 
-DELETE {{API_HostAddress}}/v1/items/13
+PATCH {{API_HostAddress}}/v1/items/15
+Content-Type: application/json
+
+{
+  "Name": "Updated Item Name 3",
+  "Description": "This is an updated description"
+}
+
+###
+
+PATCH {{API_HostAddress}}/v1/items/99999
+Content-Type: application/json
+
+{
+  "Name": "Updated Item Name",
+  "Description": "This is an updated description"
+}
+
+###
+
+DELETE {{API_HostAddress}}/v1/items/14
 
 ###
