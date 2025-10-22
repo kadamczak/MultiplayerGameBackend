@@ -9,9 +9,18 @@ namespace MultiplayerGameBackend.API.Controllers;
 public class ItemController(IItemService itemService) : ControllerBase
 {
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ItemReadDto?>> GetById(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult<ReadItemDto?>> GetById(int id, CancellationToken cancellationToken)
     {
         var item = await itemService.GetById(id, cancellationToken);
         return item is null ? NotFound() : Ok(item);
     }
+    
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ReadItemDto>>> GetAll(CancellationToken cancellationToken)
+    {
+        var items = await itemService.GetAll(cancellationToken);
+        return Ok(items);
+    }
+    
+    
 }

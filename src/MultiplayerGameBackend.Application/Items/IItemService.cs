@@ -4,5 +4,6 @@ namespace MultiplayerGameBackend.Application.Items;
 
 public interface IItemService
 {
-    Task<ItemReadDto?> GetById(int id, CancellationToken cancellationToken);
+    Task<ReadItemDto?> GetById(int id, CancellationToken cancellationToken);
+    Task<IEnumerable<ReadItemDto>> GetAll(CancellationToken cancellationToken);
 }

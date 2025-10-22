@@ -15,8 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Items\ReadDtos\Validators\" />
-      <Folder Include="Items\WriteDtos\Validators\" />
+      <Folder Include="Items\Requests\Validators\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -10,7 +10,7 @@ public class ItemService(ILogger<ItemService> logger,
     IMultiplayerGameDbContext dbContext,
     ItemMapper itemMapper) : IItemService
 {
-    public async Task<ItemReadDto?> GetById(int id, CancellationToken cancellationToken)
+    public async Task<ReadItemDto?> GetById(int id, CancellationToken cancellationToken)
     {
         logger.LogInformation("Getting Item with id {itemId}", id);
         
@@ -23,5 +23,16 @@ public class ItemService(ILogger<ItemService> logger,
         return itemDto;
     }
     
+    public async Task<IEnumerable<ReadItemDto>> GetAll(CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Getting all items");
+        
+        var items = await dbContext
+            .Items
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+        
+        return items.Select(itemMapper.Map);
+    }
     
 }

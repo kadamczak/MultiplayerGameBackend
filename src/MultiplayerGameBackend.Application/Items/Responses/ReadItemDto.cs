@@ -1,6 +1,6 @@
 namespace MultiplayerGameBackend.Application.Items.ReadDtos;
 
-public class ItemReadDto
+public class ReadItemDto
 {
     public int Id { get; set; }
     public required string Name { get; set; }

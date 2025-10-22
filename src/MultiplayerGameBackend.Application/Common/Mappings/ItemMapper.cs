@@ -7,5 +7,6 @@ namespace MultiplayerGameBackend.Application.Common.Mappings;
 [Mapper]
 public partial class ItemMapper
 {
-    public partial ItemReadDto? Map(Item? item);
+    public partial ReadItemDto? Map(Item? item);
+    public partial Item? Map(ReadItemDto? dto);
 }
