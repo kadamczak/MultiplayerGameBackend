@@ -3,6 +3,7 @@ using MultiplayerGameBackend.API.Middleware;
 using Serilog;
 using MultiplayerGameBackend.Application.Extensions;
 using MultiplayerGameBackend.Infrastructure.Extensions;
+using MultiplayerGameBackend.Infrastructure.Seeders;
 
 try
 {
@@ -12,6 +13,11 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
 
     var app = builder.Build();
+    
+    var scope = app.Services.CreateScope();
+    var seeder = scope.ServiceProvider.GetRequiredService<IMultiplayerGameSeeder>();
+
+    await seeder.Seed();
     
     app.UseMiddleware<ErrorHandlingMiddleware>();
     app.UseMiddleware<RequestTimeLoggingMiddleware>();
@@ -26,6 +32,8 @@ try
     app.UseHttpsRedirection();
     app.UseAuthorization();
     app.MapControllers();
+    
+    Log.Information("Application started");
     app.Run();
 }
 catch (Exception ex)

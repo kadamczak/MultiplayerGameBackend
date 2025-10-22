@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Infrastructure.Persistence;
+using MultiplayerGameBackend.Infrastructure.Seeders;
 
 namespace MultiplayerGameBackend.Infrastructure.Extensions;
 
@@ -20,7 +21,7 @@ public static class ServiceCollectionExtensions
         //     .AddClaimsPrincipalFactory<RestaurantsUserClaimsPrincipalFactory>()
         //     .AddEntityFrameworkStores<RestaurantsDbContext>();
 
-        //services.AddScoped<IRestaurantSeeder, RestaurantSeeder>();
+        services.AddScoped<IMultiplayerGameSeeder, MultiplayerGameSeeder>();
         //services.AddScoped<IRestaurantsRepository, RestaurantsRepository>();
     }
 }
