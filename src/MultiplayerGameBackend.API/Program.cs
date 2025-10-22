@@ -2,6 +2,7 @@ using MultiplayerGameBackend.API.Extensions;
 using MultiplayerGameBackend.API.Middleware;
 using Serilog;
 using MultiplayerGameBackend.Application.Extensions;
+using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Extensions;
 using MultiplayerGameBackend.Infrastructure.Seeders;
 
@@ -30,6 +31,11 @@ try
     }
     
     app.UseHttpsRedirection();
+    
+    app.MapGroup("v1/identity")
+        .WithTags("Identity")
+        .MapIdentityApi<User>();
+    
     app.UseAuthorization();
     app.MapControllers();
     

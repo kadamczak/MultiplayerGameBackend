@@ -15,12 +15,6 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<MultiplayerGameDbContext>(options =>
             options.UseNpgsql(connectionString)
                 .EnableSensitiveDataLogging());
-        
-        //
-        // services.AddIdentityApiEndpoints<User>()
-        //     .AddRoles<IdentityRole>()
-        //     .AddClaimsPrincipalFactory<RestaurantsUserClaimsPrincipalFactory>()
-        //     .AddEntityFrameworkStores<RestaurantsDbContext>();
 
         services.AddScoped<IMultiplayerGameDbContext, MultiplayerGameDbContext>();
         services.AddScoped<IMultiplayerGameSeeder, MultiplayerGameSeeder>();

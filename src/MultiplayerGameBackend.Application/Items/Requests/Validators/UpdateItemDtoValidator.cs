@@ -6,7 +6,7 @@ namespace MultiplayerGameBackend.Application.Items.Requests.Validators;
 public class UpdateItemDtoValidator : AbstractValidator<UpdateItemDto>
 {
     private const int MaxNameLength = 50;
-    private const int MaxDescriptionLength = 255;
+    private const int MaxDescriptionLength = 256;
     
     public UpdateItemDtoValidator()
     {

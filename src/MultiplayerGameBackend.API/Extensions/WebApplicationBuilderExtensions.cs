@@ -1,4 +1,6 @@
 using MultiplayerGameBackend.API.Middleware;
+using MultiplayerGameBackend.Domain.Entities;
+using MultiplayerGameBackend.Infrastructure.Persistence;
 using Serilog;
 
 namespace MultiplayerGameBackend.API.Extensions;
@@ -16,5 +18,10 @@ public static class WebApplicationBuilderExtensions
         builder.Host.UseSerilog((context, configuration) =>
             configuration.ReadFrom.Configuration(context.Configuration)
         );
+        
+        builder.Services.AddIdentityApiEndpoints<User>()
+            //.AddRoles<IdentityRole>()
+            //.AddClaimsPrincipalFactory<RestaurantsUserClaimsPrincipalFactory>()
+            .AddEntityFrameworkStores<MultiplayerGameDbContext>();
     }
 }
