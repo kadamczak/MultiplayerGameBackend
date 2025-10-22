@@ -55,12 +55,12 @@ public class ItemService(ILogger<ItemService> logger,
         return item.Id;
     }
     
-    public async Task Update(UpdateItemDto dto, CancellationToken cancellationToken)
+    public async Task Update(int id, UpdateItemDto dto, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Updating Item with id {itemId}", dto.Id);
+        logger.LogInformation("Updating Item with id {itemId}", id);
         
-        var item = await dbContext.Items.FindAsync([dto.Id], cancellationToken)
-            ?? throw new NotFoundException(nameof(dto.Id), dto.Id.ToString());
+        var item = await dbContext.Items.FindAsync([id], cancellationToken)
+            ?? throw new NotFoundException(nameof(id), id.ToString());
         
         item.Name = dto.Name;
         item.Description = dto.Description;

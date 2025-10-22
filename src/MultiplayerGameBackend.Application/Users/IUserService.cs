@@ -4,7 +4,6 @@ namespace MultiplayerGameBackend.Application.Users;
 
 public interface IUserService
 {
-    Task RegisterUser(RegisterDto dto);
-    Task AssignUserRole(ModifyUserRoleDto dto, CancellationToken cancellationToken);
-    Task UnassignUserRole(ModifyUserRoleDto dto, CancellationToken cancellationToken);
+    Task AssignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken);
+    Task UnassignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken);
 }

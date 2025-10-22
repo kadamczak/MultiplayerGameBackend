@@ -30,7 +30,7 @@ POST {{API_HostAddress}}/v1/items
 Content-Type: application/json
 
 {
-  "Name": "Green Staff 4",
+  "Name": "Green Staff 7",
   "Description": "Is green?"
 }
 
@@ -41,16 +41,16 @@ Content-Type: application/json
 
 {
   "Name": "New Item!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-  "Description": "This is a new item"
+  "Description": ""
 }
 
 ###
 
-PATCH {{API_HostAddress}}/v1/items/15
+PATCH {{API_HostAddress}}/v1/items/4
 Content-Type: application/json
 
 {
-  "Name": "Updated Item Name 3",
+  "Name": "Updated Item Name xddd",
   "Description": "This is an updated description"
 }
 
@@ -74,9 +74,20 @@ POST {{API_HostAddress}}/v1/identity/register
 Content-Type: application/json
 
 {
-  "UserName": "author2",
-  "Email": "author2@test.com",
+  "UserName": "author4",
+  "UserEmail": "author4@test.com",
   "Password": "Password1!"
+}
+
+###
+
+POST {{API_HostAddress}}/v1/identity/register
+Content-Type: application/json
+
+{
+  "UserName": "",
+  "UserEmail": "",
+  "Password": ""
 }
 
 ###
@@ -89,7 +100,23 @@ Content-Type: application/json
     "Password": "Password1!"
 }
 
+### 
 
+POST {{API_HostAddress}}/v1/users/0199ecd7-ff74-7e95-95b5-539c4f54d23b/roles
+Content-Type: application/json
+
+{
+  "RoleName": "User"
+}
+
+### 
+
+POST {{API_HostAddress}}/v1/users/0199ecd7-ff74-7e95-95b5-539c4f54d23b/roles
+Content-Type: application/json
+
+{
+  "RoleName": "Adminek"
+}
 
 
 

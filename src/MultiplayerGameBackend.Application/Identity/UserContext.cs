@@ -1,7 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using MultiplayerGameBackend.Application.Users;
 
-namespace MultiplayerGameBackend.Application.Users;
+namespace MultiplayerGameBackend.Application.Identity;
 
 public interface IUserContext
 {

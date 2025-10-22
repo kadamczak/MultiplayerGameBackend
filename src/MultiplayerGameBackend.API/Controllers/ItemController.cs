@@ -10,10 +10,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/items")]
-[Authorize]
-public class ItemController(IItemService itemService,
-    IValidator<CreateItemDto> createItemDtoValidator,
-    IValidator<UpdateItemDto> updateItemDtoValidator) : ControllerBase
+//[Authorize]
+public class ItemController(IItemService itemService) : ControllerBase
 {
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -33,39 +31,29 @@ public class ItemController(IItemService itemService,
     }
 
     [HttpPost]
-    [Authorize(Roles = UserRoles.Admin)]
+    //[Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)] // In case of duplicate item name
     public async Task<IActionResult> Create([FromBody] CreateItemDto dto, CancellationToken cancellationToken)
     {
-        var validationResult = await createItemDtoValidator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.ToDictionary());
-
         var createdId = await itemService.Create(dto, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = createdId }, null);
     }
     
     [HttpPatch("{id:int}")]
-    [Authorize(Roles = UserRoles.Admin)]
+    //[Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromRoute] int id, UpdateItemDto dto, CancellationToken cancellationToken)
     {
-        dto.Id = id;
-        
-        var validationResult = await updateItemDtoValidator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.ToDictionary());
-        
-        await itemService.Update(dto, cancellationToken);
+        await itemService.Update(id, dto, cancellationToken);
         return NoContent();
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = UserRoles.Admin)]
+    //[Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)

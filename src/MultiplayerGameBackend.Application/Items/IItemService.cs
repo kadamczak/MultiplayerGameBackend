@@ -8,6 +8,6 @@ public interface IItemService
     Task<ReadItemDto?> GetById(int id, CancellationToken cancellationToken);
     Task<IEnumerable<ReadItemDto>> GetAll(CancellationToken cancellationToken);
     Task<int> Create(CreateItemDto dto, CancellationToken cancellationToken);
-    Task Update(UpdateItemDto dto, CancellationToken cancellationToken);
+    Task Update(int id, UpdateItemDto dto, CancellationToken cancellationToken);
     Task<bool> Delete(int id, CancellationToken cancellationToken);
 }

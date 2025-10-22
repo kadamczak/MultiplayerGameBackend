@@ -4,7 +4,7 @@ namespace MultiplayerGameBackend.Application.Extensions;
 
 public static class ValidationExtensions
 {
-    public static IDictionary<string, string[]> ToDictionary(this ValidationResult validationResult)
+    public static IDictionary<string, string[]> FormatErrors(this ValidationResult validationResult)
     {
         return validationResult.Errors
             .GroupBy(x => x.PropertyName)

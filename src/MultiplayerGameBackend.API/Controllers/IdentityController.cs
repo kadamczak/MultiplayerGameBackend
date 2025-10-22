@@ -1,20 +1,20 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MultiplayerGameBackend.Application.Extensions;
+using MultiplayerGameBackend.Application.Identity;
+using MultiplayerGameBackend.Application.Identity.Requests;
+using MultiplayerGameBackend.Application.Identity.Requests.Validators;
+using MultiplayerGameBackend.Application.Identity.Responses;
 using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
-using MultiplayerGameBackend.Domain.Constants;
-using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/identity")]
-public class IdentityController(IUserService userService,
-    ModifyUserRoleDtoValidator modifyUserRoleDtoValidator,
-    RegisterDtoValidator registerDtoValidator,
-    UserManager<User> userManager) : ControllerBase
+public class IdentityController(IIdentityService identityService,
+    RegisterDtoValidator registerDtoValidator) : ControllerBase
 {
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -24,42 +24,36 @@ public class IdentityController(IUserService userService,
     {
         var validationResult = await registerDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
-            return BadRequest(validationResult.ToDictionary());
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        await userService.RegisterUser(dto);
+        await identityService.RegisterUser(dto);
         return Ok(new { message = "User registered successfully." });
     }
     
-    
-    [HttpPost("roles")]
-    [Authorize(Roles = UserRoles.Admin)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AssignUserRole(ModifyUserRoleDto dto, CancellationToken cancellationToken)
+    [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<TokenResponseDto>> Login([FromBody] LoginDto dto)
     {
-        var validationResult = await modifyUserRoleDtoValidator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.ToDictionary());
-        
-        await userService.AssignUserRole(dto, cancellationToken);
-        return NoContent();
+        var tokens = await identityService.Login(dto);
+        return Ok(tokens);
     }
-
-    [HttpDelete("roles")]
-    [Authorize(Roles = UserRoles.Admin)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UnassignUserRole(ModifyUserRoleDto dto, CancellationToken cancellationToken)
+    
+    [HttpPost("refresh")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<TokenResponseDto>> Refresh([FromBody] string refreshToken)
     {
-        var validationResult = await modifyUserRoleDtoValidator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.ToDictionary());
-        
-        await userService.UnassignUserRole(dto, cancellationToken);
+        var tokens = await identityService.Refresh(refreshToken);
+        return tokens is null ? Unauthorized() : Ok(tokens);
+    }
+    
+    [Authorize]
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Logout([FromBody] string refreshToken)
+    {
+        await identityService.Logout(refreshToken);
         return NoContent();
     }
 }

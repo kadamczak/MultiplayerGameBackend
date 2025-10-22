@@ -15,8 +15,9 @@ public class MultiplayerGameDbContext
     }
     
     public DbSet<Item> Items { get; set; }
-    public DbSet<User> Users { get; set; }
+    public new DbSet<User> Users { get; set; }
     public DbSet<UserItem> UserItems { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,21 +26,16 @@ public class MultiplayerGameDbContext
         ConfigureItemEntities(modelBuilder);
         ConfigureUserEntities(modelBuilder);
         ConfigureUserItemEntities(modelBuilder);
+        ConfigureRefreshTokenEntities(modelBuilder);
     }
-    
+
     private static void ConfigureItemEntities(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Item>(entity =>
         {
-            entity.Property(e => e.Name)
-                .HasMaxLength(Item.NameMaxLength);
-            
             entity.HasIndex(e => e.Name)
                 .IsUnique();
-
-            entity.Property(e => e.Description)
-                .HasMaxLength(Item.DescriptionMaxLength);
-
+            
             entity.HasMany(i => i.UserItems)
                 .WithOne(ui => ui.Item)
                 .HasForeignKey(ui => ui.ItemId)
@@ -52,30 +48,40 @@ public class MultiplayerGameDbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.Property(e => e.UserName)
-                .HasMaxLength(User.UserNameMaxLength);
+                .IsRequired()
+                .HasMaxLength(User.Constraints.UserNameMaxLength);
 
             entity.HasIndex(e => e.UserName)
                 .IsUnique();
             
             entity.Property(e => e.NormalizedUserName)
-                .HasMaxLength(User.UserNameMaxLength);
+                .IsRequired()
+                .HasMaxLength(User.Constraints.UserNameMaxLength);
 
             entity.Property(e => e.Email)
-                .HasMaxLength(User.EmailMaxLength);
+                .IsRequired()
+                .HasMaxLength(User.Constraints.EmailMaxLength);
 
             entity.HasIndex(e => e.Email)
                 .IsUnique();
             
             entity.Property(e => e.NormalizedEmail)
-                .HasMaxLength(User.EmailMaxLength);
+                .IsRequired()
+                .HasMaxLength(User.Constraints.EmailMaxLength);
 
             entity.Property(e => e.PasswordHash)
-                .HasMaxLength(User.PasswordHashMaxLength);
+                .IsRequired()
+                .HasMaxLength(User.Constraints.PasswordHashMaxLength);
 
             entity.HasMany(u => u.UserItems)
                 .WithOne(ui => ui.User)
                 .HasForeignKey(ui => ui.UserId)
                 .OnDelete(DeleteBehavior.Cascade);;
+            
+            entity.HasMany(u => u.RefreshTokens)
+                .WithOne(ui => ui.User)
+                .HasForeignKey(ui => ui.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
     
@@ -85,9 +91,6 @@ public class MultiplayerGameDbContext
         {
             entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.ObtainedAt)
-                .IsRequired();
-
             entity.HasOne(ui => ui.User)
                 .WithMany(u => u.UserItems)
                 .HasForeignKey(ui => ui.UserId);
@@ -95,6 +98,17 @@ public class MultiplayerGameDbContext
             entity.HasOne(e => e.Item)
                 .WithMany(e => e.UserItems)
                 .HasForeignKey(e => e.ItemId);
+        });
+    }
+    
+    private void ConfigureRefreshTokenEntities(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasIndex(e => e.TokenHash)
+                .IsUnique();
         });
     }
 }
