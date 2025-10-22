@@ -23,3 +23,20 @@ Accept: application/json
 
 GET {{API_HostAddress}}/v1/items
 Accept: application/json
+
+
+###
+
+POST {{API_HostAddress}}/v1/items
+Content-Type: application/json
+
+{
+  "Name": "New Item 3",
+  "Description": "This is a new item"
+}
+
+###
+
+DELETE {{API_HostAddress}}/v1/items/6
+
+###

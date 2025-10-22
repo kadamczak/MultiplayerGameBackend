@@ -6,4 +6,6 @@ namespace MultiplayerGameBackend.Application.Interfaces;
 public interface IMultiplayerGameDbContext
 {
     DbSet<Item> Items { get; }
+    
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
