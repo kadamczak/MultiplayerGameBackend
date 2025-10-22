@@ -1,12 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.API", "src\MultiplayerGameBackend.API\MultiplayerGameBackend.API.csproj", "{F6DF763A-160A-423A-AB20-F864CB7604D5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{37FC71C8-2530-41E7-9BED-5D6255366285} = {37FC71C8-2530-41E7-9BED-5D6255366285}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.Application", "src\MultiplayerGameBackend.Application\MultiplayerGameBackend.Application.csproj", "{37FC71C8-2530-41E7-9BED-5D6255366285}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70565E2A-DBEA-44B2-AB3F-575F920E1C30} = {70565E2A-DBEA-44B2-AB3F-575F920E1C30}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.Domain", "src\MultiplayerGameBackend.Domain\MultiplayerGameBackend.Domain.csproj", "{70565E2A-DBEA-44B2-AB3F-575F920E1C30}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.Infrastructure", "src\MultiplayerGameBackend.Infrastructure\MultiplayerGameBackend.Infrastructure.csproj", "{5890BB43-6484-41F0-9EE2-2A7326BAE40B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{37FC71C8-2530-41E7-9BED-5D6255366285} = {37FC71C8-2530-41E7-9BED-5D6255366285}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

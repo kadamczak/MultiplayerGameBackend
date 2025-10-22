@@ -8,7 +8,17 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\MultiplayerGameBackend.Domain\MultiplayerGameBackend.Domain.csproj" />
+        <ProjectReference Include="..\MultiplayerGameBackend.Application\MultiplayerGameBackend.Application.csproj" />
+        <ProjectReference Include="..\MultiplayerGameBackend.Infrastructure\MultiplayerGameBackend.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
