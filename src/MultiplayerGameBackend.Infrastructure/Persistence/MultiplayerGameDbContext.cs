@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.Infrastructure.Persistence;
 
 public class MultiplayerGameDbContext(DbContextOptions<MultiplayerGameDbContext> options)
-    : DbContext(options)
+    : DbContext(options), IMultiplayerGameDbContext
 {
     public DbSet<Item> Items { get; set; }
     

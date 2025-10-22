@@ -1,4 +1,9 @@
 @API_HostAddress = https://localhost:7110
 
-GET {{API_HostAddress}}/weatherforecast/
+GET {{API_HostAddress}}/v1/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{API_HostAddress}}/v1/items/1
 Accept: application/json

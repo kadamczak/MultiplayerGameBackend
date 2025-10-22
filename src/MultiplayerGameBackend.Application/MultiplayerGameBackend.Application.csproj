@@ -13,4 +13,19 @@
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Items\Commands\" />
+      <Folder Include="Items\WriteDtos\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.EntityFrameworkCore">
+        <HintPath>..\..\..\..\..\.nuget\packages\microsoft.entityframeworkcore\9.0.9\lib\net8.0\Microsoft.EntityFrameworkCore.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MultiplayerGameBackend.Domain\MultiplayerGameBackend.Domain.csproj" />
+    </ItemGroup>
+
 </Project>
