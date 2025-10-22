@@ -1,4 +1,4 @@
-namespace MultiplayerGameBackend;
+namespace MultiplayerGameBackend.API;
 
 public class WeatherForecast
 {
