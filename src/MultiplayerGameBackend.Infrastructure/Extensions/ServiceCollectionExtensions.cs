@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Application.Interfaces;
+using MultiplayerGameBackend.Domain.Entities;
+using MultiplayerGameBackend.Infrastructure.Email;
 using MultiplayerGameBackend.Infrastructure.Persistence;
 using MultiplayerGameBackend.Infrastructure.Seeders;
 
@@ -18,5 +21,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IMultiplayerGameDbContext, MultiplayerGameDbContext>();
         services.AddScoped<IMultiplayerGameSeeder, MultiplayerGameSeeder>();
+        
+        services.AddSingleton<IEmailSender<User>, NoOpEmailSender>();
     }
 }

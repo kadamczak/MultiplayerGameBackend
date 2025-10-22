@@ -26,4 +26,8 @@
       <ProjectReference Include="..\MultiplayerGameBackend.Domain\MultiplayerGameBackend.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Users\Responses\" />
+    </ItemGroup>
+
 </Project>

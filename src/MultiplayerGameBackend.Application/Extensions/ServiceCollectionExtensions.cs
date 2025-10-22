@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         
         services.AddScoped<IItemService, ItemService>();
+        services.AddScoped<IUserService, UserService>();
         
         services.AddScoped<ItemMapper>();
     }

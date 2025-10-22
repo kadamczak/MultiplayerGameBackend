@@ -1,13 +1,16 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.Application.Items;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.Items.Requests;
+using MultiplayerGameBackend.Domain.Constants;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/items")]
+[Authorize]
 public class ItemController(IItemService itemService,
     IValidator<CreateItemDto> createItemDtoValidator,
     IValidator<UpdateItemDto> updateItemDtoValidator) : ControllerBase
@@ -30,6 +33,7 @@ public class ItemController(IItemService itemService,
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)] // In case of duplicate item name
@@ -44,6 +48,7 @@ public class ItemController(IItemService itemService,
     }
     
     [HttpPatch("{id:int}")]
+    [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -60,6 +65,7 @@ public class ItemController(IItemService itemService,
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
@@ -67,5 +73,4 @@ public class ItemController(IItemService itemService,
         var operationCompleted = await itemService.Delete(id, cancellationToken);
         return operationCompleted ? NoContent() : NotFound();
     }
-
 }

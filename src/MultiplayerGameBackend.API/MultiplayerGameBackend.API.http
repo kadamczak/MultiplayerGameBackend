@@ -1,4 +1,5 @@
 @API_HostAddress = https://localhost:7110
+//@Token =
 
 GET {{API_HostAddress}}/v1/weatherforecast/
 Accept: application/json
@@ -68,3 +69,32 @@ Content-Type: application/json
 DELETE {{API_HostAddress}}/v1/items/14
 
 ###
+
+POST {{API_HostAddress}}/v1/identity/register
+Content-Type: application/json
+
+{
+  "UserName": "author2",
+  "Email": "author2@test.com",
+  "Password": "Password1!"
+}
+
+###
+
+POST {{API_HostAddress}}/v1/identity/login
+Content-Type: application/json
+
+{
+    "Email": "author@test.com",
+    "Password": "Password1!"
+}
+
+
+
+
+
+
+
+
+
+

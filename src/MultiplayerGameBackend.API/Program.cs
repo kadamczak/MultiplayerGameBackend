@@ -32,10 +32,6 @@ try
     
     app.UseHttpsRedirection();
     
-    app.MapGroup("v1/identity")
-        .WithTags("Identity")
-        .MapIdentityApi<User>();
-    
     app.UseAuthorization();
     app.MapControllers();
     

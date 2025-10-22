@@ -60,7 +60,7 @@ public class ItemService(ILogger<ItemService> logger,
         logger.LogInformation("Updating Item with id {itemId}", dto.Id);
         
         var item = await dbContext.Items.FindAsync([dto.Id], cancellationToken)
-            ?? throw new NotFoundException(nameof(dto.Id), dto.Id);
+            ?? throw new NotFoundException(nameof(dto.Id), dto.Id.ToString());
         
         item.Name = dto.Name;
         item.Description = dto.Description;
