@@ -17,6 +17,9 @@ public class MultiplayerGameDbContext(DbContextOptions<MultiplayerGameDbContext>
         {
             entity.Property(e => e.Name)
                 .HasMaxLength(50);
+            
+            entity.HasIndex(e => e.Name)
+                .IsUnique();
 
             entity.Property(e => e.Description)
                 .HasMaxLength(255);

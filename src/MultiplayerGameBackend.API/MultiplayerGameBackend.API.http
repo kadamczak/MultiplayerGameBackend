@@ -31,12 +31,22 @@ POST {{API_HostAddress}}/v1/items
 Content-Type: application/json
 
 {
-  "Name": "New Item 3",
+  "Name": "Green Staff 3",
+  "Description": "Is green?"
+}
+
+###
+
+POST {{API_HostAddress}}/v1/items
+Content-Type: application/json
+
+{
+  "Name": "New Item!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
   "Description": "This is a new item"
 }
 
 ###
 
-DELETE {{API_HostAddress}}/v1/items/6
+DELETE {{API_HostAddress}}/v1/items/13
 
 ###

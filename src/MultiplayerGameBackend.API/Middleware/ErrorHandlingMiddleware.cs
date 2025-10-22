@@ -16,6 +16,12 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             context.Response.StatusCode = 404;
             await context.Response.WriteAsync(notFound.Message);
         }
+        catch (ConflictException conflict)
+        {
+            logger.LogWarning(conflict.Message);
+            context.Response.StatusCode = 409;
+            await context.Response.WriteAsync(conflict.Message);
+        }
         catch (ForbidException forbid)
         {
             logger.LogWarning(forbid.Message);
