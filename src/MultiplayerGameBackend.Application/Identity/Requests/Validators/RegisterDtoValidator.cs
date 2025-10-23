@@ -13,14 +13,15 @@ public class RegisterDtoValidator : AbstractValidator<RegisterDto>
             .Length(User.Constraints.UserNameMinLength, User.Constraints.UserNameMaxLength)
             .WithMessage($"Username must be between {User.Constraints.UserNameMinLength} and {User.Constraints.UserNameMaxLength} characters long.");
 
-        RuleFor(x => x.UserEmail)
+        RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")
             .MaximumLength(User.Constraints.EmailMaxLength).WithMessage($"Email cannot exceed {User.Constraints.EmailMaxLength} characters.")
             .EmailAddress().WithMessage("Invalid email format.");
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(User.Constraints.RawPasswordMinLength).WithMessage($"Password must be at least {User.Constraints.RawPasswordMinLength} characters long.")
+            .Length(User.Constraints.RawPasswordMinLength, User.Constraints.RawPasswordMaxLength)
+            .WithMessage($"Password must be between {User.Constraints.RawPasswordMinLength} and {User.Constraints.RawPasswordMaxLength} characters long.")
             .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
             .Matches(@"[a-z]").WithMessage("Password must contain at least one lowercase letter.")
             .Matches(@"\d").WithMessage("Password must contain at least one digit.");

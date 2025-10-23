@@ -28,6 +28,18 @@ public static class WebApplicationBuilderExtensions
             .AddBearerToken(IdentityConstants.BearerScheme);
         
         builder.Services.AddControllers();
+
+        // Add CORS policy for local React dev server
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("LocalReact", policy =>
+            {
+                policy.WithOrigins("http://localhost:5173")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
+        });
         
         builder.Services.AddScoped<ErrorHandlingMiddleware>();
         builder.Services.AddScoped<RequestTimeLoggingMiddleware>();

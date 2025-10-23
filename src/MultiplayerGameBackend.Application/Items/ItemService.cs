@@ -4,6 +4,7 @@ using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.Items.Requests;
+using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.Application.Items;
@@ -47,7 +48,7 @@ public class ItemService(ILogger<ItemService> logger,
             .FirstOrDefaultAsync(x => x.Name == dto.Name, cancellationToken) ;
         
         if (itemWithSameName is not null)
-            throw new ConflictException(nameof(dto.Name), dto.Name);
+            throw new ConflictException(nameof(Item), nameof(dto.Name), dto.Name);
         
         var item = itemMapper.Map(dto);
         
@@ -64,7 +65,7 @@ public class ItemService(ILogger<ItemService> logger,
         logger.LogInformation("Updating Item with id {itemId}", id);
         
         var item = await dbContext.Items.FindAsync([id], cancellationToken)
-            ?? throw new NotFoundException(nameof(id), id.ToString());
+            ?? throw new NotFoundException(nameof(Item), nameof(Item.Id), id.ToString());
         
         item.Name = dto.Name.Trim();
         item.Description = dto.Description.Trim();

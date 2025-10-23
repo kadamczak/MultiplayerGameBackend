@@ -1,7 +1,23 @@
 namespace MultiplayerGameBackend.Domain.Exceptions;
 
-public class ConflictException(string propertyName, string propertyValue) 
-    : Exception($"{propertyName} with value: {propertyValue} already exists")
+public class ConflictException : Exception
 {
-    
+    public Dictionary<string, string[]>? Errors { get; }
+
+    // Original constructor for simple conflicts
+    public ConflictException(string entityName, string propertyName, string propertyValue) 
+        : base($"{entityName} with {propertyName}: '{propertyValue}' already exists.")
+    {
+        Errors = new Dictionary<string, string[]>
+        {
+            { propertyName, new[] { $"{entityName} with this {propertyName} already exists." } }
+        };
+    }
+
+    // Constructor for custom field-level errors
+    public ConflictException(Dictionary<string, string[]> errors) 
+        : base("Conflict occurred.")
+    {
+        Errors = errors;
+    }
 }

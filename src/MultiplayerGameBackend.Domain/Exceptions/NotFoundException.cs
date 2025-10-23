@@ -1,6 +1,6 @@
 namespace MultiplayerGameBackend.Domain.Exceptions;
 
-public class NotFoundException(string resourceType, string resourceIdentifier) 
-    : Exception($"{resourceType} with identifier: {resourceIdentifier} doesn't exist")
+public class NotFoundException(string resourceType, string identifier, string identifierValue) 
+    : Exception($"{resourceType} with {identifier}: {identifierValue} doesn't exist.")
 {
 }

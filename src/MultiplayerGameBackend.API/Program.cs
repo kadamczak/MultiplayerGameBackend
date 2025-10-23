@@ -27,6 +27,8 @@ try
     
     if (app.Environment.IsDevelopment())
     {
+        // Enable CORS for local React dev server in development
+        app.UseCors("LocalReact");
         // swagger?
     }
     

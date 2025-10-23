@@ -1,9 +1,6 @@
 @API_HostAddress = https://localhost:7110
 //@Token =
 
-GET {{API_HostAddress}}/v1/weatherforecast/
-Accept: application/json
-
 ###
 
 GET {{API_HostAddress}}/v1/items/1
@@ -21,7 +18,7 @@ Accept: application/json
 
 ###
 
-GET {{API_HostAddress}}/v1/items
+GET {{API_HostAddress}}/v1/items/999
 Accept: application/json
 
 ###
@@ -85,7 +82,7 @@ Content-Type: application/json
 
 {
   "UserName": "author4",
-  "UserEmail": "author4@test.com",
+  "Email": "author4@test.com",
   "Password": "Password1!"
 }
 
@@ -107,7 +104,7 @@ Content-Type: application/json
 X-Client-Type: Browser
 
 {
-    "userName": "author3",
+    "userName": "author3555",
     "Password": "Password1!"
 }
 
