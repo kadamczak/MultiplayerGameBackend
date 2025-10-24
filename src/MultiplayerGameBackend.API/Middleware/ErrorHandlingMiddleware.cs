@@ -41,7 +41,7 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             logger.LogWarning(forbid.Message);
             await WriteProblemAsync(context, new ProblemDetails
             {
-                Title = "Access forbidden",
+                Title = "Access forbidden.",
                 Status = StatusCodes.Status403Forbidden
             });
         }

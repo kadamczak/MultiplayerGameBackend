@@ -26,11 +26,11 @@ public class IdentityService(ILogger<IdentityService> logger,
         // Check if duplicate username or email
         var userSameName = await userManager.FindByNameAsync(dto.UserName);
         if (userSameName is not null)
-            throw new ConflictException(nameof(User), "Username", dto.UserName);
+            throw new ConflictException(nameof(User),  nameof(User.UserName), "Username", dto.UserName);
 
         var userSameEmail = await userManager.FindByEmailAsync(dto.Email);
         if (userSameEmail is not null)
-            throw new ConflictException(nameof(User), nameof(dto.Email), dto.Email);
+            throw new ConflictException(nameof(User), nameof(dto.Email), "Email", dto.Email);
 
         var user = new User
         {
@@ -56,7 +56,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         // Check if username and password are correct
         var user = await userManager.FindByNameAsync(dto.UserName);
         if (user is null)
-            throw new NotFoundException(nameof(User), "Username", dto.UserName);
+            throw new NotFoundException(nameof(User), nameof(User.UserName), "Username", dto.UserName);
 
         var isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
         if (!isPasswordValid)
