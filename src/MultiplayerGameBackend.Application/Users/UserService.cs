@@ -16,10 +16,10 @@ public class UserService(ILogger<UserService> logger,
     {
         logger.LogInformation("Assigning user role: {@Request}", dto);
         var user = await userManager.FindByIdAsync(id.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), id.ToString());
+                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", id.ToString());
 
         var role = await roleManager.FindByNameAsync(dto.RoleName)
-                   ?? throw new NotFoundException(nameof(IdentityRole), nameof(IdentityRole.Name), dto.RoleName);
+                   ?? throw new NotFoundException(nameof(IdentityRole), nameof(IdentityRole.Name), "Name", dto.RoleName);
 
         await userManager.AddToRoleAsync(user, role.Name!);
     }
@@ -28,10 +28,10 @@ public class UserService(ILogger<UserService> logger,
     {
         logger.LogInformation("Unassigning user role: {@Request}", dto);
         var user = await userManager.FindByIdAsync(id.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), id.ToString());
+                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", id.ToString());
 
         var role = await roleManager.FindByNameAsync(dto.RoleName)
-                   ?? throw new NotFoundException(nameof(IdentityRole), nameof(IdentityRole.Name), dto.RoleName);
+                   ?? throw new NotFoundException(nameof(IdentityRole), nameof(IdentityRole.Name), "Name", dto.RoleName);
 
         await userManager.RemoveFromRoleAsync(user, role.Name!);
     }
