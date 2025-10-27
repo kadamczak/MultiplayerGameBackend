@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Items;
+using MultiplayerGameBackend.Application.UserItems;
 using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
 
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IUserItemService, UserItemService>();
         
         services.AddScoped<ItemMapper>();
     }

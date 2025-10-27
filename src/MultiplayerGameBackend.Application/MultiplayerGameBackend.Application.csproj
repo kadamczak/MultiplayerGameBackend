@@ -30,6 +30,7 @@
 
     <ItemGroup>
       <Folder Include="Items\Requests\Validators\" />
+      <Folder Include="UserItems\Requests\" />
       <Folder Include="Users\Responses\" />
     </ItemGroup>
 

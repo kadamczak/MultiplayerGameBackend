@@ -11,6 +11,5 @@ public interface IMultiplayerGameDbContext
     DbSet<UserItem> UserItems { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
     
-    DatabaseFacade Database { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

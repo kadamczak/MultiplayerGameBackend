@@ -1,5 +1,5 @@
 @API_HostAddress = https://localhost:7110
-//@Token =
+@Token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjAxOWExMTY0LTQyZjctNzU0Yy1iYTc2LTBjYzNiYmIzMTQyMCIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJhYmMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhYmNAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTc2MTU3OTEzNSwiaXNzIjoiTXVsdGlwbGF5ZXJHYW1lQmFja2VuZC5BUEkiLCJhdWQiOiJNdWx0aXBsYXllckdhbWVCYWNrZW5kLkNsaWVudCJ9.3Ivo_gqY64CKhzzFzWTtRCBRC9NZ7E-zQ8SZnlhDloA
 
 ###
 
@@ -104,8 +104,8 @@ Content-Type: application/json
 X-Client-Type: Browser
 
 {
-    "userName": "author3555",
-    "Password": "Password1!"
+    "userName": "abc",
+    "Password": "Kupa123"
 }
 
 ### 
@@ -126,7 +126,11 @@ Content-Type: application/json
   "RoleName": "Admineek"
 }
 
+### 
 
+GET {{API_HostAddress}}/v1/users/me/items
+Accept: application/json
+Authorization: Bearer {{Token}}
 
 
 

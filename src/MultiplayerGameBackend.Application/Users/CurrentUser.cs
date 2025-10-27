@@ -1,6 +1,6 @@
 namespace MultiplayerGameBackend.Application.Users;
 
-public class CurrentUser(string Id,
+public record CurrentUser(string Id,
     string UserName,
     string Email,
     IEnumerable<string> Roles)
