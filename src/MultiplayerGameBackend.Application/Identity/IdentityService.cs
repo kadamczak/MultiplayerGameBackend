@@ -174,7 +174,7 @@ public class IdentityService(ILogger<IdentityService> logger,
             issuer: configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured."),
             audience: configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured."),
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(30),
+            expires: DateTime.UtcNow.AddMinutes(1),
             signingCredentials: creds
         );
         

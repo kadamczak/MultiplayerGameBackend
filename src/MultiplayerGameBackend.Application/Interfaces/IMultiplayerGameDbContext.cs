@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using MultiplayerGameBackend.Domain.Entities;
 
@@ -10,6 +11,9 @@ public interface IMultiplayerGameDbContext
     DbSet<User> Users { get; }
     DbSet<UserItem> UserItems { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
+    
+    DatabaseFacade Database { get; }
+    EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

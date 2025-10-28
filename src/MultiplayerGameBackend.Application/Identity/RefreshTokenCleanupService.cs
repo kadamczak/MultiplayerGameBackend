@@ -53,14 +53,11 @@ public class RefreshTokenCleanupService(
         var dbContext = scope.ServiceProvider.GetRequiredService<IMultiplayerGameDbContext>();
 
         var now = DateTime.UtcNow;
-        var cutoffDate = DateTime.UtcNow.AddDays(-30); // Keep revoked tokens for 30 days
 
         var deletedCount = await dbContext.RefreshTokens
             .Where(rt =>
                 // Remove all expired tokens
-                rt.ExpiresAt < now ||
-                // Remove revoked tokens older than retention (theft detection window)
-                (rt.RevokedAt != null && rt.RevokedAt < cutoffDate))
+                rt.ExpiresAt < now)
             .ExecuteDeleteAsync(cancellationToken);
         
         logger.LogInformation("Deleted {Count} expired/old refresh tokens.", deletedCount);

@@ -61,7 +61,7 @@ public class IdentityController(IIdentityService identityService,
     [HttpPost("refresh")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<TokenResponseDto>> Refresh(string? refreshTokenFromBody, CancellationToken cancellationToken)
+    public async Task<ActionResult<TokenResponseDto>> Refresh([FromBody] string? refreshTokenFromBody, CancellationToken cancellationToken)
     {
         // Get client type from header
         var (clientType, clientTypeError) = GetClientType();
@@ -91,11 +91,11 @@ public class IdentityController(IIdentityService identityService,
         
         return Ok(tokens);
     }
-
-    [Authorize]
+    
+    
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Logout(string? refreshToken, CancellationToken cancellationToken)
+    public async Task<IActionResult> Logout([FromBody] string? refreshToken, CancellationToken cancellationToken)
     {
         // Get client type from header
         var (clientType, clientTypeError) = GetClientType();
@@ -110,9 +110,7 @@ public class IdentityController(IIdentityService identityService,
 
         // Clear refresh token cookie for browser clients
         if (clientType == ClientTypes.Browser)
-        {
-            Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/v1/identity/refresh" });
-        }
+            Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/v1/identity" });
 
         return NoContent();
     }
@@ -143,7 +141,7 @@ public class IdentityController(IIdentityService identityService,
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Path = "/v1/identity/refresh",
+            Path = "/v1/identity",
             Expires = DateTime.UtcNow.AddDays(7)
         };
         Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
