@@ -43,7 +43,7 @@ public class IdentityController(IIdentityService identityService,
         var tokens = await identityService.Login(clientType, ipAddress, dto, cancellationToken);
         
         // if clientType is "Browser":
-        // 1. send refresh token as HttpOnly Secure cookie with SameSite=Strict and Path=/v1/identity/refresh
+        // 1. send refresh token as HttpOnly Secure cookie with SameSite=Strict and Path=/v1/identity/
         // 2. send access token in response body (to be stored in memory by the client)
         if (clientType == ClientTypes.Browser)
         {

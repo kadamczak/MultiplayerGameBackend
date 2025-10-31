@@ -73,10 +73,13 @@ public class MultiplayerGameDbContext
                 .IsRequired()
                 .HasMaxLength(User.Constraints.PasswordHashMaxLength);
 
+            entity.Property(e => e.Balance)
+                .HasDefaultValue(User.Constraints.StartingBalance);
+
             entity.HasMany(u => u.UserItems)
                 .WithOne(ui => ui.User)
                 .HasForeignKey(ui => ui.UserId)
-                .OnDelete(DeleteBehavior.Cascade);;
+                .OnDelete(DeleteBehavior.Cascade);
             
             entity.HasMany(u => u.RefreshTokens)
                 .WithOne(ui => ui.User)

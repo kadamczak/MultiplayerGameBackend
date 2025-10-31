@@ -35,7 +35,8 @@ public class IdentityService(ILogger<IdentityService> logger,
         var user = new User
         {
             UserName = dto.UserName.Trim(),
-            Email = dto.Email.Trim()
+            Email = dto.Email.Trim(),
+            Balance = User.Constraints.StartingBalance
         };
 
         // Save user and assign "User" role
@@ -174,7 +175,7 @@ public class IdentityService(ILogger<IdentityService> logger,
             issuer: configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured."),
             audience: configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured."),
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(1),
+            expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds
         );
         

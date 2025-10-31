@@ -4,18 +4,19 @@ using MultiplayerGameBackend.Application.Extensions;
 using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
+using MultiplayerGameBackend.Application.Users.Responses;
 using MultiplayerGameBackend.Domain.Constants;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/users")]
-//[Authorize]
+[Authorize]
 public class UserController(ModifyUserRoleDtoValidator modifyUserRoleDtoValidator,
     IUserService userService) : ControllerBase
 {
     [HttpPost("{id:guid}/roles")]
-    //[Authorize(Roles = UserRoles.Admin)]
+    [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -31,7 +32,7 @@ public class UserController(ModifyUserRoleDtoValidator modifyUserRoleDtoValidato
     }
 
     [HttpDelete("{id:guid}/roles")]
-    //[Authorize(Roles = UserRoles.Admin)]
+    [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -44,5 +45,14 @@ public class UserController(ModifyUserRoleDtoValidator modifyUserRoleDtoValidato
         
         await userService.UnassignUserRole(id, dto, cancellationToken);
         return NoContent();
+    }
+    
+    [HttpGet("me/game-info")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserGameInfoDto))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetCurrentUserGameInfo(CancellationToken cancellationToken)
+    {
+        var userGameInfo = await userService.GetCurrentUserGameInfo(cancellationToken);
+        return Ok(userGameInfo);
     }
 }

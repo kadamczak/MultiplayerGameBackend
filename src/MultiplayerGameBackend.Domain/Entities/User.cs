@@ -16,7 +16,11 @@ public class User : IdentityUser<Guid>
         public const int PasswordHashMaxLength = 512;
         public const int RawPasswordMinLength = 6;
         public const int RawPasswordMaxLength = 256;
+        
+        public const int StartingBalance = 300;
     }
+    
+    public int Balance { get; set; } = Constraints.StartingBalance;
     
     public List<UserItem> UserItems { get; set; } = [];
     public List<RefreshToken> RefreshTokens { get; set; } = [];

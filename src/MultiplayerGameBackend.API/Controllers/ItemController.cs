@@ -10,7 +10,7 @@ namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/items")]
-//[Authorize]
+[Authorize]
 public class ItemController(IItemService itemService) : ControllerBase
 {
     [HttpGet("{id:int}")]
