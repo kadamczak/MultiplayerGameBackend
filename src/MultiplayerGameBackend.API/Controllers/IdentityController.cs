@@ -31,11 +31,13 @@ public class IdentityController(IIdentityService identityService,
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<TokenResponseDto>> Login([FromBody] LoginDto dto, CancellationToken cancellationToken)
+    public async Task<ActionResult<TokenResponseDto>> Login(
+        [FromBody] LoginDto dto,
+        [FromHeader(Name = "X-Client-Type")] string clientType,
+        CancellationToken cancellationToken)
     {
-        var (clientType, clientTypeError) = GetClientType();
-        if (clientTypeError is not null || clientType is null)
-            return BadRequest(clientTypeError);
+        if (string.IsNullOrWhiteSpace(clientType) || !ClientTypes.IsValidClientType(clientType))
+            return BadRequest("Invalid or missing X-Client-Type header.");
         
         if (HttpContext.Connection.RemoteIpAddress is not { } ipAddress)
             return BadRequest("Unable to determine client IP address.");
@@ -61,12 +63,13 @@ public class IdentityController(IIdentityService identityService,
     [HttpPost("refresh")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<TokenResponseDto>> Refresh([FromBody] string? refreshTokenFromBody, CancellationToken cancellationToken)
+    public async Task<ActionResult<TokenResponseDto>> Refresh(
+        [FromBody] string? refreshTokenFromBody,
+        [FromHeader(Name = "X-Client-Type")] string clientType,
+        CancellationToken cancellationToken)
     {
-        // Get client type from header
-        var (clientType, clientTypeError) = GetClientType();
-        if (clientTypeError is not null || clientType is null)
-            return BadRequest(clientTypeError);
+        if (string.IsNullOrWhiteSpace(clientType) || !ClientTypes.IsValidClientType(clientType))
+            return BadRequest("Invalid or missing X-Client-Type header.");
 
         // Get refresh token based on client type
         var tokenToUse = GetRefreshTokenFromClient(refreshTokenFromBody, clientType);
@@ -95,12 +98,13 @@ public class IdentityController(IIdentityService identityService,
     
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Logout([FromBody] string? refreshToken, CancellationToken cancellationToken)
+    public async Task<IActionResult> Logout(
+        [FromBody] string? refreshToken,
+        [FromHeader(Name = "X-Client-Type")] string clientType,
+        CancellationToken cancellationToken)
     {
-        // Get client type from header
-        var (clientType, clientTypeError) = GetClientType();
-        if (clientTypeError is not null || clientType is null)
-            return BadRequest(clientTypeError);
+        if (string.IsNullOrWhiteSpace(clientType) || !ClientTypes.IsValidClientType(clientType))
+            return BadRequest("Invalid or missing X-Client-Type header.");
 
         // Get refresh token based on client type
         var tokenToUse = GetRefreshTokenFromClient(refreshToken, clientType);
@@ -113,25 +117,6 @@ public class IdentityController(IIdentityService identityService,
             Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/v1/identity" });
 
         return NoContent();
-    }
-    
-    private (string? clientType, IActionResult? error) GetClientType()
-    {
-        if (!Request.Headers.TryGetValue("X-Client-Type", out var clientTypeValues))
-            return (null, BadRequest("X-Client-Type header is required."));
-        
-        if (clientTypeValues.Count > 1)
-            return (null, BadRequest("Multiple X-Client-Type header values are not allowed."));
-
-        var clientType = clientTypeValues[0];
-
-        if (string.IsNullOrWhiteSpace(clientType))
-            return (null, BadRequest("X-Client-Type header value cannot be empty."));
-
-        if (!ClientTypes.IsValidClientType(clientType))
-            return (null, BadRequest("Invalid X-Client-Type header value."));
-
-        return (clientType, null);
     }
     
     private void AppendRefreshTokenCookie(string refreshToken)

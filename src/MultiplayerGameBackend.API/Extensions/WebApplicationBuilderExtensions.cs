@@ -6,6 +6,7 @@ using System.Text;
 using MultiplayerGameBackend.API.Middleware;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
+using Microsoft.OpenApi.Models;
 using Serilog;
 
 namespace MultiplayerGameBackend.API.Extensions;
@@ -51,6 +52,43 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddAuthorization();
         
         builder.Services.AddControllers();
+
+        // Add Swagger/OpenAPI
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Multiplayer Game Backend API",
+                Version = "v1",
+                Description = "Backend API for multiplayer game with authentication and user management"
+            });
+            
+            // Add JWT authentication to Swagger
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
         // Add CORS policy for local React dev server
         builder.Services.AddCors(options =>

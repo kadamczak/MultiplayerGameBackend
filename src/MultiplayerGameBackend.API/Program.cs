@@ -29,7 +29,14 @@ try
     {
         // Enable CORS for local React dev server in development
         app.UseCors("LocalReact");
-        // swagger?
+        
+        // Enable Swagger
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Multiplayer Game Backend API v1");
+            options.RoutePrefix = "swagger"; // Access at /swagger
+        });
     }
     
     app.UseHttpsRedirection();
