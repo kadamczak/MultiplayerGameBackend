@@ -58,7 +58,7 @@ public class UserService(ILogger<UserService> logger,
         var userGameInfo = new UserGameInfoDto
         {
             Id = userId,
-            Username = currentUser.UserName!,
+            UserName = currentUser.UserName!,
             Balance = user.Balance
         };
         

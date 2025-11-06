@@ -50,7 +50,7 @@ public class UserController(ModifyUserRoleDtoValidator modifyUserRoleDtoValidato
     [HttpGet("me/game-info")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserGameInfoDto))]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetCurrentUserGameInfo(CancellationToken cancellationToken)
+    public async Task<ActionResult<UserGameInfoDto>> GetCurrentUserGameInfo(CancellationToken cancellationToken)
     {
         var userGameInfo = await userService.GetCurrentUserGameInfo(cancellationToken);
         return Ok(userGameInfo);
