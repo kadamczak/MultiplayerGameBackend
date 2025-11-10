@@ -22,4 +22,5 @@ public class Item
     public required string Description { get; set; }
     
     public List<UserItem> UserItems { get; set; } = [];
+    public List<MerchantItemOffer> MerchantItemOffers { get; set; } = [];
 }

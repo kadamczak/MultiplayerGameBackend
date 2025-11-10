@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace MultiplayerGameBackend.Domain.Entities;
@@ -18,8 +19,11 @@ public class User : IdentityUser<Guid>
         public const int RawPasswordMaxLength = 256;
         
         public const int StartingBalance = 300;
+        public const int MinBalance = 0;
+        public const int MaxBalance = 999_999;
     }
     
+    [Range(Constraints.MinBalance, Constraints.MaxBalance)]
     public int Balance { get; set; } = Constraints.StartingBalance;
     
     public List<UserItem> UserItems { get; set; } = [];

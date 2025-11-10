@@ -36,6 +36,27 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
                 Status = StatusCodes.Status409Conflict
             });
         }
+        catch (UnprocessableEntityException unprocessableEntity)
+        {
+            logger.LogWarning(unprocessableEntity.Message);
+            
+            if (unprocessableEntity.Errors != null)
+            {
+                await WriteValidationProblemAsync(context, new ValidationProblemDetails(unprocessableEntity.Errors)
+                {
+                    Title = "One or more errors occurred.",
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+            else
+            {
+                await WriteProblemAsync(context, new ProblemDetails
+                {
+                    Title = unprocessableEntity.Message,
+                    Status = StatusCodes.Status422UnprocessableEntity
+                });
+            }
+        }
         catch (ForbidException forbid)
         {
             logger.LogWarning(forbid.Message);

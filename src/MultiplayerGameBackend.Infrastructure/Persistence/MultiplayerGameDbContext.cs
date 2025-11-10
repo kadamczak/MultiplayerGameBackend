@@ -17,6 +17,8 @@ public class MultiplayerGameDbContext
     public DbSet<Item> Items { get; set; }
     public new DbSet<User> Users { get; set; }
     public DbSet<UserItem> UserItems { get; set; }
+    public DbSet<InGameMerchant> InGameMerchants { get; set; }
+    public DbSet<MerchantItemOffer> MerchantItemOffers { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +28,8 @@ public class MultiplayerGameDbContext
         ConfigureItemEntities(modelBuilder);
         ConfigureUserEntities(modelBuilder);
         ConfigureUserItemEntities(modelBuilder);
+        ConfigureInGameMerchantEntities(modelBuilder);
+        ConfigureMerchantItemOfferEntities(modelBuilder);
         ConfigureRefreshTokenEntities(modelBuilder);
     }
 
@@ -39,6 +43,11 @@ public class MultiplayerGameDbContext
             entity.HasMany(i => i.UserItems)
                 .WithOne(ui => ui.Item)
                 .HasForeignKey(ui => ui.ItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasMany(i => i.MerchantItemOffers)
+                .WithOne(o => o.Item)
+                .HasForeignKey(o => o.ItemId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }
@@ -103,8 +112,36 @@ public class MultiplayerGameDbContext
                 .HasForeignKey(e => e.ItemId);
         });
     }
+    private static void ConfigureInGameMerchantEntities(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<InGameMerchant>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasMany(m => m.ItemOffers)
+                .WithOne(o => o.Merchant)
+                .HasForeignKey(o => o.MerchantId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
     
-    private void ConfigureRefreshTokenEntities(ModelBuilder modelBuilder)
+    private static void ConfigureMerchantItemOfferEntities(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MerchantItemOffer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(o => o.Item)
+                .WithMany(i => i.MerchantItemOffers)
+                .HasForeignKey(o => o.ItemId);
+
+            entity.HasOne(o => o.Merchant)
+                .WithMany(m => m.ItemOffers)
+                .HasForeignKey(o => o.MerchantId);
+        });
+    }
+    
+    private static void ConfigureRefreshTokenEntities(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<RefreshToken>(entity =>
         {

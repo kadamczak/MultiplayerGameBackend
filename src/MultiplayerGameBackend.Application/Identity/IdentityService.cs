@@ -122,7 +122,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         {
             AccessToken = accessToken,
             RefreshToken = newRefreshTokenPlain,
-            ExpiresInSeconds = 3600
+            ExpiresInSeconds = 900
         };
     }
 

@@ -28,6 +28,13 @@ internal class MultiplayerGameSeeder(MultiplayerGameDbContext dbContext) : IMult
                 dbContext.Items.AddRange(items);
                 await dbContext.SaveChangesAsync();
             }
+
+            if (!dbContext.InGameMerchants.Any())
+            {
+                var merchants = GetMerchants();
+                dbContext.InGameMerchants.AddRange(merchants);
+                await dbContext.SaveChangesAsync();
+            }
         }
     }
 
@@ -38,6 +45,20 @@ internal class MultiplayerGameSeeder(MultiplayerGameDbContext dbContext) : IMult
 
     private static IEnumerable<Item> GetItems() => [
         new Item() { Id = 1, Name = "Fire Staff", Description = "Burns enemies."},
-        new Item() { Id = 2, Name = "Ice Staff", Description = "Freezes enemies." }
+        new Item() { Id = 2, Name = "Ice Staff", Description = "Freezes enemies." },
+        new Item() { Id = 3, Name = "Mage Hat", Description = "Stylish." },
+        new Item() { Id = 4, Name = "Headphones", Description = "High-fidelity!" }
+    ];
+    
+    private static IEnumerable<InGameMerchant> GetMerchants() => [
+        new InGameMerchant()
+        {
+            Id = 1,
+            ItemOffers = [
+                new MerchantItemOffer() { ItemId = 1, Price = 100 },
+                new MerchantItemOffer() { ItemId = 3, Price = 150 },
+                new MerchantItemOffer() { ItemId = 4, Price = 170 }
+            ]
+        }
     ];
 }

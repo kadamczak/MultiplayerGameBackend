@@ -11,9 +11,11 @@ public interface IMultiplayerGameDbContext
     DbSet<User> Users { get; }
     DbSet<UserItem> UserItems { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
+    DbSet<InGameMerchant> InGameMerchants { get; }
+    DbSet<MerchantItemOffer> MerchantItemOffers { get; }
     
-    DatabaseFacade Database { get; }
-    EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
+    // DatabaseFacade Database { get; }
+    // EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
