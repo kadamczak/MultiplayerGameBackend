@@ -19,7 +19,7 @@ public class InGameMerchantController(IInGameMerchantService inGameMerchantServi
         return Ok(offers);
     }
     
-    [HttpPost("/offers/{offerId:int}/purchase")]
+    [HttpPost("offers/{offerId:int}/purchase")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)] // When insufficient funds
     [ProducesResponseType(StatusCodes.Status404NotFound)]
