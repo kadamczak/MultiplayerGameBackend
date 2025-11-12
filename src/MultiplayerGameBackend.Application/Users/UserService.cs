@@ -16,7 +16,8 @@ public class UserService(ILogger<UserService> logger,
     UserManager<User> userManager,
     RoleManager<IdentityRole<Guid>> roleManager,
     IUserContext userContext,
-    IMultiplayerGameDbContext dbContext) : IUserService
+    IMultiplayerGameDbContext dbContext,
+    UserCustomizationMapper customizationMapper) : IUserService
 {
 
     public async Task AssignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken)
@@ -93,32 +94,15 @@ public class UserService(ILogger<UserService> logger,
 
         if (existingCustomization is not null)
         {
-            existingCustomization.BodyColor = dto.BodyColor;
-            existingCustomization.EyeColor = dto.EyeColor;
-            existingCustomization.WingColor = dto.WingColor;
-            existingCustomization.HornColor = dto.HornColor;
-            existingCustomization.MarkingsColor = dto.MarkingsColor;
-            existingCustomization.WingType = dto.WingType;
-            existingCustomization.HornType = dto.HornType;
-            existingCustomization.MarkingsType = dto.MarkingsType;
+            customizationMapper.UpdateFromDto(dto, existingCustomization);
             existingCustomization.UserId = userId;
             
             logger.LogInformation("Updated existing customization for user {UserId}", userId);
         }
         else
         {
-            var newCustomization = new UserCustomization()
-            {
-                BodyColor = dto.BodyColor,
-                EyeColor = dto.EyeColor,
-                WingColor = dto.WingColor,
-                HornColor = dto.HornColor,
-                MarkingsColor = dto.MarkingsColor,
-                WingType = dto.WingType,
-                HornType = dto.HornType,
-                MarkingsType = dto.MarkingsType,
-                UserId = userId
-            };
+            var newCustomization = customizationMapper.Map(dto);
+            newCustomization.UserId = userId;
 
             await dbContext.UserCustomizations.AddAsync(newCustomization, cancellationToken);
             logger.LogInformation("Created new customization for user {UserId}", userId);

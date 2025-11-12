@@ -28,5 +28,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IInGameMerchantService, InGameMerchantService>();
         
         services.AddScoped<ItemMapper>();
+        services.AddScoped<UserCustomizationMapper>();
     }
 }
