@@ -9,5 +9,7 @@ public interface IUserService
     Task UnassignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken);
     
     Task<UserGameInfoDto> GetCurrentUserGameInfo(CancellationToken cancellationToken);
+
+    Task<ReadUserCustomizationDto?> GetUserCustomization(Guid userId, CancellationToken cancellationToken);
     Task UpdateUserCustomization(UpdateUserCustomizationDto dto, CancellationToken cancellationToken);
 }

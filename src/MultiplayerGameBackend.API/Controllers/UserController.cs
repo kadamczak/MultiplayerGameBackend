@@ -57,6 +57,17 @@ public class UserController(
         var userGameInfo = await userService.GetCurrentUserGameInfo(cancellationToken);
         return Ok(userGameInfo);
     }
+    
+    [HttpGet("{userId:guid}/customization")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReadUserCustomizationDto))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ReadUserCustomizationDto>> GetUserCustomization(Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var customization = await userService.GetUserCustomization(userId, cancellationToken);
+        return customization is null ? NotFound() : Ok(customization);
+    }
 
     [HttpPut("me/customization")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

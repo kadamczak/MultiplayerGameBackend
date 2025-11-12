@@ -6,7 +6,6 @@ using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Responses;
-using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 
@@ -68,6 +67,22 @@ public class UserService(ILogger<UserService> logger,
         };
         
         return userGameInfo;
+    }
+    
+    public async Task<ReadUserCustomizationDto?> GetUserCustomization(Guid userId, CancellationToken cancellationToken)
+    {
+        var customization = await dbContext.UserCustomizations
+            .FirstOrDefaultAsync(uc => uc.UserId == userId, cancellationToken);
+        
+        if (customization is null)
+        {
+            logger.LogInformation("No customization found for user {UserId}", userId);
+            return null;
+        }
+
+        var customizationDto = customizationMapper.Map(customization);
+        logger.LogInformation("Fetched customization for user {UserId}", userId);
+        return customizationDto;
     }
 
     public async Task UpdateUserCustomization(UpdateUserCustomizationDto dto, CancellationToken cancellationToken)
