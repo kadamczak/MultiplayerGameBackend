@@ -28,4 +28,7 @@ public class User : IdentityUser<Guid>
     
     public List<UserItem> UserItems { get; set; } = [];
     public List<RefreshToken> RefreshTokens { get; set; } = [];
+    
+    public int? CustomizationId { get; set; }
+    public UserCustomization? Customization { get; set; }
 }

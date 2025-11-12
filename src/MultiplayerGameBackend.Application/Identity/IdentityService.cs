@@ -77,7 +77,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         var refreshTokenPlain = GenerateRefreshToken();
         var refreshTokenEntity = CreateRefreshTokenEntity(clientType, ipAddress, user.Id, refreshTokenPlain);
 
-        dbContext.RefreshTokens.Add(refreshTokenEntity);
+        await dbContext.RefreshTokens.AddAsync(refreshTokenEntity, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         // Return tokens
@@ -85,7 +85,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         {
             AccessToken = accessToken,
             RefreshToken = refreshTokenPlain,
-            ExpiresInSeconds = 3600
+            ExpiresInSeconds = 900
         };
     }
 
@@ -114,7 +114,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         var newRefreshTokenPlain = GenerateRefreshToken();
         var newRefreshTokenEntity = CreateRefreshTokenEntity(clientType, ipAddress, user.Id, newRefreshTokenPlain);
         
-        dbContext.RefreshTokens.Add(newRefreshTokenEntity);
+        await dbContext.RefreshTokens.AddAsync(newRefreshTokenEntity, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         // Return new tokens

@@ -106,7 +106,7 @@ public class InGameMerchantService(ILogger<InGameMerchantService> logger,
             ItemId = offer.ItemId,
         };
 
-        dbContext.UserItems.Add(userItem);
+        await dbContext.UserItems.AddAsync(userItem, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
         logger.LogInformation("User {UserId} successfully purchased offer {OfferId}", userId, offerId);
     }

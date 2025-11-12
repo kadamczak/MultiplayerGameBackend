@@ -17,6 +17,7 @@ public class MultiplayerGameDbContext
     public DbSet<Item> Items { get; set; }
     public new DbSet<User> Users { get; set; }
     public DbSet<UserItem> UserItems { get; set; }
+    public DbSet<UserCustomization> UserCustomizations { get; set; }
     public DbSet<InGameMerchant> InGameMerchants { get; set; }
     public DbSet<MerchantItemOffer> MerchantItemOffers { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -28,6 +29,7 @@ public class MultiplayerGameDbContext
         ConfigureItemEntities(modelBuilder);
         ConfigureUserEntities(modelBuilder);
         ConfigureUserItemEntities(modelBuilder);
+        ConfigureUserCustomizationEntities(modelBuilder);
         ConfigureInGameMerchantEntities(modelBuilder);
         ConfigureMerchantItemOfferEntities(modelBuilder);
         ConfigureRefreshTokenEntities(modelBuilder);
@@ -94,6 +96,11 @@ public class MultiplayerGameDbContext
                 .WithOne(ui => ui.User)
                 .HasForeignKey(ui => ui.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasOne(u => u.Customization)
+                .WithOne(uc => uc.User)
+                .HasForeignKey<UserCustomization>(uc => uc.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
     
@@ -112,6 +119,15 @@ public class MultiplayerGameDbContext
                 .HasForeignKey(e => e.ItemId);
         });
     }
+    
+    private static void ConfigureUserCustomizationEntities(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserCustomization>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+    }
+    
     private static void ConfigureInGameMerchantEntities(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<InGameMerchant>(entity =>

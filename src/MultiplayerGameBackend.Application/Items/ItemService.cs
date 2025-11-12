@@ -55,7 +55,7 @@ public class ItemService(ILogger<ItemService> logger,
         item.Name = item.Name.Trim();
         item.Description = item.Description.Trim();
         
-        dbContext.Items.Add(item);
+        await dbContext.Items.AddAsync(item, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
         return item.Id;
     }

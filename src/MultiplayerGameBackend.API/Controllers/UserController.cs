@@ -12,7 +12,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 [ApiController]
 [Route("v1/users")]
 [Authorize]
-public class UserController(ModifyUserRoleDtoValidator modifyUserRoleDtoValidator,
+public class UserController(
+    ModifyUserRoleDtoValidator modifyUserRoleDtoValidator,
     IUserService userService) : ControllerBase
 {
     [HttpPost("{id:guid}/roles")]
@@ -26,7 +27,7 @@ public class UserController(ModifyUserRoleDtoValidator modifyUserRoleDtoValidato
         var validationResult = await modifyUserRoleDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
-        
+
         await userService.AssignUserRole(id, dto, cancellationToken);
         return NoContent();
     }
@@ -37,16 +38,17 @@ public class UserController(ModifyUserRoleDtoValidator modifyUserRoleDtoValidato
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UnassignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> UnassignUserRole(Guid id, ModifyUserRoleDto dto,
+        CancellationToken cancellationToken)
     {
         var validationResult = await modifyUserRoleDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
             return BadRequest(validationResult.ToDictionary());
-        
+
         await userService.UnassignUserRole(id, dto, cancellationToken);
         return NoContent();
     }
-    
+
     [HttpGet("me/game-info")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserGameInfoDto))]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -54,5 +56,16 @@ public class UserController(ModifyUserRoleDtoValidator modifyUserRoleDtoValidato
     {
         var userGameInfo = await userService.GetCurrentUserGameInfo(cancellationToken);
         return Ok(userGameInfo);
+    }
+
+    [HttpPut("me/customization")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UpdateUserCustomization(UpdateUserCustomizationDto dto,
+        CancellationToken cancellationToken)
+    {
+        await userService.UpdateUserCustomization(dto, cancellationToken);
+        return NoContent();
     }
 }
