@@ -52,20 +52,12 @@ public class UserController(
     [HttpGet("me/game-info")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserGameInfoDto))]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<UserGameInfoDto>> GetCurrentUserGameInfo(CancellationToken cancellationToken)
+    public async Task<ActionResult<UserGameInfoDto>> GetCurrentUserGameInfo(
+        [FromQuery] bool includeCustomization = false, 
+        CancellationToken cancellationToken = default)
     {
-        var userGameInfo = await userService.GetCurrentUserGameInfo(cancellationToken);
+        var userGameInfo = await userService.GetCurrentUserGameInfo(includeCustomization, cancellationToken);
         return Ok(userGameInfo);
-    }
-    
-    [HttpGet("me/customization")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReadUserCustomizationDto))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ReadUserCustomizationDto>> GetUserCustomization(CancellationToken cancellationToken)
-    {
-        var customization = await userService.GetCurrentUserCustomization(cancellationToken);
-        return customization is null ? NotFound() : Ok(customization);
     }
 
     [HttpPut("me/customization")]

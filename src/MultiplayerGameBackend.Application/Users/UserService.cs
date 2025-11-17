@@ -43,7 +43,7 @@ public class UserService(ILogger<UserService> logger,
         await userManager.RemoveFromRoleAsync(user, role.Name!);
     }
 
-    public async Task<UserGameInfoDto> GetCurrentUserGameInfo(CancellationToken cancellationToken)
+    public async Task<UserGameInfoDto> GetCurrentUserGameInfo(bool includeCustomization, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
         var userId = Guid.Parse(currentUser.Id);
@@ -51,34 +51,28 @@ public class UserService(ILogger<UserService> logger,
         var user = await userManager.FindByIdAsync(userId.ToString())
                    ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
         
+        ReadUserCustomizationDto? customizationDto = null;
+        
+        if (includeCustomization)
+        {
+            var customization = await dbContext.UserCustomizations
+                .FirstOrDefaultAsync(uc => uc.UserId == userId, cancellationToken);
+            
+            if (customization is not null)
+                customizationDto = customizationMapper.Map(customization);
+        }
+        
         var userGameInfo = new UserGameInfoDto
         {
             Id = userId,
             UserName = currentUser.UserName!,
-            Balance = user.Balance
+            Balance = user.Balance,
+            Customization = customizationDto
         };
         
         return userGameInfo;
     }
     
-    public async Task<ReadUserCustomizationDto?> GetCurrentUserCustomization(CancellationToken cancellationToken)
-    {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
-        var userId = Guid.Parse(currentUser.Id);
-        
-        var customization = await dbContext.UserCustomizations
-            .FirstOrDefaultAsync(uc => uc.UserId == userId, cancellationToken);
-        
-        if (customization is null)
-        {
-            logger.LogInformation("No customization found for user {UserId}", userId);
-            return null;
-        }
-
-        var customizationDto = customizationMapper.Map(customization);
-        logger.LogInformation("Fetched customization for user {UserId}", userId);
-        return customizationDto;
-    }
 
     public async Task UpdateUserCustomization(UpdateUserCustomizationDto dto, CancellationToken cancellationToken)
     {

@@ -17,6 +17,5 @@ public class ReadUserCustomizationDto
     public int WingType { get; set; }
     public int HornType { get; set; }
     public int MarkingsType { get; set;}
-    
-    public Guid UserId { get; set; }
+
 }
