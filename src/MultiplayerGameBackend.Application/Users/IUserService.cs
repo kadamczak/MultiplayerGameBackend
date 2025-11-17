@@ -10,6 +10,6 @@ public interface IUserService
     
     Task<UserGameInfoDto> GetCurrentUserGameInfo(CancellationToken cancellationToken);
 
-    Task<ReadUserCustomizationDto?> GetUserCustomization(Guid userId, CancellationToken cancellationToken);
+    Task<ReadUserCustomizationDto?> GetCurrentUserCustomization(CancellationToken cancellationToken);
     Task UpdateUserCustomization(UpdateUserCustomizationDto dto, CancellationToken cancellationToken);
 }

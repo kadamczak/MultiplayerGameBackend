@@ -45,17 +45,9 @@ public class UserService(ILogger<UserService> logger,
 
     public async Task<UserGameInfoDto> GetCurrentUserGameInfo(CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser();
-        
-        if (currentUser is null)
-        {
-            logger.LogWarning("Attempt to fetch data for unauthenticated user");
-            throw new ForbidException();
-        }
-        
-        logger.LogInformation("Fetching game info for user {UserId}", currentUser.Id);
-        
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
         var userId = Guid.Parse(currentUser.Id);
+        
         var user = await userManager.FindByIdAsync(userId.ToString())
                    ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
         
@@ -69,8 +61,11 @@ public class UserService(ILogger<UserService> logger,
         return userGameInfo;
     }
     
-    public async Task<ReadUserCustomizationDto?> GetUserCustomization(Guid userId, CancellationToken cancellationToken)
+    public async Task<ReadUserCustomizationDto?> GetCurrentUserCustomization(CancellationToken cancellationToken)
     {
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var userId = Guid.Parse(currentUser.Id);
+        
         var customization = await dbContext.UserCustomizations
             .FirstOrDefaultAsync(uc => uc.UserId == userId, cancellationToken);
         
@@ -87,16 +82,7 @@ public class UserService(ILogger<UserService> logger,
 
     public async Task UpdateUserCustomization(UpdateUserCustomizationDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser();
-
-        if (currentUser is null)
-        {
-            logger.LogWarning("Attempt to update customization for unauthenticated user");
-            throw new ForbidException();
-        }
-
-        logger.LogInformation("Updating customization for user {UserId}", currentUser.Id);
-
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
         var userId = Guid.Parse(currentUser.Id);
         
         // Verify user exists

@@ -26,4 +26,6 @@ public class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContex
 
         return new CurrentUser(userId, userName, email, roles);
     }
+    
+    
 }

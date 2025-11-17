@@ -14,16 +14,7 @@ public class UserItemService(ILogger<UserItemService> logger,
 {
     public async Task<IEnumerable<ReadUserItemDto>> GetCurrentUserItems(CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser();
-        
-        if (currentUser is null)
-        {
-            logger.LogWarning("Attempt to fetch items for unauthenticated user");
-            throw new ForbidException();
-        }
-        
-        logger.LogInformation("Fetching items for user {UserId}", currentUser.Id);
-        
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
         var userId = Guid.Parse(currentUser.Id);
 
         var userItems = await dbContext.UserItems
