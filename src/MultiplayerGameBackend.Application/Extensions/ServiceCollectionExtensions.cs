@@ -4,6 +4,7 @@ using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.Items;
+using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItems;
 using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
@@ -25,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUserItemService, UserItemService>();
+        services.AddScoped<IUserItemOfferService, UserItemOfferService>();
         services.AddScoped<IMerchantItemOfferService, MerchantItemOfferService>();
         
         services.AddScoped<ItemMapper>();

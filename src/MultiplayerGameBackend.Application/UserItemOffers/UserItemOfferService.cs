@@ -48,9 +48,46 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         return offers;
     }
 
-    public Task CreateOffer(CreateUserItemOfferDto dto, CancellationToken cancellationToken)
+    public async Task CreateOffer(CreateUserItemOfferDto dto, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var userId = Guid.Parse(currentUser.Id);
+        logger.LogInformation("User {UserId} attempting to create offer for UserItem {UserItemId}", userId, dto.UserItemId);
+        
+        var userItem = await dbContext.UserItems
+            .Include(ui => ui.Offer)
+            .FirstOrDefaultAsync(ui => ui.Id == dto.UserItemId, cancellationToken);
+        
+        if (userItem is null)
+        {
+            logger.LogWarning("UserItem {UserItemId} not found", dto.UserItemId);
+            throw new NotFoundException(nameof(UserItem), nameof(UserItem.Id), "ID", dto.UserItemId.ToString());
+        }
+        
+        // Check if the user owns this UserItem
+        if (userItem.UserId != userId)
+        {
+            logger.LogWarning("User {UserId} attempted to create offer for UserItem {UserItemId} that doesn't belong to them", userId, dto.UserItemId);
+            throw new ForbidException();
+        }
+        
+        // Check if an offer already exists for this UserItem
+        if (userItem.Offer is not null)
+        {
+            logger.LogWarning("Offer already exists for UserItem {UserItemId}", dto.UserItemId);
+            throw new ConflictException(nameof(UserItemOffer), nameof(dto.UserItemId), "UserItem", dto.UserItemId.ToString());
+        }
+        
+        var offer = new UserItemOffer
+        {
+            Id = Guid.NewGuid(),
+            UserItemId = dto.UserItemId,
+            Price = dto.Price
+        };
+        
+        dbContext.UserItemOffers.Add(offer);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("User {UserId} successfully created offer {OfferId} for UserItem {UserItemId}", userId, offer.Id, dto.UserItemId);
     }
 
     public async Task DeleteOffer(Guid offerId, CancellationToken cancellationToken)
