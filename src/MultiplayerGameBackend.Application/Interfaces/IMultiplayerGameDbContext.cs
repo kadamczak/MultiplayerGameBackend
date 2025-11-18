@@ -10,6 +10,7 @@ public interface IMultiplayerGameDbContext
     DbSet<Item> Items { get; }
     DbSet<User> Users { get; }
     DbSet<UserItem> UserItems { get; }
+    DbSet<UserItemOffer> UserItemOffers { get; }
     DbSet<UserCustomization> UserCustomizations { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
     DbSet<InGameMerchant> InGameMerchants { get; }
