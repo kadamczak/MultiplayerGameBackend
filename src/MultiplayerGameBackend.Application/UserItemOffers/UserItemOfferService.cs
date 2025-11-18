@@ -119,6 +119,68 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
     
     public async Task PurchaseOffer(Guid offerId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var buyerId = Guid.Parse(currentUser.Id);
+        
+        logger.LogInformation("User {BuyerId} attempting to purchase offer {OfferId}", buyerId, offerId);
+        
+        var offer = await dbContext.UserItemOffers
+            .Include(o => o.UserItem)
+            .ThenInclude(ui => ui!.User)
+            .FirstOrDefaultAsync(o => o.Id == offerId, cancellationToken);
+        
+        if (offer is null)
+        {
+            logger.LogWarning("Offer {OfferId} not found", offerId);
+            throw new NotFoundException(nameof(UserItemOffer), nameof(UserItemOffer.Id), "ID", offerId.ToString());
+        }
+        
+        // Check if user is trying to buy their own item
+        if (offer.UserItem!.UserId == buyerId)
+        {
+            logger.LogWarning("User {BuyerId} attempted to purchase their own offer {OfferId}", buyerId, offerId);
+            throw new UnprocessableEntityException(new Dictionary<string, string[]>
+            {
+                { "Offer", new[] { "You cannot purchase your own item." } }
+            });
+        }
+        
+        var buyer = await dbContext.Users.FindAsync([buyerId], cancellationToken);
+        if (buyer is null)
+        {
+            logger.LogWarning("Buyer {BuyerId} not found", buyerId);
+            throw new NotFoundException(nameof(User), nameof(User.Id), "ID", buyerId.ToString());
+        }
+        
+        // Check if buyer has sufficient balance
+        if (buyer.Balance < offer.Price)
+        {
+            logger.LogWarning("User {BuyerId} has insufficient balance ({Balance}) to purchase offer {OfferId} (price: {Price})", 
+                buyerId, buyer.Balance, offerId, offer.Price);
+            throw new UnprocessableEntityException(new Dictionary<string, string[]>
+            {
+                { "Balance", new[] { $"Insufficient balance. Required: {offer.Price}, Available: {buyer.Balance}" } }
+            });
+        }
+        
+        var seller = offer.UserItem.User!;
+        var sellerId = seller.Id;
+        
+        logger.LogInformation("Processing purchase: Buyer {BuyerId} (Balance: {BuyerBalance}), Seller {SellerId} (Balance: {SellerBalance}), Price: {Price}", 
+            buyerId, buyer.Balance, sellerId, seller.Balance, offer.Price);
+        
+        // Transfer balance
+        buyer.Balance -= offer.Price;
+        seller.Balance += offer.Price;
+        
+        // Transfer ownership
+        offer.UserItem.UserId = buyerId;
+        
+        // Remove the offer
+        dbContext.UserItemOffers.Remove(offer);
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("Successfully completed purchase: User {BuyerId} bought UserItem {UserItemId} from User {SellerId} for {Price}", 
+            buyerId, offer.UserItem.Id, sellerId, offer.Price);
     }
 }
