@@ -1,6 +1,6 @@
 namespace MultiplayerGameBackend.Domain.Constants;
 
-public class ClientTypes
+public static class ClientTypes
 {
     public const string Browser = "Browser";
     public const string Game = "Game";

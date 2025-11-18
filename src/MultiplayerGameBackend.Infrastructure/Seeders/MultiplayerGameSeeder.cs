@@ -44,10 +44,11 @@ internal class MultiplayerGameSeeder(MultiplayerGameDbContext dbContext) : IMult
     ];
 
     private static IEnumerable<Item> GetItems() => [
-        new Item() { Id = 1, Name = "Fire Staff", Description = "Burns enemies."},
-        new Item() { Id = 2, Name = "Ice Staff", Description = "Freezes enemies." },
-        new Item() { Id = 3, Name = "Mage Hat", Description = "Stylish." },
-        new Item() { Id = 4, Name = "Headphones", Description = "High-fidelity!" }
+        new Item() { Id = 1, Name = "Mage Hat", Description = "Stylish!", Type = ItemTypes.EquippableOnHead },
+        new Item() { Id = 2, Name = "Headphones", Description = "High-fidelity!", Type = ItemTypes.EquippableOnHead},
+        new Item() { Id = 3, Name = "Tome of Magic", Description = "Smart!", Type = ItemTypes.Consumable},
+        new Item() { Id = 4, Name = "Leg Armor", Description = "Fierce!", Type = ItemTypes.EquippableOnBody},
+        new Item() { Id = 5, Name = "Helmet", Description = "Sturdy!", Type = ItemTypes.EquippableOnHead},
     ];
     
     private static IEnumerable<InGameMerchant> GetMerchants() => [
@@ -57,7 +58,8 @@ internal class MultiplayerGameSeeder(MultiplayerGameDbContext dbContext) : IMult
             ItemOffers = [
                 new MerchantItemOffer() { ItemId = 1, Price = 100 },
                 new MerchantItemOffer() { ItemId = 3, Price = 150 },
-                new MerchantItemOffer() { ItemId = 4, Price = 170 }
+                new MerchantItemOffer() { ItemId = 4, Price = 170 },
+                new MerchantItemOffer() { ItemId = 5, Price = 280 },
             ]
         }
     ];

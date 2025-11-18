@@ -16,4 +16,9 @@ public class UpdateItemDto
         MinimumLength = Item.Constraints.DescriptionMinLength,
         ErrorMessage = "Description must be between {2} and {1} characters.")]
     public required string Description { get; set; }
+    
+    [Required(ErrorMessage = "Type is required.")]
+    [StringLength(Item.Constraints.TypeMaxLength,
+        ErrorMessage = "Description must be between {2} and {1} characters.")]
+    public required string Type { get; set; } // todo: check if valid
 }

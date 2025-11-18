@@ -38,7 +38,8 @@ public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
                 {
                     Id = o.Item!.Id,
                     Name = o.Item.Name,
-                    Description = o.Item.Description
+                    Description = o.Item.Description,
+                    Type = o.Item.Type,
                 },
                 Price = o.Price
             })

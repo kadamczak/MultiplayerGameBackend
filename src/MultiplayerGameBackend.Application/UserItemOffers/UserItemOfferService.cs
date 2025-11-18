@@ -35,7 +35,8 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
                     {
                         Id = o.UserItem.Item!.Id,
                         Name = o.UserItem.Item.Name,
-                        Description = o.UserItem.Item.Description
+                        Description = o.UserItem.Item.Description,
+                        Type = o.UserItem.Item.Type,
                     },
                     UserId = o.UserItem.UserId,
                     UserName = o.UserItem.User!.UserName,

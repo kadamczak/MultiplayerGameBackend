@@ -10,6 +10,7 @@ public class Item
         public const int NameMaxLength = 50;
         public const int DescriptionMinLength = 1;
         public const int DescriptionMaxLength = 256;
+        public const int TypeMaxLength = 20;
     }
    
     public int Id { get; set; }
@@ -20,6 +21,10 @@ public class Item
     
     [StringLength(Constraints.DescriptionMaxLength, MinimumLength = Constraints.DescriptionMinLength)]
     public required string Description { get; set; }
+    
+    [Required]
+    [StringLength(Constraints.TypeMaxLength)]
+    public required string Type { get; set; }
     
     public List<UserItem> UserItems { get; set; } = [];
     public List<MerchantItemOffer> MerchantItemOffers { get; set; } = [];
