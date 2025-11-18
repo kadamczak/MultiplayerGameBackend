@@ -1,17 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Identity;
-using MultiplayerGameBackend.Application.InGameMerchants.Responses;
+using MultiplayerGameBackend.Application.MerchantItemOffers.Responses;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 
-namespace MultiplayerGameBackend.Application.InGameMerchants;
+namespace MultiplayerGameBackend.Application.MerchantItemOffers;
 
-public class InGameMerchantService(ILogger<InGameMerchantService> logger,
+public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
     IMultiplayerGameDbContext dbContext,
-    IUserContext userContext) : IInGameMerchantService
+    IUserContext userContext) : IMerchantItemOfferService
 {
     public async Task<IEnumerable<ReadMerchantOfferDto>> GetOffers(int merchantId, CancellationToken cancellationToken)
     {

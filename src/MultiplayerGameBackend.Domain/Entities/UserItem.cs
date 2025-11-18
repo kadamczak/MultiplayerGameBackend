@@ -10,6 +10,6 @@ public class UserItem
     public required int ItemId { get; set; }
     public Item? Item { get; set; }
     
-    
-    public DateTime ObtainedAt { get; set; } = DateTime.UtcNow;
+    public Guid? OfferId { get; set; }
+    public UserItemOffer? Offer { get; set; }
 }

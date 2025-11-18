@@ -1,6 +1,6 @@
 using MultiplayerGameBackend.Application.Items.Responses;
 
-namespace MultiplayerGameBackend.Application.InGameMerchants.Responses;
+namespace MultiplayerGameBackend.Application.MerchantItemOffers.Responses;
 
 public class ReadMerchantOfferDto
 {

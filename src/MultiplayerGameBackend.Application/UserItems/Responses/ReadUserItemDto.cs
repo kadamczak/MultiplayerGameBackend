@@ -6,5 +6,9 @@ public class ReadUserItemDto
 {
     public Guid Id { get; set; }
     public required ReadItemDto Item { get; set; }
-    public DateTime ObtainedAt { get; set; }
+    
+    public Guid? UserId { get; set; }
+    public string? UserName { get; set; }
+    
+    public Guid? OfferId { get; set; }
 }

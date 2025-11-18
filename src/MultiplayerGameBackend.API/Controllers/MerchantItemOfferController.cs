@@ -1,21 +1,21 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MultiplayerGameBackend.Application.InGameMerchants;
-using MultiplayerGameBackend.Application.InGameMerchants.Responses;
+using MultiplayerGameBackend.Application.MerchantItemOffers;
+using MultiplayerGameBackend.Application.MerchantItemOffers.Responses;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/merchants")]
 [Authorize]
-public class InGameMerchantController(IInGameMerchantService inGameMerchantService) : ControllerBase
+public class MerchantItemOfferController(IMerchantItemOfferService merchantItemOfferService) : ControllerBase
 {
     [HttpGet("{merchantId:int}/offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ReadMerchantOfferDto?>> GetOffers([FromRoute] int merchantId, CancellationToken cancellationToken)
     {
-        var offers = await inGameMerchantService.GetOffers(merchantId, cancellationToken);
+        var offers = await merchantItemOfferService.GetOffers(merchantId, cancellationToken);
         return Ok(offers);
     }
     
@@ -25,7 +25,7 @@ public class InGameMerchantController(IInGameMerchantService inGameMerchantServi
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PurchaseOffer([FromRoute] int offerId, CancellationToken cancellationToken)
     {
-        await inGameMerchantService.PurchaseOffer(offerId, cancellationToken);
+        await merchantItemOfferService.PurchaseOffer(offerId, cancellationToken);
         return NoContent();
     }
 }

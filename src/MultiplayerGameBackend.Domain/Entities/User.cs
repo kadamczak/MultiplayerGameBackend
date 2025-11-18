@@ -26,9 +26,9 @@ public class User : IdentityUser<Guid>
     [Range(Constraints.MinBalance, Constraints.MaxBalance)]
     public int Balance { get; set; } = Constraints.StartingBalance;
     
-    public List<UserItem> UserItems { get; set; } = [];
     public List<RefreshToken> RefreshTokens { get; set; } = [];
-    
+    public List<UserItem> UserItems { get; set; } = [];
+
     public int? CustomizationId { get; set; }
     public UserCustomization? Customization { get; set; }
 }

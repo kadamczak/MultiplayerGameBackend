@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.Application.UserItems;
+using MultiplayerGameBackend.Application.UserItems.Responses;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
@@ -12,7 +13,7 @@ public class UserItemController(IUserItemService userItemService) : ControllerBa
     [HttpGet("me/items")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetCurrentUserItems(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ReadUserItemDto>>> GetCurrentUserItems(CancellationToken cancellationToken)
     {
         var userItems = await userItemService.GetCurrentUserItems(cancellationToken);
         return Ok(userItems);

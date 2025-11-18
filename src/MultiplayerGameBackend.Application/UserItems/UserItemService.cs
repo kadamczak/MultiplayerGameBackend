@@ -29,7 +29,8 @@ public class UserItemService(ILogger<UserItemService> logger,
                     Name = ui.Item.Name,
                     Description = ui.Item.Description
                 },
-                ObtainedAt = ui.ObtainedAt
+                OfferId = ui.OfferId,
+                UserId = userId
             })
             .ToListAsync(cancellationToken);
 

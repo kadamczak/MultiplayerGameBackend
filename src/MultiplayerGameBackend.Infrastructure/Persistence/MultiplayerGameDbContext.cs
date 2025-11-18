@@ -17,6 +17,7 @@ public class MultiplayerGameDbContext
     public DbSet<Item> Items { get; set; }
     public new DbSet<User> Users { get; set; }
     public DbSet<UserItem> UserItems { get; set; }
+    public DbSet<UserItemOffer> UserItemOffers { get; set; }
     public DbSet<UserCustomization> UserCustomizations { get; set; }
     public DbSet<InGameMerchant> InGameMerchants { get; set; }
     public DbSet<MerchantItemOffer> MerchantItemOffers { get; set; }
@@ -29,6 +30,7 @@ public class MultiplayerGameDbContext
         ConfigureItemEntities(modelBuilder);
         ConfigureUserEntities(modelBuilder);
         ConfigureUserItemEntities(modelBuilder);
+        ConfigureUserItemOfferEntities(modelBuilder);
         ConfigureUserCustomizationEntities(modelBuilder);
         ConfigureInGameMerchantEntities(modelBuilder);
         ConfigureMerchantItemOfferEntities(modelBuilder);
@@ -117,6 +119,19 @@ public class MultiplayerGameDbContext
             entity.HasOne(e => e.Item)
                 .WithMany(e => e.UserItems)
                 .HasForeignKey(e => e.ItemId);
+        });
+    }
+    
+    private static void ConfigureUserItemOfferEntities(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserItemOffer>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasOne(o => o.UserItem)
+                .WithOne(ui => ui.Offer)
+                .HasForeignKey<UserItemOffer>(o => o.UserItemId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
     
