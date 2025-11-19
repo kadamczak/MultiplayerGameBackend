@@ -1,9 +1,11 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MultiplayerGameBackend.Application.Extensions;
 using MultiplayerGameBackend.Application.Items;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.Items.Requests;
+using MultiplayerGameBackend.Application.Items.Requests.Validators;
 using MultiplayerGameBackend.Domain.Constants;
 
 namespace MultiplayerGameBackend.API.Controllers;
@@ -11,7 +13,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 [ApiController]
 [Route("v1/items")]
 [Authorize]
-public class ItemController(IItemService itemService) : ControllerBase
+public class ItemController(IItemService itemService,
+    CreateUpdateItemDtoValidator createUpdateItemDtoValidator) : ControllerBase
 {
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -35,8 +38,12 @@ public class ItemController(IItemService itemService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)] // In case of duplicate item name
-    public async Task<IActionResult> Create([FromBody] CreateItemDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromBody] CreateUpdateItemDto dto, CancellationToken cancellationToken)
     {
+        var validationResult = await createUpdateItemDtoValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid)
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
+        
         var createdId = await itemService.Create(dto, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = createdId }, null);
     }
@@ -46,8 +53,12 @@ public class ItemController(IItemService itemService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update([FromRoute] int id, UpdateItemDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update([FromRoute] int id, CreateUpdateItemDto dto, CancellationToken cancellationToken)
     {
+        var validationResult = await createUpdateItemDtoValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid)
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
+        
         await itemService.Update(id, dto, cancellationToken);
         return NoContent();
     }

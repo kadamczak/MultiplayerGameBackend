@@ -29,7 +29,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Items\Requests\Validators\" />
       <Folder Include="UserItems\Requests\" />
     </ItemGroup>
 

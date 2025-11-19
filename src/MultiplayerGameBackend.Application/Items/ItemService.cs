@@ -38,7 +38,7 @@ public class ItemService(ILogger<ItemService> logger,
         return items.Select(itemMapper.Map);
     }
 
-    public async Task<int> Create(CreateItemDto dto, CancellationToken cancellationToken)
+    public async Task<int> Create(CreateUpdateItemDto dto, CancellationToken cancellationToken)
     {
         logger.LogInformation("Creating new Item with name {itemName}", dto.Name);
         
@@ -60,7 +60,7 @@ public class ItemService(ILogger<ItemService> logger,
         return item.Id;
     }
     
-    public async Task Update(int id, UpdateItemDto dto, CancellationToken cancellationToken)
+    public async Task Update(int id, CreateUpdateItemDto dto, CancellationToken cancellationToken)
     {
         logger.LogInformation("Updating Item with id {itemId}", id);
         
