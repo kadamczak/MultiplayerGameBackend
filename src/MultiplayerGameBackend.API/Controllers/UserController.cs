@@ -54,9 +54,10 @@ public class UserController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<UserGameInfoDto>> GetCurrentUserGameInfo(
         [FromQuery] bool includeCustomization = false, 
+        [FromQuery] bool includeUserItems = false,
         CancellationToken cancellationToken = default)
     {
-        var userGameInfo = await userService.GetCurrentUserGameInfo(includeCustomization, cancellationToken);
+        var userGameInfo = await userService.GetCurrentUserGameInfo(includeCustomization, includeUserItems, cancellationToken);
         return Ok(userGameInfo);
     }
 

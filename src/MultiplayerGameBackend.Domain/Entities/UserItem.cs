@@ -12,4 +12,6 @@ public class UserItem
     
     public Guid? OfferId { get; set; }
     public UserItemOffer? Offer { get; set; }
+    
+    // enchants?
 }

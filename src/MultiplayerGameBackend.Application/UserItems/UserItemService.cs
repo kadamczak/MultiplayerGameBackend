@@ -29,6 +29,7 @@ public class UserItemService(ILogger<UserItemService> logger,
                     Name = ui.Item.Name,
                     Description = ui.Item.Description,
                     Type = ui.Item.Type,
+                    ThumbnailUrl = ui.Item.ThumbnailUrl,
                 },
                 OfferId = ui.OfferId,
                 UserId = userId

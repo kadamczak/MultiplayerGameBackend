@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Interfaces;
+using MultiplayerGameBackend.Application.Items.Responses;
+using MultiplayerGameBackend.Application.UserItems.Responses;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Responses;
 using MultiplayerGameBackend.Domain.Entities;
@@ -43,7 +45,7 @@ public class UserService(ILogger<UserService> logger,
         await userManager.RemoveFromRoleAsync(user, role.Name!);
     }
 
-    public async Task<UserGameInfoDto> GetCurrentUserGameInfo(bool includeCustomization, CancellationToken cancellationToken)
+    public async Task<UserGameInfoDto> GetCurrentUserGameInfo(bool includeCustomization, bool includeUserItems, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
         var userId = Guid.Parse(currentUser.Id);
@@ -61,13 +63,39 @@ public class UserService(ILogger<UserService> logger,
             if (customization is not null)
                 customizationDto = customizationMapper.Map(customization);
         }
+
+        List<ReadUserItemSimplifiedDto>? userItems = null;
+        if (includeUserItems)
+        {
+            var userItemEntities = await dbContext.UserItems
+                .AsNoTracking()
+                .Where(i => i.UserId == userId)
+                .Include(i => i.Item)
+                .ToListAsync(cancellationToken);
+            
+            userItems = userItemEntities
+                .Select(ui => new ReadUserItemSimplifiedDto
+                {
+                    Id = ui.Id,
+                    Item = new ReadItemDto
+                    {
+                        Id = ui.Item.Id,
+                        Name = ui.Item.Name,
+                        Description = ui.Item.Description,
+                        Type = ui.Item.Type,
+                        ThumbnailUrl = ui.Item.ThumbnailUrl,
+                    }
+                })
+                .ToList();
+        }
         
         var userGameInfo = new UserGameInfoDto
         {
             Id = userId,
             UserName = currentUser.UserName!,
             Balance = user.Balance,
-            Customization = customizationDto
+            Customization = customizationDto,
+            UserItems = userItems
         };
         
         return userGameInfo;

@@ -7,6 +7,6 @@ public interface IUserService
 {
     Task AssignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken);
     Task UnassignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken);
-    Task<UserGameInfoDto> GetCurrentUserGameInfo(bool includeCustomization, CancellationToken cancellationToken);
+    Task<UserGameInfoDto> GetCurrentUserGameInfo(bool includeCustomization, bool includeUserItems, CancellationToken cancellationToken);
     Task UpdateUserCustomization(UpdateUserCustomizationDto dto, CancellationToken cancellationToken);
 }

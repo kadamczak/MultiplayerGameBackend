@@ -44,11 +44,11 @@ internal class MultiplayerGameSeeder(MultiplayerGameDbContext dbContext) : IMult
     ];
 
     private static IEnumerable<Item> GetItems() => [
-        new Item() { Id = 1, Name = "Mage Hat", Description = "Stylish!", Type = ItemTypes.EquippableOnHead },
-        new Item() { Id = 2, Name = "Headphones", Description = "High-fidelity!", Type = ItemTypes.EquippableOnHead},
-        new Item() { Id = 3, Name = "Tome of Magic", Description = "Smart!", Type = ItemTypes.Consumable},
-        new Item() { Id = 4, Name = "Leg Armor", Description = "Fierce!", Type = ItemTypes.EquippableOnBody},
-        new Item() { Id = 5, Name = "Helmet", Description = "Sturdy!", Type = ItemTypes.EquippableOnHead},
+        new Item() { Id = 1, Name = "Mage Hat", Description = "Stylish!", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "/images/items/mage_hat.png" },
+        new Item() { Id = 2, Name = "Headphones", Description = "High-fidelity!", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "/images/items/headphones.png"},
+        new Item() { Id = 3, Name = "Tome of Magic", Description = "Smart!", Type = ItemTypes.Consumable, ThumbnailUrl = "/images/items/tome_of_magic.png"},
+        new Item() { Id = 4, Name = "Leg Armor", Description = "Fierce!", Type = ItemTypes.EquippableOnBody, ThumbnailUrl = "/images/items/leg_armor.png"},
+        new Item() { Id = 5, Name = "Helmet", Description = "Sturdy!", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "/images/items/helmet.png"},
     ];
     
     private static IEnumerable<InGameMerchant> GetMerchants() => [
