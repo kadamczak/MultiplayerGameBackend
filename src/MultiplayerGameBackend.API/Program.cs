@@ -39,6 +39,7 @@ try
         });
     }
     
+    app.UseStaticFiles();
     app.UseHttpsRedirection();
     
     app.UseAuthentication();

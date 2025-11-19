@@ -11,6 +11,7 @@ public class Item
         public const int DescriptionMinLength = 1;
         public const int DescriptionMaxLength = 256;
         public const int TypeMaxLength = 20;
+        public const int ThumbnailUrlMaxLength = 256;
     }
    
     public int Id { get; set; }
@@ -25,6 +26,10 @@ public class Item
     [Required]
     [StringLength(Constraints.TypeMaxLength)]
     public required string Type { get; set; }
+    
+    [Required]
+    [StringLength(Constraints.ThumbnailUrlMaxLength)]
+    public required string ThumbnailUrl { get; set; }
     
     public List<UserItem> UserItems { get; set; } = [];
     public List<MerchantItemOffer> MerchantItemOffers { get; set; } = [];

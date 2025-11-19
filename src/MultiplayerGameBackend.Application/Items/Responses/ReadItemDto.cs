@@ -6,4 +6,5 @@ public class ReadItemDto
     public required string Name { get; set; }
     public required string Description { get; set; }
     public required string Type { get; set; }
+    public required string ThumbnailUrl { get; set; }
 }

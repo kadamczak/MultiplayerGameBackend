@@ -21,4 +21,9 @@ public class CreateItemDto
     [StringLength(Item.Constraints.TypeMaxLength,
         ErrorMessage = "Description must be between {2} and {1} characters.")]
     public required string Type { get; set; } // todo: check if valid
+    
+    [Required(ErrorMessage = "ThumbnailUrl is required.")]
+    [StringLength(Item.Constraints.ThumbnailUrlMaxLength,
+        ErrorMessage = "ThumbnailUrl must not exceed {1} characters.")]
+    public required string ThumbnailUrl { get; set; }
 }
