@@ -4,5 +4,5 @@ namespace MultiplayerGameBackend.Application.UserItems;
 
 public interface IUserItemService
 {
-    Task<IEnumerable<ReadUserItemDto>> GetCurrentUserItems(CancellationToken cancellationToken);
+    Task<IEnumerable<ReadUserItemSimplifiedDto>> GetCurrentUserItems(CancellationToken cancellationToken);
 }

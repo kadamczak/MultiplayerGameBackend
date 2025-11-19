@@ -13,7 +13,7 @@ public class UserItemController(IUserItemService userItemService) : ControllerBa
     [HttpGet("me/items")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<IEnumerable<ReadUserItemDto>>> GetCurrentUserItems(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<ReadUserItemSimplifiedDto>>> GetCurrentUserItems(CancellationToken cancellationToken)
     {
         var userItems = await userItemService.GetCurrentUserItems(cancellationToken);
         return Ok(userItems);

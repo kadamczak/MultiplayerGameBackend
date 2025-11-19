@@ -10,7 +10,6 @@ public class UserItem
     public required int ItemId { get; set; }
     public Item? Item { get; set; }
     
-    public Guid? OfferId { get; set; }
     public UserItemOffer? Offer { get; set; }
     
     // enchants?

@@ -7,4 +7,6 @@ public class ReadUserItemSimplifiedDto
     public Guid Id { get; set; }
     public required ReadItemDto Item { get; set; }
     // enchants?
+    
+    public Guid? OfferId { get; set; }
 }

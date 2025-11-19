@@ -12,7 +12,7 @@ public class UserItemService(ILogger<UserItemService> logger,
     IMultiplayerGameDbContext dbContext,
     IUserContext userContext) : IUserItemService
 {
-    public async Task<IEnumerable<ReadUserItemDto>> GetCurrentUserItems(CancellationToken cancellationToken)
+    public async Task<IEnumerable<ReadUserItemSimplifiedDto>> GetCurrentUserItems(CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
         var userId = Guid.Parse(currentUser.Id);
@@ -20,7 +20,8 @@ public class UserItemService(ILogger<UserItemService> logger,
         var userItems = await dbContext.UserItems
             .AsNoTracking()
             .Where(ui => ui.UserId == userId)
-            .Select(ui => new ReadUserItemDto
+            .Include(ui => ui.Offer)
+            .Select(ui => new ReadUserItemSimplifiedDto
             {
                 Id = ui.Id,
                 Item = new ReadItemDto
@@ -31,8 +32,7 @@ public class UserItemService(ILogger<UserItemService> logger,
                     Type = ui.Item.Type,
                     ThumbnailUrl = ui.Item.ThumbnailUrl,
                 },
-                OfferId = ui.OfferId,
-                UserId = userId
+                OfferId = ui.Offer == null ? null : ui.Offer.Id
             })
             .ToListAsync(cancellationToken);
 
