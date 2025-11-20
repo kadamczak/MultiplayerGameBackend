@@ -20,7 +20,7 @@ public class UserItemService(ILogger<UserItemService> logger,
         var userItems = await dbContext.UserItems
             .AsNoTracking()
             .Where(ui => ui.UserId == userId)
-            .Include(ui => ui.Offer)
+            .Include(ui => ui.Offers)
             .Select(ui => new ReadUserItemSimplifiedDto
             {
                 Id = ui.Id,
@@ -32,7 +32,7 @@ public class UserItemService(ILogger<UserItemService> logger,
                     Type = ui.Item.Type,
                     ThumbnailUrl = ui.Item.ThumbnailUrl,
                 },
-                OfferId = ui.Offer == null ? null : ui.Offer.Id
+                HasActiveOffer = ui.Offers.Any(o => !o.WasSold)
             })
             .ToListAsync(cancellationToken);
 

@@ -129,9 +129,19 @@ public class MultiplayerGameDbContext
             entity.HasKey(e => e.Id);
             
             entity.HasOne(o => o.UserItem)
-                .WithOne(ui => ui.Offer)
-                .HasForeignKey<UserItemOffer>(o => o.UserItemId)
+                .WithMany(ui => ui.Offers)
+                .HasForeignKey(o => o.UserItemId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasOne(o => o.Seller)
+                .WithMany(u => u.SoldItemOffers)
+                .HasForeignKey(o => o.SellerId)
+                .OnDelete(DeleteBehavior.SetNull);
+            
+            entity.HasOne(o => o.Buyer)
+                .WithMany(u => u.BoughtItemOffers)
+                .HasForeignKey(o => o.BuyerId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
     

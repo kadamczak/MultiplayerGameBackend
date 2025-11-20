@@ -13,4 +13,12 @@ public class UserItemOffer
     public UserItem? UserItem { get; set; }
     
     public int Price { get; set; }
+    
+    public bool WasSold { get; set; }
+    
+    public Guid SellerId { get; set; }
+    public User? Seller { get; set; }
+    
+    public Guid? BuyerId { get; set; }
+    public User? Buyer { get; set; }
 }

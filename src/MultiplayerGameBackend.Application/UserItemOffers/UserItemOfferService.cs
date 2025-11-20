@@ -39,7 +39,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
                         Type = o.UserItem.Item.Type,
                         ThumbnailUrl = o.UserItem.Item.ThumbnailUrl,
                     },
-                    UserId = o.UserItem.UserId,
+                    UserId = o.SellerId,
                     UserName = o.UserItem.User!.UserName,
                     OfferId = o.Id
                 }
@@ -57,7 +57,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         logger.LogInformation("User {UserId} attempting to create offer for UserItem {UserItemId}", userId, dto.UserItemId);
         
         var userItem = await dbContext.UserItems
-            .Include(ui => ui.Offer)
+            .Include(ui => ui.Offers)
             .FirstOrDefaultAsync(ui => ui.Id == dto.UserItemId, cancellationToken);
         
         if (userItem is null)
@@ -73,10 +73,10 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
             throw new ForbidException();
         }
         
-        // Check if an offer already exists for this UserItem
-        if (userItem.Offer is not null)
+        // Check if an active offer already exists for this UserItem
+        if (userItem.Offers.Any(o => !o.WasSold))
         {
-            logger.LogWarning("Offer already exists for UserItem {UserItemId}", dto.UserItemId);
+            logger.LogWarning("Active offer already exists for UserItem {UserItemId}", dto.UserItemId);
             throw new ConflictException(nameof(UserItemOffer), nameof(dto.UserItemId), "UserItem", dto.UserItemId.ToString());
         }
         
@@ -84,7 +84,10 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         {
             Id = Guid.NewGuid(),
             UserItemId = dto.UserItemId,
-            Price = dto.Price
+            Price = dto.Price,
+            WasSold = false,
+            SellerId = userId,
+            BuyerId = null
         };
         
         dbContext.UserItemOffers.Add(offer);
@@ -175,8 +178,10 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         buyer.Balance -= offer.Price;
         seller.Balance += offer.Price;
         
-        // Transfer ownership
+        // Transfer ownership and check as bought
         offer.UserItem.UserId = buyerId;
+        offer.WasSold = true;
+        offer.BuyerId = buyerId;
         
         // Remove the offer
         dbContext.UserItemOffers.Remove(offer);

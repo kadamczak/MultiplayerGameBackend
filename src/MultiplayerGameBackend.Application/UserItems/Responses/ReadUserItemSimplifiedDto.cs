@@ -8,5 +8,5 @@ public class ReadUserItemSimplifiedDto
     public required ReadItemDto Item { get; set; }
     // enchants?
     
-    public Guid? OfferId { get; set; }
+    public bool HasActiveOffer { get; set; }
 }
