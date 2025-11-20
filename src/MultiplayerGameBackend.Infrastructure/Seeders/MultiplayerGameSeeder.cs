@@ -49,6 +49,11 @@ internal class MultiplayerGameSeeder(MultiplayerGameDbContext dbContext) : IMult
         new Item() { Id = 3, Name = "Tome of Magic", Description = "Smart!", Type = ItemTypes.Consumable, ThumbnailUrl = "/images/items/tome_of_magic.png"},
         new Item() { Id = 4, Name = "Leg Armor", Description = "Fierce!", Type = ItemTypes.EquippableOnBody, ThumbnailUrl = "/images/items/leg_armor.png"},
         new Item() { Id = 5, Name = "Helmet", Description = "Sturdy!", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "/images/items/helmet.png"},
+        new Item() { Id = 6, Name = "Cheese", Description = "Cheesy!", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "/images/items/cheese.png"},
+        new Item() { Id = 7, Name = "Treasure Chest", Description = "Valuable!", Type = ItemTypes.Consumable, ThumbnailUrl = "/images/items/treasure_chest.png"},
+        new Item() { Id = 8, Name = "Mana Orb", Description = "Magical!", Type = ItemTypes.Consumable, ThumbnailUrl = "/images/items/mana_orb.png"},
+        new Item() { Id = 9, Name = "Torch", Description = "Radiant!", Type = ItemTypes.Consumable, ThumbnailUrl = "/images/items/torch.png"},
+        new Item() { Id = 10, Name = "Winter Boots", Description = "Comfy!", Type = ItemTypes.EquippableOnBody, ThumbnailUrl = "/images/items/winter_boots.png"},
     ];
     
     private static IEnumerable<InGameMerchant> GetMerchants() => [
