@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Application.UserItemOffers.Responses;
@@ -13,9 +14,9 @@ public class UserItemOfferController(IUserItemOfferService userItemOfferService)
 {
     [HttpGet("offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ReadActiveUserItemOfferDto?>> GetActiveOffers(CancellationToken cancellationToken)
+    public async Task<ActionResult<ReadActiveUserItemOfferDto?>> GetActiveOffers([FromQuery] PagedQuery query, CancellationToken cancellationToken)
     {
-        var offers = await userItemOfferService.GetActiveOffers(cancellationToken);
+        var offers = await userItemOfferService.GetActiveOffers(query, cancellationToken);
         return Ok(offers);
     }
 

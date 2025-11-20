@@ -1,11 +1,14 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.UserItemOffers.Responses;
 using MultiplayerGameBackend.Application.UserItems.Responses;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
+using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 
@@ -15,7 +18,72 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
     IMultiplayerGameDbContext dbContext,
     IUserContext userContext) : IUserItemOfferService
 {
-    public async Task<IEnumerable<ReadActiveUserItemOfferDto>> GetActiveOffers(CancellationToken cancellationToken)
+    public async Task<PagedResult<ReadActiveUserItemOfferDto>> GetActiveOffers(PagedQuery query, CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Fetching active user item offers");
+        var searchPhraseLower = query.SearchPhrase?.ToLower();
+        
+        var baseQuery = dbContext.UserItemOffers
+            .AsNoTracking()
+            .Where(o => o.BuyerId == null)
+            .Include(o => o.UserItem)
+            .ThenInclude(ui => ui!.Item)
+            .Include(o => o.Seller)
+            .Where(o => searchPhraseLower == null || o.UserItem.Item.Name.ToLower().Contains(searchPhraseLower)
+                                                              || o.UserItem.Item.Type.ToLower().Contains(searchPhraseLower)
+                                                              || o.Seller.UserName.ToLower().Contains(searchPhraseLower));
+            
+        var totalCount = await baseQuery.CountAsync(cancellationToken);
+
+        if (query.SortBy is not null)
+        {
+            var columnsSelector = new Dictionary<string, Expression<Func<UserItemOffer, object>>>
+            {
+                { nameof(UserItem.Item.Name), r => r.UserItem.Item.Name },
+                { nameof(UserItem.Item.Type), r => r.UserItem.Item.Type },
+                { nameof(UserItemOffer.Seller.UserName), r => r.Seller.UserName },
+                { nameof(UserItemOffer.Price), r => r.Price }
+            };
+
+            var selectedColumn = columnsSelector[query.SortBy];
+
+            baseQuery = query.SortDirection == SortDirection.Ascending
+                ? baseQuery.OrderBy(selectedColumn)
+                : baseQuery.OrderByDescending(selectedColumn);
+        }
+        
+        var offerEntities = baseQuery
+            .Skip(query.PageSize * (query.PageNumber - 1))
+            .Take(query.PageSize);
+        
+        var offers = await offerEntities
+            .Select(o => new ReadActiveUserItemOfferDto
+            {
+                Id = o.Id,
+                Price = o.Price,
+                UserItem = new ReadUserItemDto
+                {
+                    Id = o.UserItem!.Id,
+                    Item = new ReadItemDto
+                    {
+                        Id = o.UserItem.Item!.Id,
+                        Name = o.UserItem.Item.Name,
+                        Description = o.UserItem.Item.Description,
+                        Type = o.UserItem.Item.Type,
+                        ThumbnailUrl = o.UserItem.Item.ThumbnailUrl,
+                    },
+                    UserId = o.SellerId,
+                    UserName = o.Seller.UserName,
+                    HasActiveOffer = true
+                }
+            })
+            .ToListAsync(cancellationToken);
+        
+        var result = new PagedResult<ReadActiveUserItemOfferDto>(offers, totalCount, query.PageSize, query.PageNumber);
+        return result;
+    }
+    
+    public async Task<IEnumerable<ReadActiveUserItemOfferDto>> GetActiveOffersXd(CancellationToken cancellationToken)
     {
         logger.LogInformation("Fetching active user item offers");
         
@@ -50,7 +118,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         logger.LogInformation("Fetched {OfferCount} user item offers", offers.Count);
         return offers;
     }
-
+    
     public async Task CreateOffer(CreateUserItemOfferDto dto, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
