@@ -32,7 +32,7 @@ public class UserItemService(ILogger<UserItemService> logger,
                     Type = ui.Item.Type,
                     ThumbnailUrl = ui.Item.ThumbnailUrl,
                 },
-                HasActiveOffer = ui.Offers.Any(o => !o.WasSold)
+                HasActiveOffer = ui.Offers.Any(o => o.BuyerId == null),
             })
             .ToListAsync(cancellationToken);
 

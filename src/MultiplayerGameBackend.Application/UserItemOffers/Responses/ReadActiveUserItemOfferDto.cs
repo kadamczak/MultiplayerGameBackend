@@ -2,7 +2,7 @@ using MultiplayerGameBackend.Application.UserItems.Responses;
 
 namespace MultiplayerGameBackend.Application.UserItemOffers.Responses;
 
-public class ReadUserItemOfferDto
+public class ReadActiveUserItemOfferDto
 {
     public Guid Id { get; set; }
     public required ReadUserItemDto UserItem { get; set; }

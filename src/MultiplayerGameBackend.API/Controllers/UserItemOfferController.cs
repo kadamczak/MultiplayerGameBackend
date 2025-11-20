@@ -13,9 +13,9 @@ public class UserItemOfferController(IUserItemOfferService userItemOfferService)
 {
     [HttpGet("offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ReadUserItemOfferDto?>> GetOffers(CancellationToken cancellationToken)
+    public async Task<ActionResult<ReadActiveUserItemOfferDto?>> GetActiveOffers(CancellationToken cancellationToken)
     {
-        var offers = await userItemOfferService.GetAllOffers(cancellationToken);
+        var offers = await userItemOfferService.GetActiveOffers(cancellationToken);
         return Ok(offers);
     }
 

@@ -14,8 +14,6 @@ public class UserItemOffer
     
     public int Price { get; set; }
     
-    public bool WasSold { get; set; }
-    
     public Guid SellerId { get; set; }
     public User? Seller { get; set; }
     

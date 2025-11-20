@@ -15,16 +15,17 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
     IMultiplayerGameDbContext dbContext,
     IUserContext userContext) : IUserItemOfferService
 {
-    public async Task<IEnumerable<ReadUserItemOfferDto>> GetAllOffers(CancellationToken cancellationToken)
+    public async Task<IEnumerable<ReadActiveUserItemOfferDto>> GetActiveOffers(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Fetching all user item offers");
+        logger.LogInformation("Fetching active user item offers");
         
         var offers = await dbContext.UserItemOffers
             .AsNoTracking()
+            .Where(o => o.BuyerId == null)
             .Include(o => o.UserItem)
             .ThenInclude(ui => ui!.Item)
-            .Include(o => o.UserItem!.User)
-            .Select(o => new ReadUserItemOfferDto
+            .Include(o => o.Seller)
+            .Select(o => new ReadActiveUserItemOfferDto
             {
                 Id = o.Id,
                 Price = o.Price,
@@ -40,8 +41,8 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
                         ThumbnailUrl = o.UserItem.Item.ThumbnailUrl,
                     },
                     UserId = o.SellerId,
-                    UserName = o.UserItem.User!.UserName,
-                    OfferId = o.Id
+                    UserName = o.Seller.UserName,
+                    HasActiveOffer = true
                 }
             })
             .ToListAsync(cancellationToken);
@@ -74,7 +75,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         }
         
         // Check if an active offer already exists for this UserItem
-        if (userItem.Offers.Any(o => !o.WasSold))
+        if (userItem.Offers.Any(o => o.BuyerId is null))
         {
             logger.LogWarning("Active offer already exists for UserItem {UserItemId}", dto.UserItemId);
             throw new ConflictException(nameof(UserItemOffer), nameof(dto.UserItemId), "UserItem", dto.UserItemId.ToString());
@@ -85,7 +86,6 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
             Id = Guid.NewGuid(),
             UserItemId = dto.UserItemId,
             Price = dto.Price,
-            WasSold = false,
             SellerId = userId,
             BuyerId = null
         };
@@ -180,7 +180,6 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         
         // Transfer ownership and check as bought
         offer.UserItem.UserId = buyerId;
-        offer.WasSold = true;
         offer.BuyerId = buyerId;
         
         // Remove the offer
