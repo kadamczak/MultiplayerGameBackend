@@ -182,9 +182,6 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         offer.UserItem.UserId = buyerId;
         offer.BuyerId = buyerId;
         
-        // Remove the offer
-        dbContext.UserItemOffers.Remove(offer);
-        
         await dbContext.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Successfully completed purchase: User {BuyerId} bought UserItem {UserItemId} from User {SellerId} for {Price}", 
             buyerId, offer.UserItem.Id, sellerId, offer.Price);
