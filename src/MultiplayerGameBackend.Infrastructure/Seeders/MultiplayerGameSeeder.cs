@@ -61,11 +61,23 @@ internal class MultiplayerGameSeeder(MultiplayerGameDbContext dbContext) : IMult
         {
             Id = 1,
             ItemOffers = [
-                new MerchantItemOffer() { ItemId = 1, Price = 100 },
-                new MerchantItemOffer() { ItemId = 3, Price = 150 },
-                new MerchantItemOffer() { ItemId = 4, Price = 170 },
-                new MerchantItemOffer() { ItemId = 5, Price = 280 },
+                new MerchantItemOffer() { ItemId = 1, Price = 70 },
+                new MerchantItemOffer() { ItemId = 2, Price = 150 },
+                new MerchantItemOffer() { ItemId = 3, Price = 170 },
+                new MerchantItemOffer() { ItemId = 4, Price = 280 },
+                new MerchantItemOffer() { ItemId = 5, Price = 660 },
             ]
-        }
+        },
+        new InGameMerchant()
+        {
+            Id = 2,
+            ItemOffers = [
+                new MerchantItemOffer() { ItemId = 6, Price = 2000 },
+                new MerchantItemOffer() { ItemId = 7, Price = 6000 },
+                new MerchantItemOffer() { ItemId = 8, Price = 170 },
+                new MerchantItemOffer() { ItemId = 9, Price = 280 },
+                new MerchantItemOffer() { ItemId = 10, Price = 280 },
+            ]
+        },
     ];
 }
