@@ -141,7 +141,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         await dbContext.SaveChangesAsync(cancellationToken);
     }
     
-    public async Task ChangePassword(ChangePasswordDto dto)
+    public async Task ChangePassword(ChangePasswordDto dto, string refreshToken, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
         var userId = Guid.Parse(currentUser.Id);
@@ -157,11 +157,21 @@ public class IdentityService(ILogger<IdentityService> logger,
         var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
         if (!result.Succeeded)
             throw new ApplicationException(string.Join("; ", result.Errors.Select(e => e.Description)));
-
-        logger.LogInformation("Password changed successfully for user {UserId}", userId);
+        
+        // Revoke all OTHER refresh tokens for this user
+        var refreshTokenHash = RefreshToken.ComputeHash(refreshToken);
+        var otherRefreshTokens = await dbContext.RefreshTokens
+            .Where(rt => rt.UserId == userId && rt.TokenHash != refreshTokenHash && rt.RevokedAt == null)
+            .ToListAsync(cancellationToken);
+        
+        foreach (var token in otherRefreshTokens)
+            token.RevokedAt = DateTime.UtcNow;
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("Password changed successfully for user {UserId}. All sessions invalidated.", userId);
     }
     
-    public async Task DeleteAccount(DeleteAccountDto dto)
+    public async Task DeleteAccount(DeleteAccountDto dto, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
         var userId = Guid.Parse(currentUser.Id);

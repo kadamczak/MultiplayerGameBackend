@@ -98,7 +98,9 @@ public class IdentityController(IIdentityService identityService,
     
     
     [HttpPost("logout")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Logout(
         [FromBody] string? refreshToken,
         [FromHeader(Name = "X-Client-Type")] string clientType,
@@ -126,13 +128,23 @@ public class IdentityController(IIdentityService identityService,
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto,
+        [FromHeader(Name = "X-Client-Type")] string clientType,
+        CancellationToken cancellationToken)
     {
         var validationResult = await changePasswordDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        await identityService.ChangePassword(dto);
+        if (string.IsNullOrWhiteSpace(clientType) || !ClientTypes.IsValidClientType(clientType))
+            return BadRequest("Invalid or missing X-Client-Type header.");
+        
+        var tokenToUse = GetRefreshTokenFromClient(dto.RefreshToken, clientType);
+        
+        if (string.IsNullOrWhiteSpace(tokenToUse))
+            return BadRequest("Refresh token was not present.");
+        
+        await identityService.ChangePassword(dto, tokenToUse, cancellationToken);
         return Ok(new { message = "Password changed successfully." });
     }
     
@@ -143,12 +155,13 @@ public class IdentityController(IIdentityService identityService,
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountDto dto,
-        [FromHeader(Name = "X-Client-Type")] string clientType)
+        [FromHeader(Name = "X-Client-Type")] string clientType,
+        CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(clientType) || !ClientTypes.IsValidClientType(clientType))
             return BadRequest("Invalid or missing X-Client-Type header.");
         
-        await identityService.DeleteAccount(dto);
+        await identityService.DeleteAccount(dto, cancellationToken);
         
         if (clientType == ClientTypes.Browser)
             Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/v1/identity" });
