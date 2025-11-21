@@ -161,6 +161,28 @@ public class IdentityService(ILogger<IdentityService> logger,
         logger.LogInformation("Password changed successfully for user {UserId}", userId);
     }
     
+    public async Task DeleteAccount(DeleteAccountDto dto)
+    {
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var userId = Guid.Parse(currentUser.Id);
+        
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+        
+        // Verify password before deletion
+        var isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
+        if (!isPasswordValid)
+            throw new ForbidException();
+        
+        // Delete the user (database constraints will handle related entities)
+        var result = await userManager.DeleteAsync(user);
+        if (!result.Succeeded)
+            throw new ApplicationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+
+        logger.LogInformation("Account deleted successfully for user {UserId}", userId);
+    }
+    
     private async Task<string> GenerateAccessToken(User user)
     {
         // Get claims (id, username, email)

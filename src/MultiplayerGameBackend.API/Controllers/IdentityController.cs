@@ -136,7 +136,25 @@ public class IdentityController(IIdentityService identityService,
         return Ok(new { message = "Password changed successfully." });
     }
     
-    
+    [HttpDelete("delete-account")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountDto dto,
+        [FromHeader(Name = "X-Client-Type")] string clientType)
+    {
+        if (string.IsNullOrWhiteSpace(clientType) || !ClientTypes.IsValidClientType(clientType))
+            return BadRequest("Invalid or missing X-Client-Type header.");
+        
+        await identityService.DeleteAccount(dto);
+        
+        if (clientType == ClientTypes.Browser)
+            Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/v1/identity" });
+        
+        return Ok(new { message = "Account deleted successfully." });
+    }
     
     private void AppendRefreshTokenCookie(string refreshToken)
     {
