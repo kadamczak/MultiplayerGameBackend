@@ -16,7 +16,9 @@ public class UserItemOffer
     
     public Guid SellerId { get; set; }
     public User? Seller { get; set; }
+    //public DateTime CreatedAt { get; set; }
     
     public Guid? BuyerId { get; set; }
     public User? Buyer { get; set; }
+    //public DateTime? BoughtAt { get; set; }
 }

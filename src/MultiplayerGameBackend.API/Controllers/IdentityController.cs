@@ -12,7 +12,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 [ApiController]
 [Route("v1/identity")]
 public class IdentityController(IIdentityService identityService,
-    RegisterDtoValidator registerDtoValidator) : ControllerBase
+    RegisterDtoValidator registerDtoValidator,
+    ChangePasswordDtoValidator changePasswordDtoValidator) : ControllerBase
 {
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -118,6 +119,24 @@ public class IdentityController(IIdentityService identityService,
 
         return NoContent();
     }
+    
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto, CancellationToken cancellationToken)
+    {
+        var validationResult = await changePasswordDtoValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid)
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
+        
+        await identityService.ChangePassword(dto);
+        return Ok(new { message = "Password changed successfully." });
+    }
+    
+    
     
     private void AppendRefreshTokenCookie(string refreshToken)
     {

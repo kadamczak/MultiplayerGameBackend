@@ -83,41 +83,8 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         return result;
     }
     
-    public async Task<IEnumerable<ReadActiveUserItemOfferDto>> GetActiveOffersXd(CancellationToken cancellationToken)
-    {
-        logger.LogInformation("Fetching active user item offers");
-        
-        var offers = await dbContext.UserItemOffers
-            .AsNoTracking()
-            .Where(o => o.BuyerId == null)
-            .Include(o => o.UserItem)
-            .ThenInclude(ui => ui!.Item)
-            .Include(o => o.Seller)
-            .Select(o => new ReadActiveUserItemOfferDto
-            {
-                Id = o.Id,
-                Price = o.Price,
-                UserItem = new ReadUserItemDto
-                {
-                    Id = o.UserItem!.Id,
-                    Item = new ReadItemDto
-                    {
-                        Id = o.UserItem.Item!.Id,
-                        Name = o.UserItem.Item.Name,
-                        Description = o.UserItem.Item.Description,
-                        Type = o.UserItem.Item.Type,
-                        ThumbnailUrl = o.UserItem.Item.ThumbnailUrl,
-                    },
-                    UserId = o.SellerId,
-                    UserName = o.Seller.UserName,
-                    HasActiveOffer = true
-                }
-            })
-            .ToListAsync(cancellationToken);
-        
-        logger.LogInformation("Fetched {OfferCount} user item offers", offers.Count);
-        return offers;
-    }
+
+
     
     public async Task CreateOffer(CreateUserItemOfferDto dto, CancellationToken cancellationToken)
     {

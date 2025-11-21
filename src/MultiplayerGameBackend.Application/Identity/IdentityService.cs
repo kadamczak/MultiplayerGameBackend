@@ -19,7 +19,8 @@ namespace MultiplayerGameBackend.Application.Identity;
 public class IdentityService(ILogger<IdentityService> logger,
     UserManager<User> userManager,
     IMultiplayerGameDbContext dbContext,
-    IConfiguration configuration) : IIdentityService
+    IConfiguration configuration,
+    IUserContext userContext) : IIdentityService
 {
     public async Task RegisterUser(RegisterDto dto)
     {
@@ -140,9 +141,24 @@ public class IdentityService(ILogger<IdentityService> logger,
         await dbContext.SaveChangesAsync(cancellationToken);
     }
     
-    public Task LogoutAllSessions(Guid userId)
+    public async Task ChangePassword(ChangePasswordDto dto)
     {
-        throw new NotImplementedException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var userId = Guid.Parse(currentUser.Id);
+        
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+        
+        var isCurrentPasswordValid = await userManager.CheckPasswordAsync(user, dto.CurrentPassword);
+        if (!isCurrentPasswordValid)
+            throw new ForbidException();
+        
+        var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+        if (!result.Succeeded)
+            throw new ApplicationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+
+        logger.LogInformation("Password changed successfully for user {UserId}", userId);
     }
     
     private async Task<string> GenerateAccessToken(User user)
