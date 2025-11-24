@@ -30,7 +30,6 @@ public class User : IdentityUser<Guid>
     public List<UserItem> UserItems { get; set; } = [];
     public List<UserItemOffer> SoldItemOffers { get; set; } = [];
     public List<UserItemOffer> BoughtItemOffers { get; set; } = [];
-
-    public int? CustomizationId { get; set; }
+    
     public UserCustomization? Customization { get; set; }
 }
