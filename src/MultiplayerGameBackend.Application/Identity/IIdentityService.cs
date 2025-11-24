@@ -12,4 +12,6 @@ public interface IIdentityService
     Task Logout(string refreshToken, CancellationToken cancellationToken);
     Task ChangePassword(ChangePasswordDto dto, string refreshToken, CancellationToken cancellationToken);
     Task DeleteAccount(DeleteAccountDto dto, CancellationToken cancellationToken);
+    Task ForgotPassword(ForgotPasswordDto dto, CancellationToken cancellationToken);
+    Task ResetPassword(ResetPasswordDto dto, CancellationToken cancellationToken);
 }

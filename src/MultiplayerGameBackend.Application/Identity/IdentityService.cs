@@ -20,7 +20,8 @@ public class IdentityService(ILogger<IdentityService> logger,
     UserManager<User> userManager,
     IMultiplayerGameDbContext dbContext,
     IConfiguration configuration,
-    IUserContext userContext) : IIdentityService
+    IUserContext userContext,
+    IEmailService emailService) : IIdentityService
 {
     public async Task RegisterUser(RegisterDto dto)
     {
@@ -191,6 +192,48 @@ public class IdentityService(ILogger<IdentityService> logger,
             throw new ApplicationException(string.Join("; ", result.Errors.Select(e => e.Description)));
 
         logger.LogInformation("Account deleted successfully for user {UserId}", userId);
+    }
+    
+    public async Task ForgotPassword(ForgotPasswordDto dto, CancellationToken cancellationToken)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        
+        if (user is null)
+        {
+            logger.LogWarning("Password reset requested for non-existent email: {Email}", dto.Email);
+            return;
+        }
+        
+        // Generate password reset token
+        var resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+        
+        // Send password reset email
+        // In production, you would include a link to your frontend with the token
+        // For now, we'll just send the token directly
+        await emailService.SendPasswordResetEmailAsync(user, user.Email!, resetToken);
+        logger.LogInformation("Password reset email sent to user {UserId}", user.Id);
+    }
+    
+    public async Task ResetPassword(ResetPasswordDto dto, CancellationToken cancellationToken)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+            throw new NotFoundException(nameof(User), nameof(User.Email), "Email", dto.Email);
+        
+        var result = await userManager.ResetPasswordAsync(user, dto.ResetToken, dto.NewPassword);
+        if (!result.Succeeded)
+            throw new ApplicationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+        
+        // Revoke all refresh tokens for this user
+        var refreshTokens = await dbContext.RefreshTokens
+            .Where(rt => rt.UserId == user.Id && rt.RevokedAt == null)
+            .ToListAsync(cancellationToken);
+        
+        foreach (var token in refreshTokens)
+            token.RevokedAt = DateTime.UtcNow;
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("Password reset successfully for user {UserId}. All sessions invalidated.", user.Id);
     }
     
     private async Task<string> GenerateAccessToken(User user)

@@ -22,6 +22,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMultiplayerGameDbContext, MultiplayerGameDbContext>();
         services.AddScoped<IMultiplayerGameSeeder, MultiplayerGameSeeder>();
         
-        services.AddSingleton<IEmailSender<User>, NoOpEmailSender>();
+        services.AddScoped<IEmailService, EmailService>();
     }
 }

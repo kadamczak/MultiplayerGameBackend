@@ -168,6 +168,25 @@ public class IdentityController(IIdentityService identityService,
         return Ok(new { message = "Account deleted successfully." });
     }
     
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto, CancellationToken cancellationToken)
+    {
+        await identityService.ForgotPassword(dto, cancellationToken);
+        return Ok(new { message = "If an account with that email exists, a password reset link has been sent." });
+    }
+    
+    [HttpPost("reset-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto, CancellationToken cancellationToken)
+    {
+        await identityService.ResetPassword(dto, cancellationToken);
+        return Ok(new { message = "Password has been reset successfully." });
+    }
+    
     private void AppendRefreshTokenCookie(string refreshToken)
     {
         var cookieOptions = new CookieOptions()
