@@ -1,30 +1,100 @@
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MimeKit;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.Infrastructure.Email;
 
-public class EmailService(ILogger<EmailService> logger) : IEmailService
+public class EmailService(
+    ILogger<EmailService> logger,
+    IConfiguration configuration) : IEmailService
 {
-    public Task SendPasswordResetEmailAsync(User user, string email, string resetToken)
+    public async Task SendPasswordResetEmailAsync(User user, string email, string resetToken)
     {
-        logger.LogInformation(
-            "Password Reset Token for {Email}: {ResetToken}",
-            email,
-            resetToken);
-        
-        // In production, you would send an actual email with a link like:
-        // https://yourdomain.com/reset-password?token={resetToken}&email={email}
-        // You would use an email service like SendGrid, AWS SES, etc.
-        
-        logger.LogInformation(
-            "To reset your password, use the following link (in production):");
-        logger.LogInformation(
-            "https://yourdomain.com/reset-password?token={Token}&email={Email}",
-            resetToken,
-            email);
-        
-        return Task.CompletedTask;
+        var smtpHost = configuration["Email:SmtpHost"];
+        var smtpPort = int.Parse(configuration["Email:SmtpPort"] ?? "587");
+        var smtpUsername = configuration["Email:SmtpUsername"];
+        var smtpPassword = configuration["Email:SmtpPassword"];
+        var fromEmail = configuration["Email:FromEmail"];
+        var fromName = configuration["Email:FromName"] ?? "Barvon";
+        var frontendUrl = configuration["Email:FrontendUrl"] ?? "http://localhost:5173";
+
+        // If SMTP is not configured, fall back to logging
+        if (string.IsNullOrWhiteSpace(smtpHost) || string.IsNullOrWhiteSpace(smtpUsername))
+        {
+            logger.LogWarning("SMTP not configured. Password reset token for {Email}: {ResetToken}", email, resetToken);
+            logger.LogInformation("Reset link: {FrontendUrl}/reset-password?token={Token}&email={Email}", 
+                frontendUrl, resetToken, email);
+            return;
+        }
+
+        try
+        {
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(fromName, fromEmail));
+            message.To.Add(new MailboxAddress(user.UserName, email));
+            message.Subject = "Password Reset Request";
+            
+            var resetUrl = $"{frontendUrl}/reset-password?token={Uri.EscapeDataString(resetToken)}&email={Uri.EscapeDataString(email)}";
+            
+            var bodyBuilder = new BodyBuilder
+            {
+                HtmlBody = $@"
+                    <html>
+                    <body style='font-family: Arial, sans-serif;'>
+                        <h2>Password Reset Request</h2>
+                        <p>Hello {user.UserName},</p>
+                        <p>You recently requested to reset your password. Click the button below to reset it:</p>
+                        <p style='margin: 30px 0;'>
+                            <a href='{resetUrl}' 
+                               style='background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;'>
+                                Reset Password
+                            </a>
+                        </p>
+                        <p>Or copy and paste this link into your browser:</p>
+                        <p style='color: #666; word-break: break-all;'>{resetUrl}</p>
+                        <p style='margin-top: 30px; color: #666;'>
+                            If you didn't request a password reset, you can safely ignore this email.
+                        </p>
+                        <p style='color: #666;'>
+                            This link will expire in 24 hours.
+                        </p>
+                    </body>
+                    </html>",
+                TextBody = $@"
+Password Reset Request
+
+Hello {user.UserName},
+
+You recently requested to reset your password. Click the link below to reset it:
+
+{resetUrl}
+
+If you didn't request a password reset, you can safely ignore this email.
+
+This link will expire in 24 hours."
+            };
+
+            message.Body = bodyBuilder.ToMessageBody();
+
+            // Send the email
+            using var client = new SmtpClient();
+            
+            await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(smtpUsername, smtpPassword);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+
+            logger.LogInformation("Password reset email sent successfully to {Email}", email);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to send password reset email to {Email}", email);
+            throw new ApplicationException("Failed to send password reset email. Please try again later.");
+        }
     }
 }
 
