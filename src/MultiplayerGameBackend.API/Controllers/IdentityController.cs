@@ -98,7 +98,6 @@ public class IdentityController(IIdentityService identityService,
     
     
     [HttpPost("logout")]
-    [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Logout(
