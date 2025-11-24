@@ -26,7 +26,17 @@ public class IdentityController(IIdentityService identityService,
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
         await identityService.RegisterUser(dto);
-        return Ok(new { message = "User registered successfully." });
+        return Ok(new { message = "User registered successfully. Please check your email to confirm your account." });
+    }
+    
+    [HttpPost("confirm-email")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto, CancellationToken cancellationToken)
+    {
+        await identityService.ConfirmEmail(dto, cancellationToken);
+        return Ok(new { message = "Email confirmed successfully. You can now log in." });
     }
     
     [HttpPost("login")]

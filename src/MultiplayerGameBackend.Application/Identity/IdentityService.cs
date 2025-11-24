@@ -52,6 +52,11 @@ public class IdentityService(ILogger<IdentityService> logger,
             await userManager.DeleteAsync(user);
             throw new ApplicationException(string.Join("; ", roleResult.Errors.Select(e => e.Description)));
         }
+        
+        // Generate email confirmation token and send confirmation email
+        var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        await emailService.SendEmailConfirmationAsync(user, user.Email, confirmationToken);
+        logger.LogInformation("Email confirmation sent to user {UserId}", user.Id);
     }
     
     public async Task<TokenResponseDto> Login(string clientType, IPAddress ipAddress, LoginDto dto, CancellationToken cancellationToken)
@@ -64,6 +69,10 @@ public class IdentityService(ILogger<IdentityService> logger,
         var isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
         if (!isPasswordValid)
             throw new ForbidException();
+        
+        // Check if email is confirmed
+        if (!user.EmailConfirmed)
+            throw new ForbidException("Email is not confirmed. Please check your email and confirm your account.");
         
         // If client type is "Game", revoke existing refresh tokens for game clients
         if (clientType == ClientTypes.Game)
@@ -234,6 +243,25 @@ public class IdentityService(ILogger<IdentityService> logger,
         
         await dbContext.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Password reset successfully for user {UserId}. All sessions invalidated.", user.Id);
+    }
+    
+    public async Task ConfirmEmail(ConfirmEmailDto dto, CancellationToken cancellationToken)
+    {
+        var user = await userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+            throw new NotFoundException(nameof(User), nameof(User.Email), "Email", dto.Email);
+        
+        if (user.EmailConfirmed)
+        {
+            logger.LogInformation("Email already confirmed for user {UserId}", user.Id);
+            return;
+        }
+        
+        var result = await userManager.ConfirmEmailAsync(user, dto.Token);
+        if (!result.Succeeded)
+            throw new ApplicationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+        
+        logger.LogInformation("Email confirmed successfully for user {UserId}", user.Id);
     }
     
     private async Task<string> GenerateAccessToken(User user)
