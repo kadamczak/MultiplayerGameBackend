@@ -57,7 +57,7 @@ public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
         if (currentUser is null)
         {
             logger.LogWarning("Attempt to purchase offer by unauthenticated user");
-            throw new ForbidException();
+            throw new ForbidException("User must be authenticated to purchase offers.");
         }
 
         var userId = Guid.Parse(currentUser.Id);

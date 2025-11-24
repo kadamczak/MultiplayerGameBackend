@@ -47,7 +47,7 @@ public class UserService(ILogger<UserService> logger,
 
     public async Task<UserGameInfoDto> GetCurrentUserGameInfo(bool includeCustomization, bool includeUserItems, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to access their game info.");
         var userId = Guid.Parse(currentUser.Id);
         
         var user = await userManager.FindByIdAsync(userId.ToString())
@@ -104,7 +104,7 @@ public class UserService(ILogger<UserService> logger,
 
     public async Task UpdateUserCustomization(UpdateUserCustomizationDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to update their customization.");
         var userId = Guid.Parse(currentUser.Id);
         
         // Verify user exists

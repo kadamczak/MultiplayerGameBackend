@@ -68,11 +68,11 @@ public class IdentityService(ILogger<IdentityService> logger,
 
         var isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
         if (!isPasswordValid)
-            throw new ForbidException();
+            throw new ForbidException("Invalid username or password.");
         
         // Check if email is confirmed
         if (!user.EmailConfirmed)
-            throw new ForbidException("Email is not confirmed. Please check your email and confirm your account.");
+            throw new ForbidException("Email is not confirmed. Please check your email and activate your account.");
         
         // If client type is "Game", revoke existing refresh tokens for game clients
         if (clientType == ClientTypes.Game)
@@ -153,7 +153,7 @@ public class IdentityService(ILogger<IdentityService> logger,
     
     public async Task ChangePassword(ChangePasswordDto dto, string refreshToken, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("No authenticated user found.");
         var userId = Guid.Parse(currentUser.Id);
         
         var user = await userManager.FindByIdAsync(userId.ToString());
@@ -162,7 +162,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         
         var isCurrentPasswordValid = await userManager.CheckPasswordAsync(user, dto.CurrentPassword);
         if (!isCurrentPasswordValid)
-            throw new ForbidException();
+            throw new ForbidException("Password is incorrect.");
         
         var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
         if (!result.Succeeded)
@@ -183,7 +183,7 @@ public class IdentityService(ILogger<IdentityService> logger,
     
     public async Task DeleteAccount(DeleteAccountDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("No authenticated user found.");
         var userId = Guid.Parse(currentUser.Id);
         
         var user = await userManager.FindByIdAsync(userId.ToString());
@@ -193,7 +193,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         // Verify password before deletion
         var isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
         if (!isPasswordValid)
-            throw new ForbidException();
+            throw new ForbidException("Password is incorrect.");
         
         // Delete the user (database constraints will handle related entities)
         var result = await userManager.DeleteAsync(user);

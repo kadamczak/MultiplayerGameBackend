@@ -14,7 +14,7 @@ public class UserItemService(ILogger<UserItemService> logger,
 {
     public async Task<IEnumerable<ReadUserItemSimplifiedDto>> GetCurrentUserItems(CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to access their items.");
         var userId = Guid.Parse(currentUser.Id);
 
         var userItems = await dbContext.UserItems

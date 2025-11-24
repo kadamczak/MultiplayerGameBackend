@@ -88,7 +88,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
     
     public async Task CreateOffer(CreateUserItemOfferDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to create offers.");
         var userId = Guid.Parse(currentUser.Id);
         logger.LogInformation("User {UserId} attempting to create offer for UserItem {UserItemId}", userId, dto.UserItemId);
         
@@ -106,7 +106,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         if (userItem.UserId != userId)
         {
             logger.LogWarning("User {UserId} attempted to create offer for UserItem {UserItemId} that doesn't belong to them", userId, dto.UserItemId);
-            throw new ForbidException();
+            throw new ForbidException("You do not own this Item.");
         }
         
         // Check if an active offer already exists for this UserItem
@@ -132,7 +132,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
 
     public async Task DeleteOffer(Guid offerId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to delete offers.");
         var userId = Guid.Parse(currentUser.Id);
         logger.LogInformation("User {UserId} attempting to delete offer {OfferId}", userId, offerId);
         
@@ -149,7 +149,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         if (offer.UserItem?.UserId != userId)
         {
             logger.LogWarning("User {UserId} attempted to delete offer {OfferId} that doesn't belong to them", userId, offerId);
-            throw new ForbidException();
+            throw new ForbidException("You do not own this offer.");
         }
         
         dbContext.UserItemOffers.Remove(offer);
@@ -159,7 +159,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
     
     public async Task PurchaseOffer(Guid offerId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException();
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to purchase offers.");
         var buyerId = Guid.Parse(currentUser.Id);
         
         logger.LogInformation("User {BuyerId} attempting to purchase offer {OfferId}", buyerId, offerId);
