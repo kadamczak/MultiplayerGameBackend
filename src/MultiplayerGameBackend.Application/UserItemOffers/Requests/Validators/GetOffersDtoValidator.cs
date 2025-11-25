@@ -2,14 +2,14 @@ using FluentValidation;
 
 namespace MultiplayerGameBackend.Application.UserItemOffers.Requests.Validators;
 
-public class GetOffersQueryValidator : AbstractValidator<GetOffersQuery>
+public class GetOffersDtoValidator : AbstractValidator<GetOffersDto>
 {
     private static readonly int[] AllowedPageSizes = [5, 10, 15];
     private static readonly string[] ActiveOffersSortByValues = ["Name", "Type", "SellerUserName", "Price", "PublishedAt"];
     private static readonly string[] InactiveOffersSortByValues = ["Name", "Type", "SellerUserName", "Price", "PublishedAt", "BoughtAt", "BuyerUserName"];
     private const int MaxSearchPhraseLength = 256;
 
-    public GetOffersQueryValidator()
+    public GetOffersDtoValidator()
     {
         RuleFor(x => x.PagedQuery.PageNumber)
             .GreaterThanOrEqualTo(1)

@@ -13,19 +13,19 @@ namespace MultiplayerGameBackend.API.Controllers;
 [Route("v1/users")]
 [Authorize]
 public class UserItemOfferController(IUserItemOfferService userItemOfferService,
-    GetOffersQueryValidator getOffersQueryValidator) : ControllerBase
+    GetOffersDtoValidator getOffersDtoValidator) : ControllerBase
 {
     [HttpGet("offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ReadUserItemOfferDto?>> GetOffers([FromQuery] GetOffersQuery query,
+    public async Task<ActionResult<ReadUserItemOfferDto?>> GetOffers([FromQuery] GetOffersDto dto,
         CancellationToken cancellationToken)
     {
-        var validationResult = await getOffersQueryValidator.ValidateAsync(query, cancellationToken);
+        var validationResult = await getOffersDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        var offers = await userItemOfferService.GetOffers(query.PagedQuery, query.ShowActive, cancellationToken);
+        var offers = await userItemOfferService.GetOffers(dto.PagedQuery, dto.ShowActive, cancellationToken);
         return Ok(offers);
     }
 
