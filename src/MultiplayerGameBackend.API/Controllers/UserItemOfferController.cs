@@ -14,9 +14,11 @@ public class UserItemOfferController(IUserItemOfferService userItemOfferService)
 {
     [HttpGet("offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ReadActiveUserItemOfferDto?>> GetActiveOffers([FromQuery] PagedQuery query, CancellationToken cancellationToken)
+    public async Task<ActionResult<ReadUserItemOfferDto?>> GetActiveOffers([FromQuery] PagedQuery query,
+        [FromQuery] bool showActive,
+        CancellationToken cancellationToken)
     {
-        var offers = await userItemOfferService.GetActiveOffers(query, cancellationToken);
+        var offers = await userItemOfferService.GetOffers(query, showActive, cancellationToken);
         return Ok(offers);
     }
 

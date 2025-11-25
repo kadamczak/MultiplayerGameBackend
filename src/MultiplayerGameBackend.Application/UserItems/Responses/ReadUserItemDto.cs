@@ -6,10 +6,7 @@ public class ReadUserItemDto
 {
     public Guid Id { get; set; }
     public required ReadItemDto Item { get; set; }
+    public bool? HasActiveOffer { get; set; }
+    
     // enchants?
-    
-    public Guid? UserId { get; set; }
-    public string? UserName { get; set; }
-    
-    public bool HasActiveOffer { get; set; }
 }

@@ -64,7 +64,7 @@ public class UserService(ILogger<UserService> logger,
                 customizationDto = customizationMapper.Map(customization);
         }
 
-        List<ReadUserItemSimplifiedDto>? userItems = null;
+        List<ReadUserItemDto>? userItems = null;
         if (includeUserItems)
         {
             var userItemEntities = await dbContext.UserItems
@@ -74,7 +74,7 @@ public class UserService(ILogger<UserService> logger,
                 .ToListAsync(cancellationToken);
             
             userItems = userItemEntities
-                .Select(ui => new ReadUserItemSimplifiedDto
+                .Select(ui => new ReadUserItemDto
                 {
                     Id = ui.Id,
                     Item = new ReadItemDto

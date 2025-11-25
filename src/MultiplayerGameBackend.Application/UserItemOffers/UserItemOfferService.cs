@@ -18,32 +18,47 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
     IMultiplayerGameDbContext dbContext,
     IUserContext userContext) : IUserItemOfferService
 {
-    public async Task<PagedResult<ReadActiveUserItemOfferDto>> GetActiveOffers(PagedQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResult<ReadUserItemOfferDto>> GetOffers(PagedQuery query, bool showActive, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Fetching active user item offers");
+        logger.LogInformation("Fetching user item offers");
         var searchPhraseLower = query.SearchPhrase?.ToLower();
         
         var baseQuery = dbContext.UserItemOffers
-            .AsNoTracking()
-            .Where(o => o.BuyerId == null)
+            .AsNoTracking();
+        
+        baseQuery = showActive 
+            ? baseQuery.Where(o => o.BuyerId == null)
+            : baseQuery.Where(o => o.BuyerId != null);
+        
+        baseQuery = baseQuery
             .Include(o => o.UserItem)
             .ThenInclude(ui => ui!.Item)
             .Include(o => o.Seller)
-            .Where(o => searchPhraseLower == null || o.UserItem.Item.Name.ToLower().Contains(searchPhraseLower)
-                                                              || o.UserItem.Item.Type.ToLower().Contains(searchPhraseLower)
-                                                              || o.Seller.UserName.ToLower().Contains(searchPhraseLower));
+            .Include(o => o.Buyer);
+            
+        if (showActive)
+        {
+            baseQuery = baseQuery.Where(o => searchPhraseLower == null 
+                || o.UserItem.Item.Name.ToLower().Contains(searchPhraseLower)
+                || o.UserItem.Item.Type.ToLower().Contains(searchPhraseLower)
+                || o.Seller.UserName.ToLower().Contains(searchPhraseLower));
+        }
+        else
+        {
+            baseQuery = baseQuery.Where(o => searchPhraseLower == null 
+                || o.UserItem.Item.Name.ToLower().Contains(searchPhraseLower)
+                || o.UserItem.Item.Type.ToLower().Contains(searchPhraseLower)
+                || o.Seller.UserName.ToLower().Contains(searchPhraseLower)
+                || o.Buyer.UserName.ToLower().Contains(searchPhraseLower));
+        }
             
         var totalCount = await baseQuery.CountAsync(cancellationToken);
 
         if (query.SortBy is not null)
         {
-            var columnsSelector = new Dictionary<string, Expression<Func<UserItemOffer, object>>>
-            {
-                { nameof(UserItem.Item.Name), r => r.UserItem.Item.Name },
-                { nameof(UserItem.Item.Type), r => r.UserItem.Item.Type },
-                { nameof(UserItemOffer.Seller.UserName), r => r.Seller.UserName },
-                { nameof(UserItemOffer.Price), r => r.Price }
-            };
+            var columnsSelector =  showActive
+                ? ActiveColumnsSelector
+                : InactiveColumnsSelector;
 
             var selectedColumn = columnsSelector[query.SortBy];
 
@@ -57,10 +72,19 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
             .Take(query.PageSize);
         
         var offers = await offerEntities
-            .Select(o => new ReadActiveUserItemOfferDto
+            .Select(o => new ReadUserItemOfferDto
             {
                 Id = o.Id,
                 Price = o.Price,
+                
+                SellerId = o.SellerId,
+                SellerUsername = o.Seller!.UserName,
+                PublishedAt = o.PublishedAt,
+                
+                BuyerId = o.BuyerId,
+                BuyerUsername = o.Buyer!.UserName,
+                BoughtAt = o.BoughtAt,
+                
                 UserItem = new ReadUserItemDto
                 {
                     Id = o.UserItem!.Id,
@@ -71,20 +95,34 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
                         Description = o.UserItem.Item.Description,
                         Type = o.UserItem.Item.Type,
                         ThumbnailUrl = o.UserItem.Item.ThumbnailUrl,
-                    },
-                    UserId = o.SellerId,
-                    UserName = o.Seller.UserName,
-                    HasActiveOffer = true
+                    }
                 }
             })
             .ToListAsync(cancellationToken);
         
-        var result = new PagedResult<ReadActiveUserItemOfferDto>(offers, totalCount, query.PageSize, query.PageNumber);
+        var result = new PagedResult<ReadUserItemOfferDto>(offers, totalCount, query.PageSize, query.PageNumber);
         return result;
     }
     
-
-
+    Dictionary<string, Expression<Func<UserItemOffer, object>>> ActiveColumnsSelector = new()
+    {
+        { nameof(UserItem.Item.Name), r => r.UserItem.Item.Name },
+        { nameof(UserItem.Item.Type), r => r.UserItem.Item.Type },
+        { "SellerUserName", r => r.Seller.UserName },
+        { nameof(UserItemOffer.Price), r => r.Price },
+        { nameof(UserItemOffer.PublishedAt), r => r.PublishedAt },
+    };
+    
+    Dictionary<string, Expression<Func<UserItemOffer, object>>> InactiveColumnsSelector = new()
+    {
+        { nameof(UserItem.Item.Name), r => r.UserItem.Item.Name },
+        { nameof(UserItem.Item.Type), r => r.UserItem.Item.Type },
+        { "SellerUserName", r => r.Seller.UserName },
+        { nameof(UserItemOffer.Price), r => r.Price },
+        { nameof(UserItemOffer.PublishedAt), r => r.PublishedAt },
+        { nameof(UserItemOffer.BoughtAt), r => r.BoughtAt },
+        { "BuyerUserName", r => r.Buyer.UserName },
+    };
     
     public async Task CreateOffer(CreateUserItemOfferDto dto, CancellationToken cancellationToken)
     {
@@ -122,6 +160,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
             UserItemId = dto.UserItemId,
             Price = dto.Price,
             SellerId = userId,
+            PublishedAt = DateTime.UtcNow,
             BuyerId = null
         };
         
@@ -216,6 +255,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         // Transfer ownership and check as bought
         offer.UserItem.UserId = buyerId;
         offer.BuyerId = buyerId;
+        offer.BoughtAt = DateTime.UtcNow;
         
         await dbContext.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Successfully completed purchase: User {BuyerId} bought UserItem {UserItemId} from User {SellerId} for {Price}", 

@@ -12,7 +12,7 @@ public class UserItemService(ILogger<UserItemService> logger,
     IMultiplayerGameDbContext dbContext,
     IUserContext userContext) : IUserItemService
 {
-    public async Task<IEnumerable<ReadUserItemSimplifiedDto>> GetCurrentUserItems(CancellationToken cancellationToken)
+    public async Task<IEnumerable<ReadUserItemDto>> GetCurrentUserItems(CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to access their items.");
         var userId = Guid.Parse(currentUser.Id);
@@ -21,7 +21,7 @@ public class UserItemService(ILogger<UserItemService> logger,
             .AsNoTracking()
             .Where(ui => ui.UserId == userId)
             .Include(ui => ui.Offers)
-            .Select(ui => new ReadUserItemSimplifiedDto
+            .Select(ui => new ReadUserItemDto
             {
                 Id = ui.Id,
                 Item = new ReadItemDto

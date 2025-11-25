@@ -9,5 +9,5 @@ public class UserGameInfoDto
     public int Balance { get; set; }
     
     public ReadUserCustomizationDto? Customization { get; set; }
-    public List<ReadUserItemSimplifiedDto>? UserItems { get; set; }
+    public List<ReadUserItemDto>? UserItems { get; set; }
 }
