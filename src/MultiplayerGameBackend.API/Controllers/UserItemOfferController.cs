@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.Application.Common;
+using MultiplayerGameBackend.Application.Extensions;
 using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
+using MultiplayerGameBackend.Application.UserItemOffers.Requests.Validators;
 using MultiplayerGameBackend.Application.UserItemOffers.Responses;
 
 namespace MultiplayerGameBackend.API.Controllers;
@@ -10,15 +12,20 @@ namespace MultiplayerGameBackend.API.Controllers;
 [ApiController]
 [Route("v1/users")]
 [Authorize]
-public class UserItemOfferController(IUserItemOfferService userItemOfferService) : ControllerBase
+public class UserItemOfferController(IUserItemOfferService userItemOfferService,
+    GetOffersQueryValidator getOffersQueryValidator) : ControllerBase
 {
     [HttpGet("offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ReadUserItemOfferDto?>> GetActiveOffers([FromQuery] PagedQuery query,
-        [FromQuery] bool showActive,
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ReadUserItemOfferDto?>> GetOffers([FromQuery] GetOffersQuery query,
         CancellationToken cancellationToken)
     {
-        var offers = await userItemOfferService.GetOffers(query, showActive, cancellationToken);
+        var validationResult = await getOffersQueryValidator.ValidateAsync(query, cancellationToken);
+        if (!validationResult.IsValid)
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
+        
+        var offers = await userItemOfferService.GetOffers(query.PagedQuery, query.ShowActive, cancellationToken);
         return Ok(offers);
     }
 
