@@ -21,10 +21,18 @@ public class User : IdentityUser<Guid>
         public const int StartingBalance = 300;
         public const int MinBalance = 0;
         public const int MaxBalance = 999_999;
+        
+        public const int ProfilePictureUrlMaxLength = 500;
+        public const int ProfilePictureMaxSizeBytes = 2 * 1024 * 1024; // 2 MB
+        public const int ProfilePictureCompressedMaxWidth = 500;
+        public const int ProfilePictureCompressedMaxHeight = 500;
     }
     
     [Range(Constraints.MinBalance, Constraints.MaxBalance)]
     public int Balance { get; set; } = Constraints.StartingBalance;
+    
+    [MaxLength(Constraints.ProfilePictureUrlMaxLength)]
+    public string? ProfilePictureUrl { get; set; }
     
     public List<RefreshToken> RefreshTokens { get; set; } = [];
     public List<UserItem> UserItems { get; set; } = [];

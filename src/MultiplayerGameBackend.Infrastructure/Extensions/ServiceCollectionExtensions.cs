@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Email;
+using MultiplayerGameBackend.Infrastructure.Images;
 using MultiplayerGameBackend.Infrastructure.Persistence;
 using MultiplayerGameBackend.Infrastructure.Seeders;
 
@@ -23,5 +24,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMultiplayerGameSeeder, MultiplayerGameSeeder>();
         
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IImageService, ImageService>();
     }
 }
