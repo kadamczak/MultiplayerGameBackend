@@ -26,5 +26,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IImageService, ImageService>();
         
         services.AddHostedService<RefreshTokenCleanupService>();
+        services.AddHostedService<UnactivatedAccountCleanupService>();
     }
 }

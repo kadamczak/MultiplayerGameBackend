@@ -1,21 +1,25 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Interfaces;
+using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.Infrastructure.BackgroundServices;
 
-public class RefreshTokenCleanupService(
+// Cleans accounts that were made over 24 hours ago
+// but have not been activated through email.
+public class UnactivatedAccountCleanupService(
     IServiceProvider serviceProvider,
-    ILogger<RefreshTokenCleanupService> logger)
+    ILogger<UnactivatedAccountCleanupService> logger)
     : BackgroundService
 {
     private readonly TimeSpan _interval = TimeSpan.FromHours(24);
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Refresh token cleanup service started.");
+        logger.LogInformation("Unactivated accounts cleanup service started.");
     
         using var timer = new PeriodicTimer(_interval);
         try
@@ -29,7 +33,7 @@ public class RefreshTokenCleanupService(
         }
         catch (OperationCanceledException)
         {
-            logger.LogInformation("Refresh token cleanup service is stopping.");
+            logger.LogInformation("Unactivated accounts cleanup service is stopping.");
         }
     }
     
@@ -37,28 +41,27 @@ public class RefreshTokenCleanupService(
     {
         try
         {
-            await CleanupExpiredTokens(cancellationToken);
-            logger.LogInformation("Refresh token cleanup completed.");
+            await CleanupUnactivatedAccounts(cancellationToken);
+            logger.LogInformation("Unactivated accounts cleanup completed.");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error occurred during refresh token cleanup.");
+            logger.LogError(ex, "Error occurred during unactivated accounts cleanup.");
         }
     }
 
-    private async Task CleanupExpiredTokens(CancellationToken cancellationToken)
+    private async Task CleanupUnactivatedAccounts(CancellationToken cancellationToken)
     {
         using var scope = serviceProvider.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var dbContext = scope.ServiceProvider.GetRequiredService<IMultiplayerGameDbContext>();
 
-        var now = DateTime.UtcNow;
-
-        var deletedCount = await dbContext.RefreshTokens
-            .Where(rt =>
-                // Remove all expired tokens
-                rt.ExpiresAt < now)
+        var cutoffDate = DateTime.UtcNow.AddDays(-1);
+        
+        var deletedUsersCount = await dbContext.Users
+            .Where(u => !u.EmailConfirmed && u.CreatedAt < cutoffDate)
             .ExecuteDeleteAsync(cancellationToken);
         
-        logger.LogInformation("Deleted {Count} expired/old refresh tokens.", deletedCount);
+        logger.LogInformation("Deleted {Count} unactivated accounts.", deletedUsersCount);
     }
 }

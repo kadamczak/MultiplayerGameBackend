@@ -34,6 +34,8 @@ public class User : IdentityUser<Guid>
     [MaxLength(Constraints.ProfilePictureUrlMaxLength)]
     public string? ProfilePictureUrl { get; set; }
     
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
     public List<RefreshToken> RefreshTokens { get; set; } = [];
     public List<UserItem> UserItems { get; set; } = [];
     public List<UserItemOffer> SoldItemOffers { get; set; } = [];

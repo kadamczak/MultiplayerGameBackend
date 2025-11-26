@@ -38,7 +38,8 @@ public class IdentityService(ILogger<IdentityService> logger,
         {
             UserName = dto.UserName.Trim(),
             Email = dto.Email.Trim(),
-            Balance = User.Constraints.StartingBalance
+            Balance = User.Constraints.StartingBalance,
+            CreatedAt = DateTime.UtcNow,
         };
 
         // Save user and assign "User" role
