@@ -6,6 +6,7 @@ using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
 using MultiplayerGameBackend.Application.Users.Responses;
 using MultiplayerGameBackend.Domain.Constants;
+using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
@@ -78,24 +79,21 @@ public class UserController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status413PayloadTooLarge)]
     [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
-    [RequestSizeLimit(Domain.Entities.User.Constraints.ProfilePictureMaxSizeBytes)]
     public async Task<IActionResult> UploadProfilePicture(IFormFile file, CancellationToken cancellationToken)
     {
         // Validate file size
         if (file.Length == 0)
-            return BadRequest(new { error = "No file uploaded." });
+            throw new BadRequest("No file uploaded.");
 
         if (file.Length > Domain.Entities.User.Constraints.ProfilePictureMaxSizeBytes)
-            return StatusCode(StatusCodes.Status413PayloadTooLarge, 
-                new { error = $"File size exceeds the maximum allowed size of {Domain.Entities.User.Constraints.ProfilePictureMaxSizeBytes / (1024 * 1024)} MB." });
+            throw new PayloadTooLargeException("Max file size is 2 MB." );
 
         // Validate file type
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        
+
         if (!allowedExtensions.Contains(extension))
-            return StatusCode(StatusCodes.Status415UnsupportedMediaType, 
-                new { error = "Invalid file type. Only JPG, JPEG, PNG, and WEBP files are allowed." });
+            throw new UnsupportedMediaType("Only JPG, JPEG, and PNG files are allowed.");
 
         await using var stream = file.OpenReadStream();
         var profilePictureUrl = await userService.UploadProfilePicture(stream, file.FileName, cancellationToken);

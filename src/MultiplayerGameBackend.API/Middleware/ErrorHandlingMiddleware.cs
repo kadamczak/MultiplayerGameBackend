@@ -66,6 +66,33 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
                 Status = StatusCodes.Status403Forbidden
             });
         }
+        catch (PayloadTooLargeException payloadTooLarge)
+        {
+            logger.LogWarning(payloadTooLarge.Message);
+            await WriteProblemAsync(context, new ProblemDetails
+            {
+                Title = payloadTooLarge.Message,
+                Status = StatusCodes.Status413PayloadTooLarge
+            });
+        }
+        catch (UnsupportedMediaType unsupportedMediaType)
+        {
+            logger.LogWarning(unsupportedMediaType.Message);
+            await WriteProblemAsync(context, new ProblemDetails
+            {
+                Title = unsupportedMediaType.Message,
+                Status = StatusCodes.Status415UnsupportedMediaType
+            });
+        }
+        catch (BadRequest badRequest)
+        {
+            logger.LogWarning(badRequest.Message);
+            await WriteProblemAsync(context, new ProblemDetails
+            {
+                Title = badRequest.Message,
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, ex.Message);
