@@ -54,18 +54,29 @@ public class UserItemService(ILogger<UserItemService> logger,
             .Take(query.PageSize);
         
         var userItems = await userItemEntities
-            .Select(ui => new ReadUserItemDto
+            .Select(ui => new
             {
-                Id = ui.Id,
+                ui.Id,
+                ui.Item,
+                ActiveOffer = dbContext.UserItemOffers
+                    .AsNoTracking()
+                    .Where(o => o.UserItemId == ui.Id && o.BuyerId == null)
+                    .Select(o => new { o.Id, o.Price })
+                    .FirstOrDefault()
+            })
+            .Select(x => new ReadUserItemDto
+            {
+                Id = x.Id,
                 Item = new ReadItemDto
                 {
-                    Id = ui.Item.Id,
-                    Name = ui.Item.Name,
-                    Description = ui.Item.Description,
-                    Type = ui.Item.Type,
-                    ThumbnailUrl = ui.Item.ThumbnailUrl,
+                    Id = x.Item.Id,
+                    Name = x.Item.Name,
+                    Description = x.Item.Description,
+                    Type = x.Item.Type,
+                    ThumbnailUrl = x.Item.ThumbnailUrl,
                 },
-                HasActiveOffer = dbContext.UserItemOffers.Any(o => o.UserItemId == ui.Id && o.BuyerId == null),
+                ActiveOfferId = x.ActiveOffer != null ? x.ActiveOffer.Id : null,
+                ActiveOfferPrice = x.ActiveOffer != null ? x.ActiveOffer.Price : null,
             })
             .ToListAsync(cancellationToken);
 
