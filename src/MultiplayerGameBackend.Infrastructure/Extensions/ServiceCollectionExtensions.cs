@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Application.Interfaces;
-using MultiplayerGameBackend.Domain.Entities;
+using MultiplayerGameBackend.Infrastructure.BackgroundServices;
 using MultiplayerGameBackend.Infrastructure.Email;
 using MultiplayerGameBackend.Infrastructure.Images;
 using MultiplayerGameBackend.Infrastructure.Persistence;
@@ -25,5 +24,7 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IImageService, ImageService>();
+        
+        services.AddHostedService<RefreshTokenCleanupService>();
     }
 }

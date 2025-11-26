@@ -20,8 +20,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserContext, UserContext>();
         services.AddHttpContextAccessor();
         
-        services.AddHostedService<RefreshTokenCleanupService>();
-        
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IIdentityService, IdentityService>();

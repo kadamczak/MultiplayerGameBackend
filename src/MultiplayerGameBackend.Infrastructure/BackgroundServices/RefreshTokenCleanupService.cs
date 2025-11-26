@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Interfaces;
 
-namespace MultiplayerGameBackend.Application.Identity;
+namespace MultiplayerGameBackend.Infrastructure.BackgroundServices;
 
 public class RefreshTokenCleanupService(
     IServiceProvider serviceProvider,
