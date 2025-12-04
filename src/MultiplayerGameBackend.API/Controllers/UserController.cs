@@ -66,10 +66,10 @@ public class UserController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> UpdateUserCustomization(UpdateUserCustomizationDto dto,
+    public async Task<IActionResult> UpdateUserAppearance(UpdateUserAppearanceDto dto,
         CancellationToken cancellationToken)
     {
-        await userService.UpdateUserCustomization(dto, cancellationToken);
+        await userService.UpdateUserAppearance(dto, cancellationToken);
         return NoContent();
     }
 

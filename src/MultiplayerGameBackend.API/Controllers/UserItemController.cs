@@ -28,5 +28,16 @@ public class UserItemController(IUserItemService userItemService,
         return Ok(userItems);
     }
     
+    [HttpPut("me/equipped-items")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> UpdateEquippedUserItems([FromBody] UpdateEquippedUserItemsDto dto,
+        CancellationToken cancellationToken)
+    {
+        await userItemService.UpdateEquippedUserItems(dto, cancellationToken);
+        return NoContent();
+    }
     
 }

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic.CompilerServices;
 using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Interfaces;
@@ -83,5 +84,68 @@ public class UserItemService(ILogger<UserItemService> logger,
         logger.LogInformation("Fetched {totalCount} items for user {UserId}", totalCount, currentUser.Id);
         var result = new PagedResult<ReadUserItemDto>(userItems, totalCount, query.PageSize, query.PageNumber);
         return result;
+    }
+
+    public async Task UpdateEquippedUserItems(UpdateEquippedUserItemsDto dto, CancellationToken cancellationToken)
+    {
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to update equipped items.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        logger.LogInformation("Updating equipped items for user {UserId}", userId);
+
+        // Validate head item if provided
+        if (dto.EquippedHeadUserItemId.HasValue)
+        {
+            var headUserItem = await dbContext.UserItems
+                .Include(ui => ui.Item)
+                .FirstOrDefaultAsync(ui => ui.Id == dto.EquippedHeadUserItemId.Value, cancellationToken);
+            
+            if (headUserItem is null)
+                throw new NotFoundException(nameof(UserItem), nameof(UserItem.Id), "ID", dto.EquippedHeadUserItemId.Value.ToString());
+            
+            if (headUserItem.UserId != userId)
+                throw new ForbidException("Cannot equip items that don't belong to you.");
+            
+            if (headUserItem.Item?.Type != ItemTypes.EquippableOnHead)
+                throw new UnprocessableEntityException(new Dictionary<string, string[]>
+                {
+                    { nameof(dto.EquippedHeadUserItemId), new[] { "The specified item is not a Head item." } }
+                });
+        }
+
+        // Validate body item if provided
+        if (dto.EquippedBodyUserItemId.HasValue)
+        {
+            var bodyUserItem = await dbContext.UserItems
+                .Include(ui => ui.Item)
+                .FirstOrDefaultAsync(ui => ui.Id == dto.EquippedBodyUserItemId.Value, cancellationToken);
+            
+            if (bodyUserItem is null)
+                throw new NotFoundException(nameof(UserItem), nameof(UserItem.Id), "ID", dto.EquippedBodyUserItemId.Value.ToString());
+            
+            if (bodyUserItem.UserId != userId)
+                throw new ForbidException("Cannot equip items that don't belong to you.");
+            
+            if (bodyUserItem.Item?.Type != ItemTypes.EquippableOnBody)
+                throw new UnprocessableEntityException(new Dictionary<string, string[]>
+                {
+                    { nameof(dto.EquippedBodyUserItemId), new[] { "The specified item is not a Body item." } }
+                });
+        }
+
+        // Get the user's customization
+        var customization = await dbContext.UserCustomizations
+            .FirstOrDefaultAsync(uc => uc.UserId == userId, cancellationToken);
+
+        if (customization is null)
+            throw new NotFoundException(nameof(UserCustomization), nameof(UserCustomization.UserId), "User ID", userId.ToString());
+
+        // Update the equipped items
+        customization.EquippedHeadUserItemId = dto.EquippedHeadUserItemId;
+        customization.EquippedBodyUserItemId = dto.EquippedBodyUserItemId;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("Updated equipped items for user {UserId}: Head={HeadItemId}, Body={BodyItemId}", 
+            userId, dto.EquippedHeadUserItemId, dto.EquippedBodyUserItemId);
     }
 }

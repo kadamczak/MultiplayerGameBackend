@@ -17,5 +17,7 @@ public class ReadUserCustomizationDto
     public int WingType { get; set; }
     public int HornType { get; set; }
     public int MarkingsType { get; set;}
-
+    
+    public Guid? EquippedHeadUserItemId { get; set; }
+    public Guid? EquippedBodyUserItemId { get; set; }
 }

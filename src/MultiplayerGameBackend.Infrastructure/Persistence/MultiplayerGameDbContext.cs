@@ -150,6 +150,16 @@ public class MultiplayerGameDbContext
         modelBuilder.Entity<UserCustomization>(entity =>
         {
             entity.HasKey(e => e.Id);
+            
+            entity.HasOne(uc => uc.EquippedHeadUserItem)
+                .WithMany()
+                .HasForeignKey(uc => uc.EquippedHeadUserItemId)
+                .OnDelete(DeleteBehavior.SetNull);
+            
+            entity.HasOne(uc => uc.EquippedBodyUserItem)
+                .WithMany()
+                .HasForeignKey(uc => uc.EquippedBodyUserItemId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
     

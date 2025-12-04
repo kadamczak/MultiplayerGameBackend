@@ -39,7 +39,14 @@ public class UserCustomization
     public int EyeType { get; set; }
     public int WingType { get; set; }
     public int HornType { get; set; }
-    public int MarkingsType { get; set;}
+    public int MarkingsType { get; set; }
+    
+    // Equipped items
+    public Guid? EquippedHeadUserItemId { get; set; }
+    public UserItem? EquippedHeadUserItem { get; set; }
+    
+    public Guid? EquippedBodyUserItemId { get; set; }
+    public UserItem? EquippedBodyUserItem { get; set; }
     
     public Guid UserId { get; set;  }
     public User? User { get; set; }

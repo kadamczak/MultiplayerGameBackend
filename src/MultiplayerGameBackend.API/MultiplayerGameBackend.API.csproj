@@ -23,4 +23,8 @@
         <ProjectReference Include="..\MultiplayerGameBackend.Infrastructure\MultiplayerGameBackend.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="logs\" />
+    </ItemGroup>
+
 </Project>

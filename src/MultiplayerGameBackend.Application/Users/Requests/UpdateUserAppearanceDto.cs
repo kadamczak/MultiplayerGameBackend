@@ -3,7 +3,7 @@ using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.Application.Users.Requests;
 
-public class UpdateUserCustomizationDto
+public class UpdateUserAppearanceDto
 {
     [StringLength(UserCustomization.Constraints.ColorMaxLength, MinimumLength = UserCustomization.Constraints.ColorMinLength)]
     public required string HeadColor { get; set; }
