@@ -75,6 +75,16 @@ public class UserService(ILogger<UserService> logger,
                 .ToListAsync(cancellationToken);
             
             userItems = userItemEntities
+                .Select(ui => new
+                {
+                    ui.Id,
+                    ui.Item,
+                    ActiveOffer = dbContext.UserItemOffers
+                        .AsNoTracking()
+                        .Where(o => o.UserItemId == ui.Id && o.BuyerId == null)
+                        .Select(o => new { o.Id, o.Price })
+                        .FirstOrDefault()
+                })
                 .Select(ui => new ReadUserItemDto
                 {
                     Id = ui.Id,
@@ -85,7 +95,9 @@ public class UserService(ILogger<UserService> logger,
                         Description = ui.Item.Description,
                         Type = ui.Item.Type,
                         ThumbnailUrl = ui.Item.ThumbnailUrl,
-                    }
+                    },
+                    ActiveOfferId = ui.ActiveOffer?.Id,
+                    ActiveOfferPrice = ui.ActiveOffer?.Price,
                 })
                 .ToList();
         }
