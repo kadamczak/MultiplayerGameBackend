@@ -17,6 +17,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.Infr
 		{37FC71C8-2530-41E7-9BED-5D6255366285} = {37FC71C8-2530-41E7-9BED-5D6255366285}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.Application.Tests", "tests\MultiplayerGameBackend.Application.Tests\MultiplayerGameBackend.Application.Tests.csproj", "{53185375-D07B-4F8D-9BDD-5444DA146E87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.Infrastructure.Tests", "tests\MultiplayerGameBackend.Infrastructure.Tests\MultiplayerGameBackend.Infrastructure.Tests.csproj", "{EEE26C93-1132-401C-AE8E-5C8DC587341F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.API.Tests", "tests\MultiplayerGameBackend.API.Tests\MultiplayerGameBackend.API.Tests.csproj", "{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,5 +65,17 @@ Global
 		{5890BB43-6484-41F0-9EE2-2A7326BAE40B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5890BB43-6484-41F0-9EE2-2A7326BAE40B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5890BB43-6484-41F0-9EE2-2A7326BAE40B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53185375-D07B-4F8D-9BDD-5444DA146E87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53185375-D07B-4F8D-9BDD-5444DA146E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53185375-D07B-4F8D-9BDD-5444DA146E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53185375-D07B-4F8D-9BDD-5444DA146E87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEE26C93-1132-401C-AE8E-5C8DC587341F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE26C93-1132-401C-AE8E-5C8DC587341F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE26C93-1132-401C-AE8E-5C8DC587341F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE26C93-1132-401C-AE8E-5C8DC587341F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
