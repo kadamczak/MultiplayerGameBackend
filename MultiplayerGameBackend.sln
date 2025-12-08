@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.API.Tests", "tests\MultiplayerGameBackend.API.Tests\MultiplayerGameBackend.API.Tests.csproj", "{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiplayerGameBackend.Domain.Tests", "tests\MultiplayerGameBackend.Domain.Tests\MultiplayerGameBackend.Domain.Tests.csproj", "{3E869F40-177C-46ED-BB19-9BA2C868F49F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,5 +79,9 @@ Global
 		{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDF61B7A-8DB2-4F63-A242-8E1F6A060ED0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E869F40-177C-46ED-BB19-9BA2C868F49F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E869F40-177C-46ED-BB19-9BA2C868F49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E869F40-177C-46ED-BB19-9BA2C868F49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E869F40-177C-46ED-BB19-9BA2C868F49F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
