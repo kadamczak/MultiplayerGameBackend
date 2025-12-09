@@ -69,6 +69,8 @@ public class ItemService(ILogger<ItemService> logger,
         
         item.Name = dto.Name.Trim();
         item.Description = dto.Description.Trim();
+        item.Type = dto.Type;
+        item.ThumbnailUrl = dto.ThumbnailUrl;
         
         await dbContext.SaveChangesAsync(cancellationToken);
     }

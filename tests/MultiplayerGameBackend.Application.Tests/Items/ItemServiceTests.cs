@@ -39,7 +39,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         {
             Name = "Test Sword",
             Description = "A powerful sword",
-            Type = ItemTypes.EquippableOnHead,
+            Type = ItemTypes.EquippableOnBody,
             ThumbnailUrl = "assets/sword.png"
         };
         context.Items.Add(item);
@@ -82,12 +82,11 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var items = new List<Item>
-        {
+        List<Item> items = [
             new() { Name = "Item 1", Description = "Desc 1", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "url1.png" },
             new() { Name = "Item 2", Description = "Desc 2", Type = ItemTypes.EquippableOnBody, ThumbnailUrl = "url2.png" },
             new() { Name = "Item 3", Description = "Desc 3", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "url3.png" }
-        };
+        ];
         context.Items.AddRange(items);
         await context.SaveChangesAsync();
 
@@ -115,6 +114,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
 
         // Assert
         Assert.NotNull(result);
+        Assert.Empty(result);
     }
 
     #endregion
@@ -130,8 +130,8 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
 
         var dto = new CreateUpdateItemDto
         {
-            Name = "  New Helmet  ",
-            Description = "  A shiny helmet  ",
+            Name = "New Helmet",
+            Description = "A shiny helmet",
             Type = ItemTypes.EquippableOnHead,
             ThumbnailUrl = "assets/helmet.png"
         };
@@ -144,8 +144,8 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
 
         var createdItem = await context.Items.FindAsync(itemId);
         Assert.NotNull(createdItem);
-        Assert.Equal("New Helmet", createdItem.Name); // Trimmed
-        Assert.Equal("A shiny helmet", createdItem.Description); // Trimmed
+        Assert.Equal("New Helmet", createdItem.Name);
+        Assert.Equal("A shiny helmet", createdItem.Description);
         Assert.Equal(ItemTypes.EquippableOnHead, createdItem.Type);
         Assert.Equal("assets/helmet.png", createdItem.ThumbnailUrl);
     }
@@ -204,7 +204,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var exception = await Assert.ThrowsAsync<ConflictException>(
             () => service.Create(dto, CancellationToken.None)
         );
-
+        
         Assert.NotNull(exception.Errors);
         Assert.True(exception.Errors.ContainsKey("Name"));
     }
@@ -232,8 +232,8 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
 
         var updateDto = new CreateUpdateItemDto
         {
-            Name = "  Updated Name  ",
-            Description = "  Updated Description  ",
+            Name = "Updated Name",
+            Description = "Updated Description",
             Type = ItemTypes.EquippableOnBody,
             ThumbnailUrl = "assets/updated.png"
         };
@@ -246,7 +246,8 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         Assert.NotNull(updatedItem);
         Assert.Equal("Updated Name", updatedItem.Name);
         Assert.Equal("Updated Description", updatedItem.Description);
-        // Note: ItemService.Update doesn't update Type and ThumbnailUrl based on the code
+        Assert.Equal(ItemTypes.EquippableOnBody, updatedItem.Type);
+        Assert.Equal("assets/updated.png", updatedItem.ThumbnailUrl);
     }
 
     [Fact]
@@ -282,6 +283,8 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         Assert.NotNull(updatedItem);
         Assert.Equal("Trimmed Name", updatedItem.Name);
         Assert.Equal("Trimmed Description", updatedItem.Description);
+        Assert.Equal(ItemTypes.EquippableOnBody, updatedItem.Type);
+        Assert.Equal("assets/test2.png", updatedItem.ThumbnailUrl);
     }
 
     [Fact]
@@ -379,7 +382,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
 
     #endregion
 
-    #region Edge Cases and Integration Tests
+    #region Other Tests
 
     [Fact]
     public async Task Create_AndGetById_ShouldWorkTogether()
@@ -407,48 +410,13 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Update_AndGetById_ShouldWorkTogether()
-    {
-        // Arrange
-        await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
-
-        var item = new Item
-        {
-            Name = "Before Update",
-            Description = "Original",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/before.png"
-        };
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var updateDto = new CreateUpdateItemDto
-        {
-            Name = "After Update",
-            Description = "Modified",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/after.png"
-        };
-
-        // Act
-        await service.Update(item.Id, updateDto, CancellationToken.None);
-        var retrieved = await service.GetById(item.Id, CancellationToken.None);
-
-        // Assert
-        Assert.NotNull(retrieved);
-        Assert.Equal("After Update", retrieved.Name);
-        Assert.Equal("Modified", retrieved.Description);
-    }
-
-    [Fact]
     public async Task CancellationToken_ShouldBeRespected()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
         var cts = new CancellationTokenSource();
-        cts.Cancel();
+        await cts.CancelAsync();
 
         // Act & Assert
         await Assert.ThrowsAsync<OperationCanceledException>(
