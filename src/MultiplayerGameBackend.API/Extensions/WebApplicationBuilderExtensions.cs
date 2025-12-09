@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MultiplayerGameBackend.API.Middleware;
+using MultiplayerGameBackend.API.Services;
+using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
 using Microsoft.OpenApi.Models;
@@ -100,6 +102,9 @@ public static class WebApplicationBuilderExtensions
                       .AllowCredentials();
             });
         });
+        
+        builder.Services.AddScoped<IUserContext, UserContext>();
+        builder.Services.AddHttpContextAccessor();
         
         builder.Services.AddScoped<ErrorHandlingMiddleware>();
         builder.Services.AddScoped<RequestTimeLoggingMiddleware>();

@@ -1,13 +1,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Users;
 
-namespace MultiplayerGameBackend.Application.Identity;
-
-public interface IUserContext
-{
-    CurrentUser? GetCurrentUser();
-}
+namespace MultiplayerGameBackend.API.Services;
 
 public class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContext
 {
@@ -26,6 +22,5 @@ public class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContex
 
         return new CurrentUser(userId, userName, email, roles);
     }
-    
-    
 }
+

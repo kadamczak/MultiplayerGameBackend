@@ -17,9 +17,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddValidatorsFromAssemblyContaining<ModifyUserRoleDtoValidator>();
         
-        services.AddScoped<IUserContext, UserContext>();
-        services.AddHttpContextAccessor();
-        
         services.AddScoped<IItemService, ItemService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IIdentityService, IdentityService>();
