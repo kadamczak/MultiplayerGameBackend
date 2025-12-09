@@ -40,11 +40,13 @@ public class DatabaseFixture : IAsyncLifetime
     {
         await using var context = CreateDbContext();
         
+        // Remove all data from tables (in reverse order of dependencies to avoid FK constraints)
         context.UserItemOffers.RemoveRange(context.UserItemOffers);
         context.MerchantItemOffers.RemoveRange(context.MerchantItemOffers);
         context.UserItems.RemoveRange(context.UserItems);
         context.Items.RemoveRange(context.Items);
         context.Users.RemoveRange(context.Users);
+        context.InGameMerchants.RemoveRange(context.InGameMerchants);
         
         await context.SaveChangesAsync();
     }
