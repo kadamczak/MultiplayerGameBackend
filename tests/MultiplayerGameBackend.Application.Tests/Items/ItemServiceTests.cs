@@ -23,8 +23,8 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         _mapper = new ItemMapper();
     }
 
-    public async Task InitializeAsync() => await _fixture.InitializeAsync();
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task InitializeAsync() => Task.CompletedTask;
+    public async Task DisposeAsync() => await _fixture.CleanDatabase();
 
     #region GetById Tests
 
@@ -115,7 +115,6 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
 
         // Assert
         Assert.NotNull(result);
-        // Note: May not be empty if other tests have run, so we just check it's not null
     }
 
     #endregion

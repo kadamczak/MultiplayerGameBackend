@@ -18,7 +18,6 @@ public class DatabaseFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _postgresContainer.StartAsync();
-        
         await using var context = CreateDbContext();
         await context.Database.EnsureCreatedAsync();
     }
@@ -37,25 +36,17 @@ public class DatabaseFixture : IAsyncLifetime
         return new MultiplayerGameDbContext(options);
     }
     
-    public async Task ResetDatabaseAsync()
+    public async Task CleanDatabase()
     {
         await using var context = CreateDbContext();
-    
-        // Disable FK checks, truncate, re-enable
-        await context.Database.ExecuteSqlRawAsync("SET session_replication_role = 'replica';");
-    
-        var tableNames = context.Model.GetEntityTypes()
-            .Select(t => t.GetTableName())
-            .Where(t => t != null)
-            .Distinct();
-    
-        foreach (var tableName in tableNames)
-        {
-            await context.Database.ExecuteSqlRawAsync(
-                $"TRUNCATE TABLE {tableName} RESTART IDENTITY CASCADE");
-        }
-    
-        await context.Database.ExecuteSqlRawAsync("SET session_replication_role = 'origin';");
+        
+        context.UserItemOffers.RemoveRange(context.UserItemOffers);
+        context.MerchantItemOffers.RemoveRange(context.MerchantItemOffers);
+        context.UserItems.RemoveRange(context.UserItems);
+        context.Items.RemoveRange(context.Items);
+        context.Users.RemoveRange(context.Users);
+        
+        await context.SaveChangesAsync();
     }
 }
 
