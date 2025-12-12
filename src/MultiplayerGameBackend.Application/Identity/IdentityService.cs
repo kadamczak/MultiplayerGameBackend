@@ -20,7 +20,6 @@ public class IdentityService(ILogger<IdentityService> logger,
     UserManager<User> userManager,
     IMultiplayerGameDbContext dbContext,
     IConfiguration configuration,
-    IUserContext userContext,
     IEmailService emailService) : IIdentityService
 {
     public async Task RegisterUser(RegisterDto dto)
@@ -152,11 +151,8 @@ public class IdentityService(ILogger<IdentityService> logger,
         await dbContext.SaveChangesAsync(cancellationToken);
     }
     
-    public async Task ChangePassword(ChangePasswordDto dto, string refreshToken, CancellationToken cancellationToken)
+    public async Task ChangePassword(Guid userId, ChangePasswordDto dto, string refreshToken, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("No authenticated user found.");
-        var userId = Guid.Parse(currentUser.Id);
-        
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null)
             throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
@@ -182,11 +178,8 @@ public class IdentityService(ILogger<IdentityService> logger,
         logger.LogInformation("Password changed successfully for user {UserId}. All sessions invalidated.", userId);
     }
     
-    public async Task DeleteAccount(DeleteAccountDto dto, CancellationToken cancellationToken)
+    public async Task DeleteAccount(Guid userId, DeleteAccountDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("No authenticated user found.");
-        var userId = Guid.Parse(currentUser.Id);
-        
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null)
             throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());

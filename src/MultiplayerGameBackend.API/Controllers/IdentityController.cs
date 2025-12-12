@@ -6,6 +6,7 @@ using MultiplayerGameBackend.Application.Identity.Requests;
 using MultiplayerGameBackend.Application.Identity.Requests.Validators;
 using MultiplayerGameBackend.Application.Identity.Responses;
 using MultiplayerGameBackend.Domain.Constants;
+using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
@@ -13,7 +14,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 [Route("v1/identity")]
 public class IdentityController(IIdentityService identityService,
     RegisterDtoValidator registerDtoValidator,
-    ChangePasswordDtoValidator changePasswordDtoValidator) : ControllerBase
+    ChangePasswordDtoValidator changePasswordDtoValidator,
+    IUserContext userContext) : ControllerBase
 {
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -153,7 +155,10 @@ public class IdentityController(IIdentityService identityService,
         if (string.IsNullOrWhiteSpace(tokenToUse))
             return BadRequest("Refresh token was not present.");
         
-        await identityService.ChangePassword(dto, tokenToUse, cancellationToken);
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        await identityService.ChangePassword(userId, dto, tokenToUse, cancellationToken);
         return Ok(new { message = "Password changed successfully." });
     }
     
@@ -170,7 +175,10 @@ public class IdentityController(IIdentityService identityService,
         if (string.IsNullOrWhiteSpace(clientType) || !ClientTypes.IsValidClientType(clientType))
             return BadRequest("Invalid or missing X-Client-Type header.");
         
-        await identityService.DeleteAccount(dto, cancellationToken);
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        await identityService.DeleteAccount(userId, dto, cancellationToken);
         
         if (clientType == ClientTypes.Browser)
             Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/v1/identity" });
