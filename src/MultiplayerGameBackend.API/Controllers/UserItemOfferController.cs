@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MultiplayerGameBackend.Application.Common;
+using MultiplayerGameBackend.API.Services;
 using MultiplayerGameBackend.Application.Extensions;
-using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests.Validators;
