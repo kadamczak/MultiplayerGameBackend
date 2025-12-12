@@ -1,8 +1,6 @@
 using Microsoft.Extensions.Logging;
-using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.Tests.Common;
-using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
@@ -14,13 +12,11 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
 {
     private readonly DatabaseFixture _fixture;
     private readonly ILogger<MerchantItemOfferService> _logger;
-    private readonly IUserContext _userContext;
 
     public MerchantItemOfferServiceTests(DatabaseFixture fixture)
     {
         _fixture = fixture;
         _logger = Substitute.For<ILogger<MerchantItemOfferService>>();
-        _userContext = Substitute.For<IUserContext>();
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -34,7 +30,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var merchant = new InGameMerchant { Id = 1 };
         context.InGameMerchants.Add(merchant);
@@ -86,7 +82,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var merchant = new InGameMerchant { Id = 1 };
         context.InGameMerchants.Add(merchant);
@@ -105,7 +101,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
@@ -120,7 +116,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var merchant1 = new InGameMerchant { Id = 1 };
         var merchant2 = new InGameMerchant { Id = 2 };
@@ -177,7 +173,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
         var user = new User
@@ -214,15 +210,8 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
-        _userContext.GetCurrentUser().Returns(new CurrentUser(
-            userId.ToString(),
-            "testuser",
-            "test@example.com",
-            new[] { "User" }
-        ));
-
         // Act
-        await service.PurchaseOffer(offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
 
         // Assert
         var updatedUser = await context.Users.FindAsync(userId);
@@ -235,40 +224,17 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     }
 
     [Fact]
-    public async Task PurchaseOffer_ShouldThrowForbidException_WhenUserIsNotAuthenticated()
-    {
-        // Arrange
-        await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
-
-        _userContext.GetCurrentUser().Returns((CurrentUser?)null);
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ForbidException>(
-            () => service.PurchaseOffer(1, CancellationToken.None)
-        );
-
-        Assert.Contains("authenticated", exception.Message);
-    }
-
-    [Fact]
     public async Task PurchaseOffer_ShouldThrowNotFoundException_WhenOfferDoesNotExist()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
-        _userContext.GetCurrentUser().Returns(new CurrentUser(
-            userId.ToString(),
-            "testuser",
-            "test@example.com",
-            new[] { "User" }
-        ));
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
-            () => service.PurchaseOffer(999, CancellationToken.None)
+            () => service.PurchaseOffer(userId, 999, CancellationToken.None)
         );
 
         Assert.NotNull(exception);
@@ -279,7 +245,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var merchant = new InGameMerchant { Id = 1 };
         context.InGameMerchants.Add(merchant);
@@ -304,16 +270,10 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await context.SaveChangesAsync();
 
         var nonExistentUserId = Guid.NewGuid();
-        _userContext.GetCurrentUser().Returns(new CurrentUser(
-            nonExistentUserId.ToString(),
-            "testuser",
-            "test@example.com",
-            new[] { "User" }
-        ));
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
-            () => service.PurchaseOffer(offer.Id, CancellationToken.None)
+            () => service.PurchaseOffer(nonExistentUserId, offer.Id, CancellationToken.None)
         );
 
         Assert.NotNull(exception);
@@ -324,7 +284,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
         var user = new User
@@ -361,16 +321,9 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
-        _userContext.GetCurrentUser().Returns(new CurrentUser(
-            userId.ToString(),
-            "pooruser",
-            "poor@example.com",
-            new[] { "User" }
-        ));
-
         // Act & Assert
         var exception = await Assert.ThrowsAsync<UnprocessableEntityException>(
-            () => service.PurchaseOffer(offer.Id, CancellationToken.None)
+            () => service.PurchaseOffer(userId, offer.Id, CancellationToken.None)
         );
 
         Assert.NotNull(exception.Errors);
@@ -382,7 +335,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
         var user = new User
@@ -419,15 +372,8 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
-        _userContext.GetCurrentUser().Returns(new CurrentUser(
-            userId.ToString(),
-            "exactuser",
-            "exact@example.com",
-            new[] { "User" }
-        ));
-
         // Act
-        await service.PurchaseOffer(offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
 
         // Assert
         var updatedUser = await context.Users.FindAsync(userId);
@@ -443,7 +389,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context, _userContext);
+        var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
         var user = new User
@@ -480,17 +426,10 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
-        _userContext.GetCurrentUser().Returns(new CurrentUser(
-            userId.ToString(),
-            "collector",
-            "collector@example.com",
-            new[] { "User" }
-        ));
-
         // Act
-        await service.PurchaseOffer(offer.Id, CancellationToken.None);
-        await service.PurchaseOffer(offer.Id, CancellationToken.None);
-        await service.PurchaseOffer(offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
 
         // Assert
         var updatedUser = await context.Users.FindAsync(userId);

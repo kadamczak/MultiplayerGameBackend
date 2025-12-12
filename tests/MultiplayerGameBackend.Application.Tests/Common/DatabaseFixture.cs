@@ -44,9 +44,14 @@ public class DatabaseFixture : IAsyncLifetime
         context.UserItemOffers.RemoveRange(context.UserItemOffers);
         context.MerchantItemOffers.RemoveRange(context.MerchantItemOffers);
         context.UserItems.RemoveRange(context.UserItems);
+        context.UserCustomizations.RemoveRange(context.UserCustomizations);
         context.Items.RemoveRange(context.Items);
-        context.Users.RemoveRange(context.Users);
         context.InGameMerchants.RemoveRange(context.InGameMerchants);
+        
+        // Clean Identity tables
+        context.UserRoles.RemoveRange(context.UserRoles);
+        context.Users.RemoveRange(context.Users);
+        context.Roles.RemoveRange(context.Roles);
         
         await context.SaveChangesAsync();
     }
