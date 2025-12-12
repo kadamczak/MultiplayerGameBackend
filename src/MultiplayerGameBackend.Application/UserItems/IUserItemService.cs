@@ -5,6 +5,6 @@ namespace MultiplayerGameBackend.Application.UserItems;
 
 public interface IUserItemService
 {
-    Task<PagedResult<ReadUserItemDto>> GetCurrentUserItems(PagedQuery query, CancellationToken cancellationToken);
-    Task UpdateEquippedUserItems(UpdateEquippedUserItemsDto dto, CancellationToken cancellationToken);
+    Task<PagedResult<ReadUserItemDto>> GetCurrentUserItems(Guid userId, PagedQuery query, CancellationToken cancellationToken);
+    Task UpdateEquippedUserItems(Guid userId, UpdateEquippedUserItemsDto dto, CancellationToken cancellationToken);
 }

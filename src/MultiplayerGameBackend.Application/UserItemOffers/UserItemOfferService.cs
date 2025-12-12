@@ -15,8 +15,7 @@ using MultiplayerGameBackend.Domain.Exceptions;
 namespace MultiplayerGameBackend.Application.UserItemOffers;
 
 public class UserItemOfferService(ILogger<UserItemOfferService> logger,
-    IMultiplayerGameDbContext dbContext,
-    IUserContext userContext) : IUserItemOfferService
+    IMultiplayerGameDbContext dbContext) : IUserItemOfferService
 {
     public async Task<PagedResult<ReadUserItemOfferDto>> GetOffers(PagedQuery query, bool showActive, CancellationToken cancellationToken)
     {
@@ -124,10 +123,8 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         { "BuyerUserName", r => r.Buyer.UserName },
     };
     
-    public async Task CreateOffer(CreateUserItemOfferDto dto, CancellationToken cancellationToken)
+    public async Task CreateOffer(Guid userId, CreateUserItemOfferDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to create offers.");
-        var userId = Guid.Parse(currentUser.Id);
         logger.LogInformation("User {UserId} attempting to create offer for UserItem {UserItemId}", userId, dto.UserItemId);
         
         var userItem = await dbContext.UserItems
@@ -169,10 +166,8 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         logger.LogInformation("User {UserId} successfully created offer {OfferId} for UserItem {UserItemId}", userId, offer.Id, dto.UserItemId);
     }
 
-    public async Task DeleteOffer(Guid offerId, CancellationToken cancellationToken)
+    public async Task DeleteOffer(Guid userId, Guid offerId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to delete offers.");
-        var userId = Guid.Parse(currentUser.Id);
         logger.LogInformation("User {UserId} attempting to delete offer {OfferId}", userId, offerId);
         
         var offer = await dbContext.UserItemOffers
@@ -196,11 +191,8 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         logger.LogInformation("User {UserId} successfully deleted offer {OfferId}", userId, offerId);
     }
     
-    public async Task PurchaseOffer(Guid offerId, CancellationToken cancellationToken)
+    public async Task PurchaseOffer(Guid buyerId, Guid offerId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to purchase offers.");
-        var buyerId = Guid.Parse(currentUser.Id);
-        
         logger.LogInformation("User {BuyerId} attempting to purchase offer {OfferId}", buyerId, offerId);
         
         var offer = await dbContext.UserItemOffers

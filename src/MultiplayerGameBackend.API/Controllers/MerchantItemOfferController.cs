@@ -1,14 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.MerchantItemOffers.Responses;
+using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/merchants")]
 [Authorize]
-public class MerchantItemOfferController(IMerchantItemOfferService merchantItemOfferService) : ControllerBase
+public class MerchantItemOfferController(IMerchantItemOfferService merchantItemOfferService,
+    IUserContext userContext) : ControllerBase
 {
     [HttpGet("{merchantId:int}/offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -25,7 +28,10 @@ public class MerchantItemOfferController(IMerchantItemOfferService merchantItemO
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PurchaseOffer([FromRoute] int offerId, CancellationToken cancellationToken)
     {
-        await merchantItemOfferService.PurchaseOffer(offerId, cancellationToken);
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        await merchantItemOfferService.PurchaseOffer(userId, offerId, cancellationToken);
         return NoContent();
     }
 }
