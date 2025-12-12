@@ -16,17 +16,16 @@ namespace MultiplayerGameBackend.Application.Users;
 public class UserService(ILogger<UserService> logger,
     UserManager<User> userManager,
     RoleManager<IdentityRole<Guid>> roleManager,
-    IUserContext userContext,
     IMultiplayerGameDbContext dbContext,
     UserCustomizationMapper customizationMapper,
     IImageService imageService) : IUserService
 {
 
-    public async Task AssignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken)
+    public async Task AssignUserRole(Guid userId, ModifyUserRoleDto dto, CancellationToken cancellationToken)
     {
         logger.LogInformation("Assigning user role: {@Request}", dto);
-        var user = await userManager.FindByIdAsync(id.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", id.ToString());
+        var user = await userManager.FindByIdAsync(userId.ToString())
+                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
 
         var role = await roleManager.FindByNameAsync(dto.RoleName)
                    ?? throw new NotFoundException(nameof(IdentityRole), nameof(IdentityRole.Name), "Name", dto.RoleName);
@@ -34,11 +33,11 @@ public class UserService(ILogger<UserService> logger,
         await userManager.AddToRoleAsync(user, role.Name!);
     }
 
-    public async Task UnassignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken)
+    public async Task UnassignUserRole(Guid userId, ModifyUserRoleDto dto, CancellationToken cancellationToken)
     {
         logger.LogInformation("Unassigning user role: {@Request}", dto);
-        var user = await userManager.FindByIdAsync(id.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", id.ToString());
+        var user = await userManager.FindByIdAsync(userId.ToString())
+                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
 
         var role = await roleManager.FindByNameAsync(dto.RoleName)
                    ?? throw new NotFoundException(nameof(IdentityRole), nameof(IdentityRole.Name), "Name", dto.RoleName);
@@ -46,11 +45,8 @@ public class UserService(ILogger<UserService> logger,
         await userManager.RemoveFromRoleAsync(user, role.Name!);
     }
 
-    public async Task<UserGameInfoDto> GetCurrentUserGameInfo(bool includeCustomization, bool includeUserItems, CancellationToken cancellationToken)
+    public async Task<UserGameInfoDto> GetCurrentUserGameInfo(Guid userId, bool includeCustomization, bool includeUserItems, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to access their game info.");
-        var userId = Guid.Parse(currentUser.Id);
-        
         var user = await userManager.FindByIdAsync(userId.ToString())
                    ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
         
@@ -105,7 +101,7 @@ public class UserService(ILogger<UserService> logger,
         var userGameInfo = new UserGameInfoDto
         {
             Id = userId,
-            UserName = currentUser.UserName!,
+            UserName = user.UserName!,
             Balance = user.Balance,
             ProfilePictureUrl = user.ProfilePictureUrl,
             Customization = customizationDto,
@@ -116,11 +112,8 @@ public class UserService(ILogger<UserService> logger,
     }
     
 
-    public async Task UpdateUserAppearance(UpdateUserAppearanceDto dto, CancellationToken cancellationToken)
+    public async Task UpdateUserAppearance(Guid userId, UpdateUserAppearanceDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to update their customization.");
-        var userId = Guid.Parse(currentUser.Id);
-        
         // Verify user exists
         _ = await userManager.FindByIdAsync(userId.ToString())
             ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
@@ -149,11 +142,8 @@ public class UserService(ILogger<UserService> logger,
         logger.LogInformation("Successfully saved customization for user {UserId}", userId);
     }
 
-    public async Task<string> UploadProfilePicture(Stream imageStream, string fileName, CancellationToken cancellationToken)
+    public async Task<string> UploadProfilePicture(Guid userId, Stream imageStream, string fileName, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to upload a profile picture.");
-        var userId = Guid.Parse(currentUser.Id);
-        
         var user = await userManager.FindByIdAsync(userId.ToString())
                    ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
 
@@ -172,11 +162,8 @@ public class UserService(ILogger<UserService> logger,
         return profilePictureUrl;
     }
 
-    public async Task DeleteProfilePicture(CancellationToken cancellationToken)
+    public async Task DeleteProfilePicture(Guid userId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to delete their profile picture.");
-        var userId = Guid.Parse(currentUser.Id);
-        
         var user = await userManager.FindByIdAsync(userId.ToString())
                    ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
 

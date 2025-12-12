@@ -5,6 +5,12 @@ using MultiplayerGameBackend.Application.Users;
 
 namespace MultiplayerGameBackend.API.Services;
 
+public interface IUserContext
+{
+    CurrentUser? GetCurrentUser();
+}
+
+
 public class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContext
 {
     public CurrentUser? GetCurrentUser()

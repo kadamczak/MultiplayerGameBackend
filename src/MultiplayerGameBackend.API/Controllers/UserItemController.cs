@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MultiplayerGameBackend.API.Services;
 using MultiplayerGameBackend.Application.Extensions;
 using MultiplayerGameBackend.Application.UserItems;
 using MultiplayerGameBackend.Application.UserItems.Requests;
 using MultiplayerGameBackend.Application.UserItems.Requests.Validators;
 using MultiplayerGameBackend.Application.UserItems.Responses;
+using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.API.Controllers;
 
@@ -12,7 +14,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 [Route("v1/users")]
 [Authorize]
 public class UserItemController(IUserItemService userItemService,
-    GetUserItemsDtoValidator getUserItemsDtoValidator) : ControllerBase
+    GetUserItemsDtoValidator getUserItemsDtoValidator,
+    IUserContext userContext) : ControllerBase
 {
     [HttpGet("me/items")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -24,7 +27,10 @@ public class UserItemController(IUserItemService userItemService,
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        var userItems = await userItemService.GetCurrentUserItems(dto.PagedQuery, cancellationToken);
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        var userItems = await userItemService.GetCurrentUserItems(userId, dto.PagedQuery, cancellationToken);
         return Ok(userItems);
     }
     
@@ -36,7 +42,10 @@ public class UserItemController(IUserItemService userItemService,
     public async Task<IActionResult> UpdateEquippedUserItems([FromBody] UpdateEquippedUserItemsDto dto,
         CancellationToken cancellationToken)
     {
-        await userItemService.UpdateEquippedUserItems(dto, cancellationToken);
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        await userItemService.UpdateEquippedUserItems(userId, dto, cancellationToken);
         return NoContent();
     }
     

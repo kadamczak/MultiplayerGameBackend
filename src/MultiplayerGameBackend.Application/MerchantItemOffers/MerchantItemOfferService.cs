@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.MerchantItemOffers.Responses;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Items.Responses;
@@ -10,8 +9,7 @@ using MultiplayerGameBackend.Domain.Exceptions;
 namespace MultiplayerGameBackend.Application.MerchantItemOffers;
 
 public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
-    IMultiplayerGameDbContext dbContext,
-    IUserContext userContext) : IMerchantItemOfferService
+    IMultiplayerGameDbContext dbContext) : IMerchantItemOfferService
 {
     public async Task<IEnumerable<ReadMerchantOfferDto>> GetOffers(int merchantId, CancellationToken cancellationToken)
     {
@@ -50,17 +48,8 @@ public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
         return offers;
     }
 
-    public async Task PurchaseOffer(int offerId, CancellationToken cancellationToken)
+    public async Task PurchaseOffer(Guid userId, int offerId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser();
-
-        if (currentUser is null)
-        {
-            logger.LogWarning("Attempt to purchase offer by unauthenticated user");
-            throw new ForbidException("User must be authenticated to purchase offers.");
-        }
-
-        var userId = Guid.Parse(currentUser.Id);
         logger.LogInformation("User {UserId} attempting to purchase offer {OfferId}", userId, offerId);
 
         // Fetch the offer with related item

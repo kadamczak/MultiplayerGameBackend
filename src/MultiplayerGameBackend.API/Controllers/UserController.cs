@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MultiplayerGameBackend.API.Services;
 using MultiplayerGameBackend.Application.Extensions;
+using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
@@ -15,38 +17,39 @@ namespace MultiplayerGameBackend.API.Controllers;
 [Authorize]
 public class UserController(
     ModifyUserRoleDtoValidator modifyUserRoleDtoValidator,
-    IUserService userService) : ControllerBase
+    IUserService userService,
+    IUserContext userContext) : ControllerBase
 {
-    [HttpPost("{id:guid}/roles")]
+    [HttpPost("{userId:guid}/roles")]
     [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AssignUserRole(Guid id, ModifyUserRoleDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> AssignUserRole(Guid userId, ModifyUserRoleDto dto, CancellationToken cancellationToken)
     {
         var validationResult = await modifyUserRoleDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
 
-        await userService.AssignUserRole(id, dto, cancellationToken);
+        await userService.AssignUserRole(userId, dto, cancellationToken);
         return NoContent();
     }
 
-    [HttpDelete("{id:guid}/roles")]
+    [HttpDelete("{userId:guid}/roles")]
     [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UnassignUserRole(Guid id, ModifyUserRoleDto dto,
+    public async Task<IActionResult> UnassignUserRole(Guid userId, ModifyUserRoleDto dto,
         CancellationToken cancellationToken)
     {
         var validationResult = await modifyUserRoleDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
-            return BadRequest(validationResult.ToDictionary());
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
 
-        await userService.UnassignUserRole(id, dto, cancellationToken);
+        await userService.UnassignUserRole(userId, dto, cancellationToken);
         return NoContent();
     }
 
@@ -58,18 +61,24 @@ public class UserController(
         [FromQuery] bool includeUserItems = false,
         CancellationToken cancellationToken = default)
     {
-        var userGameInfo = await userService.GetCurrentUserGameInfo(includeCustomization, includeUserItems, cancellationToken);
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        var userGameInfo = await userService.GetCurrentUserGameInfo(userId, includeCustomization, includeUserItems, cancellationToken);
         return Ok(userGameInfo);
     }
 
-    [HttpPut("me/customization")]
+    [HttpPut("me/appearance")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> UpdateUserAppearance(UpdateUserAppearanceDto dto,
         CancellationToken cancellationToken)
     {
-        await userService.UpdateUserAppearance(dto, cancellationToken);
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        await userService.UpdateUserAppearance(userId, dto, cancellationToken);
         return NoContent();
     }
 
@@ -81,6 +90,9 @@ public class UserController(
     [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
     public async Task<IActionResult> UploadProfilePicture(IFormFile file, CancellationToken cancellationToken)
     {
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
         // Validate file size
         if (file.Length == 0)
             throw new BadRequest("No file uploaded.");
@@ -96,7 +108,7 @@ public class UserController(
             throw new UnsupportedMediaType("Only JPG, JPEG, and PNG files are allowed.");
 
         await using var stream = file.OpenReadStream();
-        var profilePictureUrl = await userService.UploadProfilePicture(stream, file.FileName, cancellationToken);
+        var profilePictureUrl = await userService.UploadProfilePicture(userId, stream, file.FileName, cancellationToken);
         
         return Ok(new { profilePictureUrl });
     }
@@ -107,7 +119,10 @@ public class UserController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProfilePicture(CancellationToken cancellationToken)
     {
-        await userService.DeleteProfilePicture(cancellationToken);
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var userId = Guid.Parse(currentUser.Id);
+        
+        await userService.DeleteProfilePicture(userId, cancellationToken);
         return NoContent();
     }
 }

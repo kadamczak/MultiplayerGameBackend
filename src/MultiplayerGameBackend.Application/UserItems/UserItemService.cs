@@ -14,14 +14,10 @@ using MultiplayerGameBackend.Domain.Exceptions;
 namespace MultiplayerGameBackend.Application.UserItems;
 
 public class UserItemService(ILogger<UserItemService> logger,
-    IMultiplayerGameDbContext dbContext,
-    IUserContext userContext) : IUserItemService
+    IMultiplayerGameDbContext dbContext) : IUserItemService
 {
-    public async Task<PagedResult<ReadUserItemDto>> GetCurrentUserItems(PagedQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResult<ReadUserItemDto>> GetCurrentUserItems(Guid userId,  PagedQuery query, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to access their items.");
-        var userId = Guid.Parse(currentUser.Id);
-        
         var searchPhraseLower = query.SearchPhrase?.ToLower();
         var baseQuery = dbContext.UserItems
             .AsNoTracking()
@@ -81,16 +77,13 @@ public class UserItemService(ILogger<UserItemService> logger,
             })
             .ToListAsync(cancellationToken);
 
-        logger.LogInformation("Fetched {totalCount} items for user {UserId}", totalCount, currentUser.Id);
+        logger.LogInformation("Fetched {totalCount} items for user {UserId}", totalCount, userId);
         var result = new PagedResult<ReadUserItemDto>(userItems, totalCount, query.PageSize, query.PageNumber);
         return result;
     }
 
-    public async Task UpdateEquippedUserItems(UpdateEquippedUserItemsDto dto, CancellationToken cancellationToken)
+    public async Task UpdateEquippedUserItems(Guid userId, UpdateEquippedUserItemsDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated to update equipped items.");
-        var userId = Guid.Parse(currentUser.Id);
-        
         logger.LogInformation("Updating equipped items for user {UserId}", userId);
 
         // Validate head item if provided
