@@ -1,4 +1,5 @@
 using MultiplayerGameBackend.Application.Common;
+using MultiplayerGameBackend.Application.UserItems.Requests;
 using MultiplayerGameBackend.Application.UserItems.Responses;
 
 namespace MultiplayerGameBackend.Application.UserItems;

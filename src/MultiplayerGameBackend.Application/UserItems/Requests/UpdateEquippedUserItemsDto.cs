@@ -1,4 +1,4 @@
-namespace MultiplayerGameBackend.Application.UserItems;
+namespace MultiplayerGameBackend.Application.UserItems.Requests;
 
 public class UpdateEquippedUserItemsDto
 {
