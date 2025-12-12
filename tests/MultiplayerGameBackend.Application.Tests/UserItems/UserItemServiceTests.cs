@@ -457,7 +457,16 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
             NormalizedEmail = "TEST@EXAMPLE.COM",
             PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
         };
-        context.Users.Add(user);
+        var buyer = new User
+        {
+            Id = buyerId,
+            UserName = "buyer",
+            NormalizedUserName = "BUYER",
+            Email = "buyer@example.com",
+            NormalizedEmail = "BUYER@EXAMPLE.COM",
+            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
+        };
+        context.Users.AddRange(user, buyer);
 
         var item = new Item
         {
