@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MultiplayerGameBackend.Application.Identity;
+using MultiplayerGameBackend.API.Services;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.MerchantItemOffers.Responses;
 using MultiplayerGameBackend.Domain.Exceptions;

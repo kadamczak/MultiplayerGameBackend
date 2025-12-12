@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MultiplayerGameBackend.API.Services;
 using MultiplayerGameBackend.Application.Extensions;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Users;
@@ -46,7 +47,7 @@ public class UserController(
     {
         var validationResult = await modifyUserRoleDtoValidator.ValidateAsync(dto, cancellationToken);
         if (!validationResult.IsValid)
-            return BadRequest(validationResult.ToDictionary());
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
 
         await userService.UnassignUserRole(userId, dto, cancellationToken);
         return NoContent();
