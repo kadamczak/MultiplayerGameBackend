@@ -57,7 +57,7 @@ PATCH {{API_HostAddress}}/v1/items/4
 Content-Type: application/json
 
 {
-  "Name": "Updated Item Name xddd",
+  "Name": "Updated Item Name 2",
   "Description": "This is an updated description"
 }
 

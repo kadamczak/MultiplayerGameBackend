@@ -12,10 +12,20 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
         <PackageReference Include="xunit" Version="2.9.2"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.0"/>
+        <PackageReference Include="Testcontainers.PostgreSql" Version="4.1.0"/>
+        <PackageReference Include="FluentAssertions" Version="7.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
         <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\MultiplayerGameBackend.API\MultiplayerGameBackend.API.csproj"/>
+        <ProjectReference Include="..\..\src\MultiplayerGameBackend.Application\MultiplayerGameBackend.Application.csproj"/>
+        <ProjectReference Include="..\..\src\MultiplayerGameBackend.Infrastructure\MultiplayerGameBackend.Infrastructure.csproj"/>
+        <ProjectReference Include="..\..\src\MultiplayerGameBackend.Domain\MultiplayerGameBackend.Domain.csproj"/>
     </ItemGroup>
 
 </Project>

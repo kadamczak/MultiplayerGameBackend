@@ -15,10 +15,13 @@ try
 
     var app = builder.Build();
     
-    var scope = app.Services.CreateScope();
-    var seeder = scope.ServiceProvider.GetRequiredService<IMultiplayerGameSeeder>();
-
-    await seeder.Seed();
+    // Only run seeder if not in testing environment
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        var scope = app.Services.CreateScope();
+        var seeder = scope.ServiceProvider.GetRequiredService<IMultiplayerGameSeeder>();
+        await seeder.Seed();
+    }
     
     app.UseMiddleware<ErrorHandlingMiddleware>();
     app.UseMiddleware<RequestTimeLoggingMiddleware>();

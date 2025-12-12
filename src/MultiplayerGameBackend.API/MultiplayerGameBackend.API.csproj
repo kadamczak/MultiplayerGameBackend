@@ -4,7 +4,12 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <InvariantGlobalization>false</InvariantGlobalization>
     </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="MultiplayerGameBackend.API.Tests" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
