@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
-using MultiplayerGameBackend.Application.Tests.Common;
+using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Domain.Constants;

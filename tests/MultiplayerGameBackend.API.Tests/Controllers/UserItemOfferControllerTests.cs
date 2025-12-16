@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MultiplayerGameBackend.API.Tests.Helpers;
+using MultiplayerGameBackend.API.Tests.TestHelpers;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Application.UserItemOffers.Responses;
 using MultiplayerGameBackend.Domain.Constants;

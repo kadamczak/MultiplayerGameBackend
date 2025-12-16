@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MultiplayerGameBackend.Domain.Entities;
 
-namespace MultiplayerGameBackend.API.Tests.Helpers;
+namespace MultiplayerGameBackend.API.Tests.TestHelpers;
 
 public static class JwtTokenHelper
 {

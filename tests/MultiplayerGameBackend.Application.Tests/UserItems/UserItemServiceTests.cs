@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
-using MultiplayerGameBackend.Application.Tests.Common;
+using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Application.UserItems;
 using MultiplayerGameBackend.Application.UserItems.Requests;
 using MultiplayerGameBackend.Domain.Constants;

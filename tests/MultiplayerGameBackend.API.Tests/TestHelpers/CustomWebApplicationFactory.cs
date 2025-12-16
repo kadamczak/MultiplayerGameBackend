@@ -12,7 +12,7 @@ using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 
-namespace MultiplayerGameBackend.API.Tests.Helpers;
+namespace MultiplayerGameBackend.API.Tests.TestHelpers;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {

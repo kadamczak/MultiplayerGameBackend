@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using MultiplayerGameBackend.API.Tests.Helpers;
+using MultiplayerGameBackend.API.Tests.TestHelpers;
 using MultiplayerGameBackend.Application.Items.Requests;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Domain.Constants;

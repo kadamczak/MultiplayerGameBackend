@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
-using MultiplayerGameBackend.Application.Tests.Common;
+using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;

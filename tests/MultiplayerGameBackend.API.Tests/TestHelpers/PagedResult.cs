@@ -1,4 +1,4 @@
-namespace MultiplayerGameBackend.API.Tests.Helpers;
+namespace MultiplayerGameBackend.API.Tests.TestHelpers;
 
 /// <summary>
 /// Helper class to match the PagedResult structure returned from the API

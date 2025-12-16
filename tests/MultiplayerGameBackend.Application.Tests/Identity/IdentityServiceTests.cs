@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Identity.Requests;
 using MultiplayerGameBackend.Application.Interfaces;
-using MultiplayerGameBackend.Application.Tests.Common;
+using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;

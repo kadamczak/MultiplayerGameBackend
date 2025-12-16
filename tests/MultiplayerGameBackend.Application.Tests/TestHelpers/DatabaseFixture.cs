@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MultiplayerGameBackend.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 
-namespace MultiplayerGameBackend.Application.Tests.Common;
+namespace MultiplayerGameBackend.Application.Tests.TestHelpers;
 
 public class DatabaseFixture : IAsyncLifetime
 {

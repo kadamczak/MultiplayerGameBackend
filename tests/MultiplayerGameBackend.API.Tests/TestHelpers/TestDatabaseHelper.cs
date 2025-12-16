@@ -3,7 +3,7 @@ using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
 
-namespace MultiplayerGameBackend.API.Tests.Helpers;
+namespace MultiplayerGameBackend.API.Tests.TestHelpers;
 
 public static class TestDatabaseHelper
 {
