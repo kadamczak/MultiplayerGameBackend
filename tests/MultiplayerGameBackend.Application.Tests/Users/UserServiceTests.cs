@@ -6,6 +6,8 @@ using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Exceptions;
+using MultiplayerGameBackend.Tests.Shared.Factories;
+using MultiplayerGameBackend.Tests.Shared.Helpers;
 using NSubstitute;
 
 namespace MultiplayerGameBackend.Application.Tests.Users;
@@ -41,17 +43,13 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
-        await userManager.CreateAsync(user);
-
-        var role = TestEntityFactory.CreateRole("Admin");
-        await roleManager.CreateAsync(role);
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
+        await DatabaseHelper.CreateAndSaveRole(roleManager, "Admin");
 
         var dto = new ModifyUserRoleDto { RoleName = "Admin" };
 
         // Act
-        await service.AssignUserRole(userId, dto, CancellationToken.None);
+        await service.AssignUserRole(user.Id, dto, CancellationToken.None);
 
         // Assert
         var isInRole = await userManager.IsInRoleAsync(user, "Admin");
@@ -67,8 +65,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var role = TestEntityFactory.CreateRole("Admin");
-        await roleManager.CreateAsync(role);
+        await DatabaseHelper.CreateAndSaveRole(roleManager, "Admin");
 
         var dto = new ModifyUserRoleDto { RoleName = "Admin" };
 
@@ -87,15 +84,13 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
-        await userManager.CreateAsync(user);
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
         var dto = new ModifyUserRoleDto { RoleName = "NonExistentRole" };
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(
-            () => service.AssignUserRole(userId, dto, CancellationToken.None)
+            () => service.AssignUserRole(user.Id, dto, CancellationToken.None)
         );
     }
 
@@ -112,18 +107,12 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
-        await userManager.CreateAsync(user);
-
-        var role = TestEntityFactory.CreateRole("Admin");
-        await roleManager.CreateAsync(role);
-        await userManager.AddToRoleAsync(user, "Admin");
+        var user = await DatabaseHelper.CreateAndSaveUserWithRole(userManager, roleManager, "testuser", "test@example.com", "Password123!", "Admin");
 
         var dto = new ModifyUserRoleDto { RoleName = "Admin" };
 
         // Act
-        await service.UnassignUserRole(userId, dto, CancellationToken.None);
+        await service.UnassignUserRole(user.Id, dto, CancellationToken.None);
 
         // Assert
         var isInRole = await userManager.IsInRoleAsync(user, "Admin");
@@ -139,8 +128,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var role = TestEntityFactory.CreateRole("Admin");
-        await roleManager.CreateAsync(role);
+        await DatabaseHelper.CreateAndSaveRole(roleManager, "Admin");
 
         var dto = new ModifyUserRoleDto { RoleName = "Admin" };
 
@@ -163,16 +151,14 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId, balance: 500);
-        await userManager.CreateAsync(user);
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!", balance: 500);
 
         // Act
-        var result = await service.GetCurrentUserGameInfo(userId, includeCustomization: false, includeUserItems: false, CancellationToken.None);
+        var result = await service.GetCurrentUserGameInfo(user.Id, includeCustomization: false, includeUserItems: false, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(userId, result.Id);
+        Assert.Equal(user.Id, result.Id);
         Assert.Equal("gamer123", result.UserName);
         Assert.Equal(500, result.Balance);
         Assert.Null(result.Customization);
@@ -188,16 +174,11 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId, balance: 500);
-        await userManager.CreateAsync(user);
-
-        var customization = TestEntityFactory.CreateUserCustomization(userId);
-        context.UserCustomizations.Add(customization);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!", balance: 500);
+        await DatabaseHelper.CreateAndSaveUserCustomization(context, user.Id);
 
         // Act
-        var result = await service.GetCurrentUserGameInfo(userId, includeCustomization: true, includeUserItems: false, CancellationToken.None);
+        var result = await service.GetCurrentUserGameInfo(user.Id, includeCustomization: true, includeUserItems: false, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -216,20 +197,12 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId, balance: 500);
-        await userManager.CreateAsync(user);
-
-        var item = TestEntityFactory.CreateItem("Cool Helmet", ItemTypes.EquippableOnHead, "A very cool helmet", "assets/helmet.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem = TestEntityFactory.CreateUserItem(userId, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!", balance: 500);
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Cool Helmet", ItemTypes.EquippableOnHead, "A very cool helmet", "assets/helmet.png");
+        await DatabaseHelper.CreateAndSaveUserItem(context, user.Id, item.Id);
 
         // Act
-        var result = await service.GetCurrentUserGameInfo(userId, includeCustomization: false, includeUserItems: true, CancellationToken.None);
+        var result = await service.GetCurrentUserGameInfo(user.Id, includeCustomization: false, includeUserItems: true, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -267,9 +240,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId);
-        await userManager.CreateAsync(user);
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
 
         var dto = new UpdateUserAppearanceDto
         {
@@ -283,10 +254,10 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         };
 
         // Act
-        await service.UpdateUserAppearance(userId, dto, CancellationToken.None);
+        await service.UpdateUserAppearance(user.Id, dto, CancellationToken.None);
 
         // Assert
-        var customization = context.UserCustomizations.FirstOrDefault(c => c.UserId == userId);
+        var customization = context.UserCustomizations.FirstOrDefault(c => c.UserId == user.Id);
         Assert.NotNull(customization);
         Assert.Equal("#FF0000", customization.HeadColor);
         Assert.Equal("#00FF00", customization.BodyColor);
@@ -301,12 +272,8 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId);
-        await userManager.CreateAsync(user);
-
-        var existingCustomization = TestEntityFactory.CreateUserCustomization(
-            userId,
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
+        await DatabaseHelper.CreateAndSaveUserCustomization(context, user.Id,
             headColor: "#000000",
             bodyColor: "#000000",
             tailColor: "#000000",
@@ -315,8 +282,6 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
             hornColor: "#000000",
             markingsColor: "#000000"
         );
-        context.UserCustomizations.Add(existingCustomization);
-        await context.SaveChangesAsync();
 
         var dto = new UpdateUserAppearanceDto
         {
@@ -330,10 +295,10 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         };
 
         // Act
-        await service.UpdateUserAppearance(userId, dto, CancellationToken.None);
+        await service.UpdateUserAppearance(user.Id, dto, CancellationToken.None);
 
         // Assert
-        var customization = context.UserCustomizations.FirstOrDefault(c => c.UserId == userId);
+        var customization = context.UserCustomizations.FirstOrDefault(c => c.UserId == user.Id);
         Assert.NotNull(customization);
         Assert.Equal("#FFFFFF", customization.HeadColor);
         Assert.Equal("#FFFFFF", customization.BodyColor);
@@ -353,9 +318,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId);
-        await userManager.CreateAsync(user);
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
 
         var imageStream = new MemoryStream();
         var expectedUrl = "/uploads/profiles/test.jpg";
@@ -363,11 +326,11 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
             .Returns(expectedUrl);
 
         // Act
-        var result = await service.UploadProfilePicture(userId, imageStream, "test.jpg", CancellationToken.None);
+        var result = await service.UploadProfilePicture(user.Id, imageStream, "test.jpg", CancellationToken.None);
 
         // Assert
         Assert.Equal(expectedUrl, result);
-        var updatedUser = await userManager.FindByIdAsync(userId.ToString());
+        var updatedUser = await userManager.FindByIdAsync(user.Id.ToString());
         Assert.Equal(expectedUrl, updatedUser!.ProfilePictureUrl);
     }
 
@@ -380,11 +343,10 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
         var oldUrl = "/uploads/profiles/old.jpg";
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId);
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
         user.ProfilePictureUrl = oldUrl;
-        await userManager.CreateAsync(user);
+        await context.SaveChangesAsync();
 
         var imageStream = new MemoryStream();
         var newUrl = "/uploads/profiles/new.jpg";
@@ -392,11 +354,11 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
             .Returns(newUrl);
 
         // Act
-        await service.UploadProfilePicture(userId, imageStream, "new.jpg", CancellationToken.None);
+        await service.UploadProfilePicture(user.Id, imageStream, "new.jpg", CancellationToken.None);
 
         // Assert
         await _imageService.Received(1).DeleteProfilePictureAsync(oldUrl, Arg.Any<CancellationToken>());
-        var updatedUser = await userManager.FindByIdAsync(userId.ToString());
+        var updatedUser = await userManager.FindByIdAsync(user.Id.ToString());
         Assert.Equal(newUrl, updatedUser!.ProfilePictureUrl);
     }
 
@@ -414,18 +376,17 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
         var pictureUrl = "/uploads/profiles/test.jpg";
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId);
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
         user.ProfilePictureUrl = pictureUrl;
-        await userManager.CreateAsync(user);
+        await context.SaveChangesAsync();
 
         // Act
-        await service.DeleteProfilePicture(userId, CancellationToken.None);
+        await service.DeleteProfilePicture(user.Id, CancellationToken.None);
 
         // Assert
         await _imageService.Received(1).DeleteProfilePictureAsync(pictureUrl, Arg.Any<CancellationToken>());
-        var updatedUser = await userManager.FindByIdAsync(userId.ToString());
+        var updatedUser = await userManager.FindByIdAsync(user.Id.ToString());
         Assert.Null(updatedUser!.ProfilePictureUrl);
     }
 
@@ -438,14 +399,13 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var roleManager = IdentityHelper.CreateRoleManager(context);
         var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("gamer123", "gamer@example.com", userId);
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
         user.ProfilePictureUrl = null;
-        await userManager.CreateAsync(user);
+        await context.SaveChangesAsync();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(
-            () => service.DeleteProfilePicture(userId, CancellationToken.None)
+            () => service.DeleteProfilePicture(user.Id, CancellationToken.None)
         );
     }
 

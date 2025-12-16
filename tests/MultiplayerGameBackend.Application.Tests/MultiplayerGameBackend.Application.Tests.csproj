@@ -24,6 +24,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\MultiplayerGameBackend.Application\MultiplayerGameBackend.Application.csproj" />
       <ProjectReference Include="..\..\src\MultiplayerGameBackend.Infrastructure\MultiplayerGameBackend.Infrastructure.csproj" />
+      <ProjectReference Include="..\MultiplayerGameBackend.Tests.Shared\MultiplayerGameBackend.Tests.Shared.csproj" />
     </ItemGroup>
 
 </Project>

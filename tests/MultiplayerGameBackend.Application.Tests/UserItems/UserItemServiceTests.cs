@@ -6,6 +6,7 @@ using MultiplayerGameBackend.Application.UserItems.Requests;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
+using MultiplayerGameBackend.Tests.Shared.Factories;
 using NSubstitute;
 
 namespace MultiplayerGameBackend.Application.Tests.UserItems;

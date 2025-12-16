@@ -3,6 +3,8 @@ using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Exceptions;
+using MultiplayerGameBackend.Tests.Shared.Factories;
+using MultiplayerGameBackend.Tests.Shared.Helpers;
 using NSubstitute;
 
 namespace MultiplayerGameBackend.Application.Tests.MerchantItemOffers;
@@ -31,18 +33,13 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
 
-        var merchant = TestEntityFactory.CreateMerchant();
-        context.InGameMerchants.Add(merchant);
+        var merchant = await DatabaseHelper.CreateAndSaveMerchant(context);
+        var item1 = await DatabaseHelper.CreateAndSaveItem(context, "Health Potion", ItemTypes.Consumable, "Restores 50 HP", "assets/health_potion.png");
+        var item2 = await DatabaseHelper.CreateAndSaveItem(context, "Iron Sword", ItemTypes.EquippableOnBody, "A sturdy iron sword", "assets/iron_sword.png");
+        
+        await DatabaseHelper.CreateAndSaveMerchantItemOffer(context, merchant.Id, item1.Id, 50);
+        await DatabaseHelper.CreateAndSaveMerchantItemOffer(context, merchant.Id, item2.Id, 150);
 
-        var item1 = TestEntityFactory.CreateItem("Health Potion", ItemTypes.Consumable, "Restores 50 HP", "assets/health_potion.png");
-        var item2 = TestEntityFactory.CreateItem("Iron Sword", ItemTypes.EquippableOnBody, "A sturdy iron sword", "assets/iron_sword.png");
-        context.Items.AddRange(item1, item2);
-        await context.SaveChangesAsync();
-
-        var offer1 = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item1.Id, 50);
-        var offer2 = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item2.Id, 150);
-        context.MerchantItemOffers.AddRange(offer1, offer2);
-        await context.SaveChangesAsync();
 
         // Act
         var result = await service.GetOffers(merchant.Id, CancellationToken.None);
@@ -61,9 +58,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
 
-        var merchant = TestEntityFactory.CreateMerchant();
-        context.InGameMerchants.Add(merchant);
-        await context.SaveChangesAsync();
+        var merchant = await DatabaseHelper.CreateAndSaveMerchant(context);
 
         // Act
         var result = await service.GetOffers(merchant.Id, CancellationToken.None);
@@ -95,19 +90,14 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
 
-        var merchant1 = TestEntityFactory.CreateMerchant();
-        var merchant2 = TestEntityFactory.CreateMerchant();
-        context.InGameMerchants.AddRange(merchant1, merchant2);
+        var merchant1 = await DatabaseHelper.CreateAndSaveMerchant(context);
+        var merchant2 = await DatabaseHelper.CreateAndSaveMerchant(context);
 
-        var item1 = TestEntityFactory.CreateItem("Merchant 1 Item", ItemTypes.Consumable, "Item for merchant 1", "assets/item1.png");
-        var item2 = TestEntityFactory.CreateItem("Merchant 2 Item", ItemTypes.Consumable, "Item for merchant 2", "assets/item2.png");
-        context.Items.AddRange(item1, item2);
-        await context.SaveChangesAsync();
+        var item1 = await DatabaseHelper.CreateAndSaveItem(context, "Merchant 1 Item", ItemTypes.Consumable, "Item for merchant 1", "assets/item1.png");
+        var item2 = await DatabaseHelper.CreateAndSaveItem(context, "Merchant 2 Item", ItemTypes.Consumable, "Item for merchant 2", "assets/item2.png");
 
-        var offer1 = TestEntityFactory.CreateMerchantItemOffer(merchant1.Id, item1.Id, 100);
-        var offer2 = TestEntityFactory.CreateMerchantItemOffer(merchant2.Id, item2.Id, 200);
-        context.MerchantItemOffers.AddRange(offer1, offer2);
-        await context.SaveChangesAsync();
+        await DatabaseHelper.CreateAndSaveMerchantItemOffer(context, merchant1.Id, item1.Id, 100);
+        await DatabaseHelper.CreateAndSaveMerchantItemOffer(context, merchant2.Id, item2.Id, 200);
 
         // Act
         var result = await service.GetOffers(merchant1.Id, CancellationToken.None);
@@ -129,31 +119,20 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId, balance: 500);
-        context.Users.Add(user);
-
-        var merchant = TestEntityFactory.CreateMerchant();
-        context.InGameMerchants.Add(merchant);
-
-        var item = TestEntityFactory.CreateItem("Magic Scroll", ItemTypes.Consumable, "A powerful magic scroll", "assets/scroll.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 200);
-        context.MerchantItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!", balance: 500);
+        var (merchant, item, offer) = await DatabaseHelper.CreateAndSaveMerchantWithOffer(context, 200, "Magic Scroll", ItemTypes.Consumable);
 
         // Act
-        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(user.Id, offer.Id, CancellationToken.None);
 
         // Assert
-        var updatedUser = await context.Users.FindAsync(userId);
+        var updatedUser = await context.Users.FindAsync(user.Id);
         Assert.NotNull(updatedUser);
         Assert.Equal(300, updatedUser.Balance); // 500 - 200
 
-        var userItems = context.UserItems.Where(ui => ui.UserId == userId).ToList();
+        var userItems = context.UserItems.Where(ui => ui.UserId == user.Id).ToList();
         Assert.Single(userItems);
         Assert.Equal(item.Id, userItems[0].ItemId);
     }
@@ -182,16 +161,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
 
-        var merchant = TestEntityFactory.CreateMerchant();
-        context.InGameMerchants.Add(merchant);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "assets/test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 100);
-        context.MerchantItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var (merchant, item, offer) = await DatabaseHelper.CreateAndSaveMerchantWithOffer(context, 100);
 
         var nonExistentUserId = Guid.NewGuid();
 
@@ -209,25 +179,14 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("pooruser", "poor@example.com", userId, balance: 50);
-        context.Users.Add(user);
-
-        var merchant = TestEntityFactory.CreateMerchant();
-        context.InGameMerchants.Add(merchant);
-
-        var item = TestEntityFactory.CreateItem("Expensive Item", ItemTypes.EquippableOnHead, "Very expensive", "assets/expensive.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 200);
-        context.MerchantItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "pooruser", "poor@example.com", "Password123!", balance: 50);
+        var (merchant, item, offer) = await DatabaseHelper.CreateAndSaveMerchantWithOffer(context, 200, "Expensive Item", ItemTypes.EquippableOnHead);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<UnprocessableEntityException>(
-            () => service.PurchaseOffer(userId, offer.Id, CancellationToken.None)
+            () => service.PurchaseOffer(user.Id, offer.Id, CancellationToken.None)
         );
 
         Assert.NotNull(exception.Errors);
@@ -240,31 +199,20 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("exactuser", "exact@example.com", userId, balance: 100);
-        context.Users.Add(user);
-
-        var merchant = TestEntityFactory.CreateMerchant();
-        context.InGameMerchants.Add(merchant);
-
-        var item = TestEntityFactory.CreateItem("Exact Price Item", ItemTypes.Consumable, "Costs exactly 100", "assets/exact.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 100);
-        context.MerchantItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "exactuser", "exact@example.com", "Password123!", balance: 100);
+        var (merchant, item, offer) = await DatabaseHelper.CreateAndSaveMerchantWithOffer(context, 100, "Exact Price Item", ItemTypes.Consumable);
 
         // Act
-        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(user.Id, offer.Id, CancellationToken.None);
 
         // Assert
-        var updatedUser = await context.Users.FindAsync(userId);
+        var updatedUser = await context.Users.FindAsync(user.Id);
         Assert.NotNull(updatedUser);
         Assert.Equal(0, updatedUser.Balance);
 
-        var userItems = context.UserItems.Where(ui => ui.UserId == userId).ToList();
+        var userItems = context.UserItems.Where(ui => ui.UserId == user.Id).ToList();
         Assert.Single(userItems);
     }
 
@@ -274,33 +222,22 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var userId = Guid.NewGuid();
-        var user = TestEntityFactory.CreateUser("collector", "collector@example.com", userId, balance: 500);
-        context.Users.Add(user);
-
-        var merchant = TestEntityFactory.CreateMerchant();
-        context.InGameMerchants.Add(merchant);
-
-        var item = TestEntityFactory.CreateItem("Stackable Potion", ItemTypes.Consumable, "Can buy multiple", "assets/potion.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 50);
-        context.MerchantItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "collector", "collector@example.com", "Password123!", balance: 500);
+        var (merchant, item, offer) = await DatabaseHelper.CreateAndSaveMerchantWithOffer(context, 50, "Stackable Potion", ItemTypes.Consumable);
 
         // Act
-        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
-        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
-        await service.PurchaseOffer(userId, offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(user.Id, offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(user.Id, offer.Id, CancellationToken.None);
+        await service.PurchaseOffer(user.Id, offer.Id, CancellationToken.None);
 
         // Assert
-        var updatedUser = await context.Users.FindAsync(userId);
+        var updatedUser = await context.Users.FindAsync(user.Id);
         Assert.NotNull(updatedUser);
         Assert.Equal(350, updatedUser.Balance); // 500 - (50 * 3)
 
-        var userItems = context.UserItems.Where(ui => ui.UserId == userId).ToList();
+        var userItems = context.UserItems.Where(ui => ui.UserId == user.Id).ToList();
         Assert.Equal(3, userItems.Count);
         Assert.All(userItems, ui => Assert.Equal(item.Id, ui.ItemId));
     }
