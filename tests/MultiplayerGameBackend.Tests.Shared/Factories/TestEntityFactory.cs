@@ -1,10 +1,18 @@
+using Microsoft.AspNetCore.Identity;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 
-namespace MultiplayerGameBackend.Application.Tests.TestHelpers;
+namespace MultiplayerGameBackend.Tests.Shared.Factories;
 
+/// <summary>
+/// Factory for creating test entities without database interaction.
+/// Use this for creating in-memory test objects.
+/// </summary>
 public static class TestEntityFactory
 {
+    /// <summary>
+    /// Creates a test user with minimal required fields
+    /// </summary>
     public static User CreateUser(
         string userName = "testuser",
         string email = "test@example.com",
@@ -24,6 +32,9 @@ public static class TestEntityFactory
         };
     }
     
+    /// <summary>
+    /// Creates a test item
+    /// </summary>
     public static Item CreateItem(
         string name = "Test Item",
         string type = ItemTypes.Consumable,
@@ -39,6 +50,9 @@ public static class TestEntityFactory
         };
     }
     
+    /// <summary>
+    /// Creates test items for head and body slots
+    /// </summary>
     public static (Item headItem, Item bodyItem) CreateHeadAndBodyItems()
     {
         var headItem = new Item
@@ -60,6 +74,9 @@ public static class TestEntityFactory
         return (headItem, bodyItem);
     }
     
+    /// <summary>
+    /// Creates a test user item
+    /// </summary>
     public static UserItem CreateUserItem(Guid userId, int itemId)
     {
         return new UserItem
@@ -69,6 +86,9 @@ public static class TestEntityFactory
         };
     }
     
+    /// <summary>
+    /// Creates a test user customization
+    /// </summary>
     public static UserCustomization CreateUserCustomization(
         Guid userId,
         string? headColor = null,
@@ -92,11 +112,17 @@ public static class TestEntityFactory
         };
     }
     
+    /// <summary>
+    /// Creates a test in-game merchant
+    /// </summary>
     public static InGameMerchant CreateMerchant()
     {
         return new InGameMerchant();
     }
     
+    /// <summary>
+    /// Creates a test merchant item offer
+    /// </summary>
     public static MerchantItemOffer CreateMerchantItemOffer(int merchantId, int itemId, int price)
     {
         return new MerchantItemOffer
@@ -107,6 +133,9 @@ public static class TestEntityFactory
         };
     }
     
+    /// <summary>
+    /// Creates a test user item offer
+    /// </summary>
     public static UserItemOffer CreateUserItemOffer(
         Guid sellerId,
         Guid userItemId,
@@ -125,9 +154,12 @@ public static class TestEntityFactory
         };
     }
     
-    public static Microsoft.AspNetCore.Identity.IdentityRole<Guid> CreateRole(string roleName)
+    /// <summary>
+    /// Creates a test identity role
+    /// </summary>
+    public static IdentityRole<Guid> CreateRole(string roleName)
     {
-        return new Microsoft.AspNetCore.Identity.IdentityRole<Guid>
+        return new IdentityRole<Guid>
         {
             Name = roleName,
             NormalizedName = roleName.ToUpper()

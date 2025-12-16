@@ -4,8 +4,8 @@ using MultiplayerGameBackend.Application.Items;
 using MultiplayerGameBackend.Application.Items.Requests;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
-using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
+using MultiplayerGameBackend.Tests.Shared.Helpers;
 using NSubstitute;
 
 namespace MultiplayerGameBackend.Application.Tests.Items;
@@ -35,9 +35,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = TestEntityFactory.CreateItem("Test Sword", ItemTypes.EquippableOnBody, "A powerful sword", "assets/sword.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Sword", ItemTypes.EquippableOnBody, "A powerful sword", "assets/sword.png");
 
         // Act
         var result = await service.GetById(item.Id, CancellationToken.None);
@@ -76,13 +74,9 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        List<Item> items = [
-            TestEntityFactory.CreateItem("Item 1", ItemTypes.EquippableOnHead, "Desc 1", "url1.png"),
-            TestEntityFactory.CreateItem("Item 2", ItemTypes.EquippableOnBody, "Desc 2", "url2.png"),
-            TestEntityFactory.CreateItem("Item 3", ItemTypes.EquippableOnHead, "Desc 3", "url3.png")
-        ];
-        context.Items.AddRange(items);
-        await context.SaveChangesAsync();
+        await DatabaseHelper.CreateAndSaveItem(context, "Item 1", ItemTypes.EquippableOnHead, "Desc 1", "url1.png");
+        await DatabaseHelper.CreateAndSaveItem(context, "Item 2", ItemTypes.EquippableOnBody, "Desc 2", "url2.png");
+        await DatabaseHelper.CreateAndSaveItem(context, "Item 3", ItemTypes.EquippableOnHead, "Desc 3", "url3.png");
 
         // Act
         var result = await service.GetAll(CancellationToken.None);
@@ -176,9 +170,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var existingItem = TestEntityFactory.CreateItem("Duplicate Item", ItemTypes.EquippableOnHead, "First one", "assets/dup.png");
-        context.Items.Add(existingItem);
-        await context.SaveChangesAsync();
+        await DatabaseHelper.CreateAndSaveItem(context, "Duplicate Item", ItemTypes.EquippableOnHead, "First one", "assets/dup.png");
 
         var dto = new CreateUpdateItemDto
         {
@@ -208,9 +200,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = TestEntityFactory.CreateItem("Original Name", ItemTypes.EquippableOnHead, "Original Description", "assets/original.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Original Name", ItemTypes.EquippableOnHead, "Original Description", "assets/original.png");
 
         var updateDto = new CreateUpdateItemDto
         {
@@ -239,9 +229,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.EquippableOnHead, "Test Description", "assets/test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.EquippableOnHead, "Test Description", "assets/test.png");
 
         var updateDto = new CreateUpdateItemDto
         {
@@ -295,9 +283,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = TestEntityFactory.CreateItem("Item to Delete", ItemTypes.EquippableOnHead, "Will be deleted", "assets/delete.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Item to Delete", ItemTypes.EquippableOnHead, "Will be deleted", "assets/delete.png");
 
         // Act
         var result = await service.Delete(item.Id, CancellationToken.None);
@@ -329,9 +315,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = TestEntityFactory.CreateItem("Double Delete Test", ItemTypes.EquippableOnHead, "Test double deletion", "assets/double.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Double Delete Test", ItemTypes.EquippableOnHead, "Test double deletion", "assets/double.png");
         var itemId = item.Id;
 
         // Act - Delete once

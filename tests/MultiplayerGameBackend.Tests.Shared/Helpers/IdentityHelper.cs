@@ -7,13 +7,16 @@ using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
 using NSubstitute;
 
-namespace MultiplayerGameBackend.Application.Tests.TestHelpers;
+namespace MultiplayerGameBackend.Tests.Shared.Helpers;
 
 /// <summary>
 /// Helper class for creating Identity-related objects for testing
 /// </summary>
 public static class IdentityHelper
 {
+    /// <summary>
+    /// Creates a basic UserManager for tests
+    /// </summary>
     public static UserManager<User> CreateUserManager(MultiplayerGameDbContext context)
     {
         var userStore = new UserStore<User, IdentityRole<Guid>, MultiplayerGameDbContext, Guid>(context);
@@ -68,6 +71,9 @@ public static class IdentityHelper
             passwordValidators, keyNormalizer, errors, services, logger);
     }
 
+    /// <summary>
+    /// Creates a RoleManager for tests
+    /// </summary>
     public static RoleManager<IdentityRole<Guid>> CreateRoleManager(MultiplayerGameDbContext context)
     {
         var roleStore = new RoleStore<IdentityRole<Guid>, MultiplayerGameDbContext, Guid>(context);
