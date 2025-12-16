@@ -8,7 +8,6 @@ using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
-using MultiplayerGameBackend.Tests.Shared.Factories;
 using MultiplayerGameBackend.Tests.Shared.Helpers;
 using NSubstitute;
 
@@ -56,8 +55,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
 
         // First, create the User role
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var role = TestEntityFactory.CreateRole(UserRoles.User);
-        await roleManager.CreateAsync(role);
+        await DatabaseHelper.CreateAndSaveRole(roleManager, UserRoles.User);
 
         var dto = new RegisterDto
         {
