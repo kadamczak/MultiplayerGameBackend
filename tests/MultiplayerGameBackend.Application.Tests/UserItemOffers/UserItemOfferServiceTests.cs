@@ -35,42 +35,22 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
-        var buyer = CreateUser("buyer", "buyer@example.com");
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
+        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com");
         context.Users.AddRange(seller, buyer);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem1 = new UserItem { UserId = seller.Id, ItemId = item.Id };
-        var userItem2 = new UserItem { UserId = seller.Id, ItemId = item.Id };
+        var userItem1 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
+        var userItem2 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
         context.UserItems.AddRange(userItem1, userItem2);
         await context.SaveChangesAsync();
 
-        var activeOffer = new UserItemOffer
-        {
-            UserItemId = userItem1.Id,
-            SellerId = seller.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow,
-            BuyerId = null
-        };
-        var soldOffer = new UserItemOffer
-        {
-            UserItemId = userItem2.Id,
-            SellerId = seller.Id,
-            Price = 200,
-            PublishedAt = DateTime.UtcNow.AddDays(-1),
-            BuyerId = buyer.Id,
-            BoughtAt = DateTime.UtcNow
-        };
+        var activeOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem1.Id, 100);
+        var soldOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem2.Id, 200, buyer.Id, DateTime.UtcNow);
+        soldOffer.PublishedAt = DateTime.UtcNow.AddDays(-1);
         context.UserItemOffers.AddRange(activeOffer, soldOffer);
         await context.SaveChangesAsync();
 
@@ -93,42 +73,22 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
-        var buyer = CreateUser("buyer", "buyer@example.com");
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
+        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com");
         context.Users.AddRange(seller, buyer);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem1 = new UserItem { UserId = seller.Id, ItemId = item.Id };
-        var userItem2 = new UserItem { UserId = seller.Id, ItemId = item.Id };
+        var userItem1 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
+        var userItem2 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
         context.UserItems.AddRange(userItem1, userItem2);
         await context.SaveChangesAsync();
 
-        var activeOffer = new UserItemOffer
-        {
-            UserItemId = userItem1.Id,
-            SellerId = seller.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow,
-            BuyerId = null
-        };
-        var soldOffer = new UserItemOffer
-        {
-            UserItemId = userItem2.Id,
-            SellerId = seller.Id,
-            Price = 200,
-            PublishedAt = DateTime.UtcNow.AddDays(-1),
-            BuyerId = buyer.Id,
-            BoughtAt = DateTime.UtcNow
-        };
+        var activeOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem1.Id, 100);
+        var soldOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem2.Id, 200, buyer.Id, DateTime.UtcNow);
+        soldOffer.PublishedAt = DateTime.UtcNow.AddDays(-1);
         context.UserItemOffers.AddRange(activeOffer, soldOffer);
         await context.SaveChangesAsync();
 
@@ -152,45 +112,21 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(seller);
 
-        var item1 = new Item
-        {
-            Name = "Magic Sword",
-            Description = "A magical sword",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "sword.png"
-        };
-        var item2 = new Item
-        {
-            Name = "Health Potion",
-            Description = "Restores health",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "potion.png"
-        };
+        var item1 = TestEntityFactory.CreateItem("Magic Sword", ItemTypes.EquippableOnBody, "A magical sword", "sword.png");
+        var item2 = TestEntityFactory.CreateItem("Health Potion", ItemTypes.Consumable, "Restores health", "potion.png");
         context.Items.AddRange(item1, item2);
         await context.SaveChangesAsync();
 
-        var userItem1 = new UserItem { UserId = seller.Id, ItemId = item1.Id };
-        var userItem2 = new UserItem { UserId = seller.Id, ItemId = item2.Id };
+        var userItem1 = TestEntityFactory.CreateUserItem(seller.Id, item1.Id);
+        var userItem2 = TestEntityFactory.CreateUserItem(seller.Id, item2.Id);
         context.UserItems.AddRange(userItem1, userItem2);
         await context.SaveChangesAsync();
 
-        var offer1 = new UserItemOffer
-        {
-            UserItemId = userItem1.Id,
-            SellerId = seller.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow
-        };
-        var offer2 = new UserItemOffer
-        {
-            UserItemId = userItem2.Id,
-            SellerId = seller.Id,
-            Price = 50,
-            PublishedAt = DateTime.UtcNow
-        };
+        var offer1 = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem1.Id, 100);
+        var offer2 = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem2.Id, 50);
         context.UserItemOffers.AddRange(offer1, offer2);
         await context.SaveChangesAsync();
 
@@ -212,38 +148,20 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(seller);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem1 = new UserItem { UserId = seller.Id, ItemId = item.Id };
-        var userItem2 = new UserItem { UserId = seller.Id, ItemId = item.Id };
+        var userItem1 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
+        var userItem2 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
         context.UserItems.AddRange(userItem1, userItem2);
         await context.SaveChangesAsync();
 
-        var expensiveOffer = new UserItemOffer
-        {
-            UserItemId = userItem1.Id,
-            SellerId = seller.Id,
-            Price = 200,
-            PublishedAt = DateTime.UtcNow
-        };
-        var cheapOffer = new UserItemOffer
-        {
-            UserItemId = userItem2.Id,
-            SellerId = seller.Id,
-            Price = 50,
-            PublishedAt = DateTime.UtcNow
-        };
+        var expensiveOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem1.Id, 200);
+        var cheapOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem2.Id, 50);
         context.UserItemOffers.AddRange(expensiveOffer, cheapOffer);
         await context.SaveChangesAsync();
 
@@ -272,33 +190,21 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(seller);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
         // Create 5 offers
         for (int i = 1; i <= 5; i++)
         {
-            var userItem = new UserItem { UserId = seller.Id, ItemId = item.Id };
+            var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
             context.UserItems.Add(userItem);
             await context.SaveChangesAsync();
 
-            var offer = new UserItemOffer
-            {
-                UserItemId = userItem.Id,
-                SellerId = seller.Id,
-                Price = i * 10,
-                PublishedAt = DateTime.UtcNow
-            };
+            var offer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, i * 10);
             context.UserItemOffers.Add(offer);
         }
         await context.SaveChangesAsync();
@@ -326,20 +232,14 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var user = CreateUser("seller", "seller@example.com");
+        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(user);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = user.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(user.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
@@ -367,7 +267,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var user = CreateUser("seller", "seller@example.com");
+        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(user);
         await context.SaveChangesAsync();
 
@@ -390,21 +290,15 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var owner = CreateUser("owner", "owner@example.com");
-        var otherUser = CreateUser("other", "other@example.com");
+        var owner = TestEntityFactory.CreateUser("owner", "owner@example.com");
+        var otherUser = TestEntityFactory.CreateUser("other", "other@example.com");
         context.Users.AddRange(owner, otherUser);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = owner.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(owner.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
@@ -427,31 +321,18 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var user = CreateUser("seller", "seller@example.com");
+        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(user);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = user.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(user.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var existingOffer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = user.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow,
-            BuyerId = null
-        };
+        var existingOffer = TestEntityFactory.CreateUserItemOffer(user.Id, userItem.Id, 100);
         context.UserItemOffers.Add(existingOffer);
         await context.SaveChangesAsync();
 
@@ -474,34 +355,21 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
-        var buyer = CreateUser("buyer", "buyer@example.com");
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
+        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com");
         context.Users.AddRange(seller, buyer);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
         // Create item that was sold
-        var userItem = new UserItem { UserId = seller.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var soldOffer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = seller.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow.AddDays(-1),
-            BuyerId = buyer.Id,
-            BoughtAt = DateTime.UtcNow
-        };
+        var soldOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, 100, buyer.Id, DateTime.UtcNow);
+        soldOffer.PublishedAt = DateTime.UtcNow.AddDays(-1);
         context.UserItemOffers.Add(soldOffer);
         await context.SaveChangesAsync();
 
@@ -535,30 +403,18 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var user = CreateUser("seller", "seller@example.com");
+        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(user);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = user.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(user.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = user.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow
-        };
+        var offer = TestEntityFactory.CreateUserItemOffer(user.Id, userItem.Id, 100);
         context.UserItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -577,7 +433,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var user = CreateUser("seller", "seller@example.com");
+        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(user);
         await context.SaveChangesAsync();
 
@@ -594,31 +450,19 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var owner = CreateUser("owner", "owner@example.com");
-        var otherUser = CreateUser("other", "other@example.com");
+        var owner = TestEntityFactory.CreateUser("owner", "owner@example.com");
+        var otherUser = TestEntityFactory.CreateUser("other", "other@example.com");
         context.Users.AddRange(owner, otherUser);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = owner.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(owner.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = owner.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow
-        };
+        var offer = TestEntityFactory.CreateUserItemOffer(owner.Id, userItem.Id, 100);
         context.UserItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -639,33 +483,19 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
-        seller.Balance = 100;
-        var buyer = CreateUser("buyer", "buyer@example.com");
-        buyer.Balance = 500;
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com", balance: 100);
+        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com", balance: 500);
         context.Users.AddRange(seller, buyer);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync(); // Save users and items
 
-        var userItem = new UserItem { UserId = seller.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = seller.Id,
-            Price = 150,
-            PublishedAt = DateTime.UtcNow
-        };
+        var offer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, 150);
         context.UserItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -695,7 +525,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var buyer = CreateUser("buyer", "buyer@example.com");
+        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com");
         buyer.Balance = 500;
         context.Users.Add(buyer);
         await context.SaveChangesAsync();
@@ -713,31 +543,18 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var user = CreateUser("user", "user@example.com");
-        user.Balance = 500;
+        var user = TestEntityFactory.CreateUser("user", "user@example.com", balance: 500);
         context.Users.Add(user);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = user.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(user.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = user.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow
-        };
+        var offer = TestEntityFactory.CreateUserItemOffer(user.Id, userItem.Id, 100);
         context.UserItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -756,30 +573,18 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
         context.Users.Add(seller);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = seller.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = seller.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow
-        };
+        var offer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, 100);
         context.UserItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -796,33 +601,19 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
 
-        var seller = CreateUser("seller", "seller@example.com");
-        seller.Balance = 100;
-        var buyer = CreateUser("buyer", "buyer@example.com");
-        buyer.Balance = 50; // Not enough
+        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com", balance: 100);
+        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com", balance: 50); // Not enough
         context.Users.AddRange(seller, buyer);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync(); // Save users and items
 
-        var userItem = new UserItem { UserId = seller.Id, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = seller.Id,
-            Price = 100,
-            PublishedAt = DateTime.UtcNow
-        };
+        var offer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, 100);
         context.UserItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -834,22 +625,6 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         Assert.Contains("Balance", exception.Errors.Keys);
     }
 
-    #endregion
-
-    #region Helper Methods
-
-    private User CreateUser(string username, string email)
-    {
-        return new User
-        {
-            Id = Guid.NewGuid(),
-            UserName = username,
-            NormalizedUserName = username.ToUpper(),
-            Email = email,
-            NormalizedEmail = email.ToUpper(),
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
-    }
 
     #endregion
 }

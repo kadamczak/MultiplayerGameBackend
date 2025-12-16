@@ -35,36 +35,15 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var item1 = new Item
-        {
-            Name = "Iron Helmet",
-            Description = "A sturdy iron helmet",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/helmet.png"
-        };
-        var item2 = new Item
-        {
-            Name = "Steel Sword",
-            Description = "A sharp steel sword",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/sword.png"
-        };
+        var (item1, item2) = TestEntityFactory.CreateHeadAndBodyItems();
         context.Items.AddRange(item1, item2);
         await context.SaveChangesAsync();
 
-        var userItem1 = new UserItem { UserId = userId, ItemId = item1.Id };
-        var userItem2 = new UserItem { UserId = userId, ItemId = item2.Id };
+        var userItem1 = TestEntityFactory.CreateUserItem(userId, item1.Id);
+        var userItem2 = TestEntityFactory.CreateUserItem(userId, item2.Id);
         context.UserItems.AddRange(userItem1, userItem2);
         await context.SaveChangesAsync();
 

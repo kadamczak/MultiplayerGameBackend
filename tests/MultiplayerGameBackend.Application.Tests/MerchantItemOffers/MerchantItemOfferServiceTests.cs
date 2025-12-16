@@ -32,38 +32,16 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
 
-        var merchant = new InGameMerchant { Id = 1 };
+        var merchant = TestEntityFactory.CreateMerchant();
         context.InGameMerchants.Add(merchant);
 
-        var item1 = new Item
-        {
-            Name = "Health Potion",
-            Description = "Restores 50 HP",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/health_potion.png"
-        };
-        var item2 = new Item
-        {
-            Name = "Iron Sword",
-            Description = "A sturdy iron sword",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/iron_sword.png"
-        };
+        var item1 = TestEntityFactory.CreateItem("Health Potion", ItemTypes.Consumable, "Restores 50 HP", "assets/health_potion.png");
+        var item2 = TestEntityFactory.CreateItem("Iron Sword", ItemTypes.EquippableOnBody, "A sturdy iron sword", "assets/iron_sword.png");
         context.Items.AddRange(item1, item2);
         await context.SaveChangesAsync();
 
-        var offer1 = new MerchantItemOffer
-        {
-            MerchantId = merchant.Id,
-            ItemId = item1.Id,
-            Price = 50
-        };
-        var offer2 = new MerchantItemOffer
-        {
-            MerchantId = merchant.Id,
-            ItemId = item2.Id,
-            Price = 150
-        };
+        var offer1 = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item1.Id, 50);
+        var offer2 = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item2.Id, 150);
         context.MerchantItemOffers.AddRange(offer1, offer2);
         await context.SaveChangesAsync();
 
@@ -84,7 +62,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
 
-        var merchant = new InGameMerchant { Id = 1 };
+        var merchant = TestEntityFactory.CreateMerchant();
         context.InGameMerchants.Add(merchant);
         await context.SaveChangesAsync();
 
