@@ -22,6 +22,7 @@ public class MultiplayerGameDbContext
     public DbSet<InGameMerchant> InGameMerchants { get; set; }
     public DbSet<MerchantItemOffer> MerchantItemOffers { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<FriendRequest> FriendRequests { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,6 +36,7 @@ public class MultiplayerGameDbContext
         ConfigureInGameMerchantEntities(modelBuilder);
         ConfigureMerchantItemOfferEntities(modelBuilder);
         ConfigureRefreshTokenEntities(modelBuilder);
+        ConfigureFriendRequestEntities(modelBuilder);
     }
 
     private static void ConfigureItemEntities(ModelBuilder modelBuilder)
@@ -200,6 +202,26 @@ public class MultiplayerGameDbContext
             
             entity.HasIndex(e => e.TokenHash)
                 .IsUnique();
+        });
+    }
+    
+    private static void ConfigureFriendRequestEntities(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<FriendRequest>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasOne(fr => fr.Requester)
+                .WithMany(u => u.SentFriendRequests)
+                .HasForeignKey(fr => fr.RequesterId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasOne(fr => fr.Receiver)
+                .WithMany(u => u.ReceivedFriendRequests)
+                .HasForeignKey(fr => fr.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => new { e.RequesterId, e.ReceiverId, e.Status });
         });
     }
 }

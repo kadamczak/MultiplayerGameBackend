@@ -15,6 +15,7 @@ public interface IMultiplayerGameDbContext
     DbSet<RefreshToken> RefreshTokens { get; }
     DbSet<InGameMerchant> InGameMerchants { get; }
     DbSet<MerchantItemOffer> MerchantItemOffers { get; }
+    DbSet<FriendRequest> FriendRequests { get; }
     
     // DatabaseFacade Database { get; }
     // EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
