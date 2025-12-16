@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
-using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 using NSubstitute;
 
@@ -96,39 +95,17 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
 
-        var merchant1 = new InGameMerchant { Id = 1 };
-        var merchant2 = new InGameMerchant { Id = 2 };
+        var merchant1 = TestEntityFactory.CreateMerchant();
+        var merchant2 = TestEntityFactory.CreateMerchant();
         context.InGameMerchants.AddRange(merchant1, merchant2);
 
-        var item1 = new Item
-        {
-            Name = "Merchant 1 Item",
-            Description = "Item for merchant 1",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/item1.png"
-        };
-        var item2 = new Item
-        {
-            Name = "Merchant 2 Item",
-            Description = "Item for merchant 2",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/item2.png"
-        };
+        var item1 = TestEntityFactory.CreateItem("Merchant 1 Item", ItemTypes.Consumable, "Item for merchant 1", "assets/item1.png");
+        var item2 = TestEntityFactory.CreateItem("Merchant 2 Item", ItemTypes.Consumable, "Item for merchant 2", "assets/item2.png");
         context.Items.AddRange(item1, item2);
         await context.SaveChangesAsync();
 
-        var offer1 = new MerchantItemOffer
-        {
-            MerchantId = merchant1.Id,
-            ItemId = item1.Id,
-            Price = 100
-        };
-        var offer2 = new MerchantItemOffer
-        {
-            MerchantId = merchant2.Id,
-            ItemId = item2.Id,
-            Price = 200
-        };
+        var offer1 = TestEntityFactory.CreateMerchantItemOffer(merchant1.Id, item1.Id, 100);
+        var offer2 = TestEntityFactory.CreateMerchantItemOffer(merchant2.Id, item2.Id, 200);
         context.MerchantItemOffers.AddRange(offer1, offer2);
         await context.SaveChangesAsync();
 
@@ -154,37 +131,17 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly",
-            Balance = 500
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId, balance: 500);
         context.Users.Add(user);
 
-        var merchant = new InGameMerchant { Id = 1 };
+        var merchant = TestEntityFactory.CreateMerchant();
         context.InGameMerchants.Add(merchant);
 
-        var item = new Item
-        {
-            Name = "Magic Scroll",
-            Description = "A powerful magic scroll",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/scroll.png"
-        };
+        var item = TestEntityFactory.CreateItem("Magic Scroll", ItemTypes.Consumable, "A powerful magic scroll", "assets/scroll.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var offer = new MerchantItemOffer
-        {
-            MerchantId = merchant.Id,
-            ItemId = item.Id,
-            Price = 200
-        };
+        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 200);
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -225,25 +182,14 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         await using var context = _fixture.CreateDbContext();
         var service = new MerchantItemOfferService(_logger, context);
 
-        var merchant = new InGameMerchant { Id = 1 };
+        var merchant = TestEntityFactory.CreateMerchant();
         context.InGameMerchants.Add(merchant);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "assets/test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var offer = new MerchantItemOffer
-        {
-            MerchantId = merchant.Id,
-            ItemId = item.Id,
-            Price = 100
-        };
+        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 100);
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -265,37 +211,17 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "pooruser",
-            NormalizedUserName = "POORUSER",
-            Email = "poor@example.com",
-            NormalizedEmail = "POOR@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly",
-            Balance = 50
-        };
+        var user = TestEntityFactory.CreateUser("pooruser", "poor@example.com", userId, balance: 50);
         context.Users.Add(user);
 
-        var merchant = new InGameMerchant { Id = 1 };
+        var merchant = TestEntityFactory.CreateMerchant();
         context.InGameMerchants.Add(merchant);
 
-        var item = new Item
-        {
-            Name = "Expensive Item",
-            Description = "Very expensive",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/expensive.png"
-        };
+        var item = TestEntityFactory.CreateItem("Expensive Item", ItemTypes.EquippableOnHead, "Very expensive", "assets/expensive.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var offer = new MerchantItemOffer
-        {
-            MerchantId = merchant.Id,
-            ItemId = item.Id,
-            Price = 200
-        };
+        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 200);
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -316,37 +242,17 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "exactuser",
-            NormalizedUserName = "EXACTUSER",
-            Email = "exact@example.com",
-            NormalizedEmail = "EXACT@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly",
-            Balance = 100
-        };
+        var user = TestEntityFactory.CreateUser("exactuser", "exact@example.com", userId, balance: 100);
         context.Users.Add(user);
 
-        var merchant = new InGameMerchant { Id = 1 };
+        var merchant = TestEntityFactory.CreateMerchant();
         context.InGameMerchants.Add(merchant);
 
-        var item = new Item
-        {
-            Name = "Exact Price Item",
-            Description = "Costs exactly 100",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/exact.png"
-        };
+        var item = TestEntityFactory.CreateItem("Exact Price Item", ItemTypes.Consumable, "Costs exactly 100", "assets/exact.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var offer = new MerchantItemOffer
-        {
-            MerchantId = merchant.Id,
-            ItemId = item.Id,
-            Price = 100
-        };
+        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 100);
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -370,37 +276,17 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
         var service = new MerchantItemOfferService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "collector",
-            NormalizedUserName = "COLLECTOR",
-            Email = "collector@example.com",
-            NormalizedEmail = "COLLECTOR@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly",
-            Balance = 500
-        };
+        var user = TestEntityFactory.CreateUser("collector", "collector@example.com", userId, balance: 500);
         context.Users.Add(user);
 
-        var merchant = new InGameMerchant { Id = 1 };
+        var merchant = TestEntityFactory.CreateMerchant();
         context.InGameMerchants.Add(merchant);
 
-        var item = new Item
-        {
-            Name = "Stackable Potion",
-            Description = "Can buy multiple",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/potion.png"
-        };
+        var item = TestEntityFactory.CreateItem("Stackable Potion", ItemTypes.Consumable, "Can buy multiple", "assets/potion.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var offer = new MerchantItemOffer
-        {
-            MerchantId = merchant.Id,
-            ItemId = item.Id,
-            Price = 50
-        };
+        var offer = TestEntityFactory.CreateMerchantItemOffer(merchant.Id, item.Id, 50);
         context.MerchantItemOffers.Add(offer);
         await context.SaveChangesAsync();
 

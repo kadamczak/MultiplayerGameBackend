@@ -35,13 +35,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = new Item
-        {
-            Name = "Test Sword",
-            Description = "A powerful sword",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/sword.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Sword", ItemTypes.EquippableOnBody, "A powerful sword", "assets/sword.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
@@ -83,9 +77,9 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         var service = new ItemService(_logger, context, _mapper);
 
         List<Item> items = [
-            new() { Name = "Item 1", Description = "Desc 1", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "url1.png" },
-            new() { Name = "Item 2", Description = "Desc 2", Type = ItemTypes.EquippableOnBody, ThumbnailUrl = "url2.png" },
-            new() { Name = "Item 3", Description = "Desc 3", Type = ItemTypes.EquippableOnHead, ThumbnailUrl = "url3.png" }
+            TestEntityFactory.CreateItem("Item 1", ItemTypes.EquippableOnHead, "Desc 1", "url1.png"),
+            TestEntityFactory.CreateItem("Item 2", ItemTypes.EquippableOnBody, "Desc 2", "url2.png"),
+            TestEntityFactory.CreateItem("Item 3", ItemTypes.EquippableOnHead, "Desc 3", "url3.png")
         ];
         context.Items.AddRange(items);
         await context.SaveChangesAsync();
@@ -182,13 +176,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var existingItem = new Item
-        {
-            Name = "Duplicate Item",
-            Description = "First one",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/dup.png"
-        };
+        var existingItem = TestEntityFactory.CreateItem("Duplicate Item", ItemTypes.EquippableOnHead, "First one", "assets/dup.png");
         context.Items.Add(existingItem);
         await context.SaveChangesAsync();
 
@@ -220,13 +208,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = new Item
-        {
-            Name = "Original Name",
-            Description = "Original Description",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/original.png"
-        };
+        var item = TestEntityFactory.CreateItem("Original Name", ItemTypes.EquippableOnHead, "Original Description", "assets/original.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
@@ -257,13 +239,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "Test Description",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/test.png"
-        };
+        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.EquippableOnHead, "Test Description", "assets/test.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
@@ -319,13 +295,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = new Item
-        {
-            Name = "Item to Delete",
-            Description = "Will be deleted",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/delete.png"
-        };
+        var item = TestEntityFactory.CreateItem("Item to Delete", ItemTypes.EquippableOnHead, "Will be deleted", "assets/delete.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
@@ -359,13 +329,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var service = new ItemService(_logger, context, _mapper);
 
-        var item = new Item
-        {
-            Name = "Double Delete Test",
-            Description = "Test double deletion",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/double.png"
-        };
+        var item = TestEntityFactory.CreateItem("Double Delete Test", ItemTypes.EquippableOnHead, "Test double deletion", "assets/double.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
         var itemId = item.Id;

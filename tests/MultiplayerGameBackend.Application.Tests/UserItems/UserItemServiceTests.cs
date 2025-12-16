@@ -89,45 +89,17 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userId1 = Guid.NewGuid();
         var userId2 = Guid.NewGuid();
 
-        var user1 = new User
-        {
-            Id = userId1,
-            UserName = "user1",
-            NormalizedUserName = "USER1",
-            Email = "user1@example.com",
-            NormalizedEmail = "USER1@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
-        var user2 = new User
-        {
-            Id = userId2,
-            UserName = "user2",
-            NormalizedUserName = "USER2",
-            Email = "user2@example.com",
-            NormalizedEmail = "USER2@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user1 = TestEntityFactory.CreateUser("user1", "user1@example.com", userId1);
+        var user2 = TestEntityFactory.CreateUser("user2", "user2@example.com", userId2);
         context.Users.AddRange(user1, user2);
 
-        var item1 = new Item
-        {
-            Name = "User1 Item",
-            Description = "Item for user 1",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/item1.png"
-        };
-        var item2 = new Item
-        {
-            Name = "User2 Item",
-            Description = "Item for user 2",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/item2.png"
-        };
+        var item1 = TestEntityFactory.CreateItem("User1 Item", ItemTypes.Consumable, "Item for user 1", "assets/item1.png");
+        var item2 = TestEntityFactory.CreateItem("User2 Item", ItemTypes.Consumable, "Item for user 2", "assets/item2.png");
         context.Items.AddRange(item1, item2);
         await context.SaveChangesAsync();
 
-        var userItem1 = new UserItem { UserId = userId1, ItemId = item1.Id };
-        var userItem2 = new UserItem { UserId = userId2, ItemId = item2.Id };
+        var userItem1 = TestEntityFactory.CreateUserItem(userId1, item1.Id);
+        var userItem2 = TestEntityFactory.CreateUserItem(userId2, item2.Id);
         context.UserItems.AddRange(userItem1, userItem2);
         await context.SaveChangesAsync();
 
@@ -150,36 +122,16 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var item1 = new Item
-        {
-            Name = "Magic Sword",
-            Description = "A magical weapon",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/sword.png"
-        };
-        var item2 = new Item
-        {
-            Name = "Health Potion",
-            Description = "Restores health",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/potion.png"
-        };
+        var item1 = TestEntityFactory.CreateItem("Magic Sword", ItemTypes.EquippableOnBody, "A magical weapon", "assets/sword.png");
+        var item2 = TestEntityFactory.CreateItem("Health Potion", ItemTypes.Consumable, "Restores health", "assets/potion.png");
         context.Items.AddRange(item1, item2);
         await context.SaveChangesAsync();
 
-        var userItem1 = new UserItem { UserId = userId, ItemId = item1.Id };
-        var userItem2 = new UserItem { UserId = userId, ItemId = item2.Id };
+        var userItem1 = TestEntityFactory.CreateUserItem(userId, item1.Id);
+        var userItem2 = TestEntityFactory.CreateUserItem(userId, item2.Id);
         context.UserItems.AddRange(userItem1, userItem2);
         await context.SaveChangesAsync();
 
@@ -202,36 +154,16 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var itemZ = new Item
-        {
-            Name = "Zebra Shield",
-            Description = "Shield",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/shield.png"
-        };
-        var itemA = new Item
-        {
-            Name = "Apple Potion",
-            Description = "Potion",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/potion.png"
-        };
+        var itemZ = TestEntityFactory.CreateItem("Zebra Shield", ItemTypes.EquippableOnBody, "Shield", "assets/shield.png");
+        var itemA = TestEntityFactory.CreateItem("Apple Potion", ItemTypes.Consumable, "Potion", "assets/potion.png");
         context.Items.AddRange(itemZ, itemA);
         await context.SaveChangesAsync();
 
-        var userItemZ = new UserItem { UserId = userId, ItemId = itemZ.Id };
-        var userItemA = new UserItem { UserId = userId, ItemId = itemA.Id };
+        var userItemZ = TestEntityFactory.CreateUserItem(userId, itemZ.Id);
+        var userItemA = TestEntityFactory.CreateUserItem(userId, itemA.Id);
         context.UserItems.AddRange(userItemZ, userItemA);
         await context.SaveChangesAsync();
 
@@ -261,36 +193,16 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var itemZ = new Item
-        {
-            Name = "Zebra Shield",
-            Description = "Shield",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/shield.png"
-        };
-        var itemA = new Item
-        {
-            Name = "Apple Potion",
-            Description = "Potion",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "assets/potion.png"
-        };
+        var itemZ = TestEntityFactory.CreateItem("Zebra Shield", ItemTypes.EquippableOnBody, "Shield", "assets/shield.png");
+        var itemA = TestEntityFactory.CreateItem("Apple Potion", ItemTypes.Consumable, "Potion", "assets/potion.png");
         context.Items.AddRange(itemZ, itemA);
         await context.SaveChangesAsync();
 
-        var userItemZ = new UserItem { UserId = userId, ItemId = itemZ.Id };
-        var userItemA = new UserItem { UserId = userId, ItemId = itemA.Id };
+        var userItemZ = TestEntityFactory.CreateUserItem(userId, itemZ.Id);
+        var userItemA = TestEntityFactory.CreateUserItem(userId, itemA.Id);
         context.UserItems.AddRange(userItemZ, userItemA);
         await context.SaveChangesAsync();
 
@@ -320,31 +232,17 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
         // Create 5 items
         for (int i = 1; i <= 5; i++)
         {
-            var item = new Item
-            {
-                Name = $"Item {i}",
-                Description = $"Description {i}",
-                Type = ItemTypes.Consumable,
-                ThumbnailUrl = $"assets/item{i}.png"
-            };
+            var item = TestEntityFactory.CreateItem($"Item {i}", ItemTypes.Consumable, $"Description {i}", $"assets/item{i}.png");
             context.Items.Add(item);
             await context.SaveChangesAsync();
 
-            var userItem = new UserItem { UserId = userId, ItemId = item.Id };
+            var userItem = TestEntityFactory.CreateUserItem(userId, item.Id);
             context.UserItems.Add(userItem);
         }
         await context.SaveChangesAsync();
@@ -369,38 +267,18 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var item = new Item
-        {
-            Name = "Rare Sword",
-            Description = "A rare sword",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/sword.png"
-        };
+        var item = TestEntityFactory.CreateItem("Rare Sword", ItemTypes.EquippableOnBody, "A rare sword", "assets/sword.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = userId, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(userId, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = userId,
-            Price = 100,
-            BuyerId = null // Active offer
-        };
+        var offer = TestEntityFactory.CreateUserItemOffer(userId, userItem.Id, 100);
         context.UserItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -427,47 +305,19 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
 
         var userId = Guid.NewGuid();
         var buyerId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
-        var buyer = new User
-        {
-            Id = buyerId,
-            UserName = "buyer",
-            NormalizedUserName = "BUYER",
-            Email = "buyer@example.com",
-            NormalizedEmail = "BUYER@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
+        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com", buyerId);
         context.Users.AddRange(user, buyer);
 
-        var item = new Item
-        {
-            Name = "Sold Sword",
-            Description = "A sold sword",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/sword.png"
-        };
+        var item = TestEntityFactory.CreateItem("Sold Sword", ItemTypes.EquippableOnBody, "A sold sword", "assets/sword.png");
         context.Items.Add(item);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = userId, ItemId = item.Id };
+        var userItem = TestEntityFactory.CreateUserItem(userId, item.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItem.Id,
-            SellerId = userId,
-            Price = 100,
-            BuyerId = buyerId // Sold offer
-        };
+        var offer = TestEntityFactory.CreateUserItemOffer(userId, userItem.Id, 100, buyerId, DateTime.UtcNow);
         context.UserItemOffers.Add(offer);
         await context.SaveChangesAsync();
 
@@ -496,41 +346,17 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
 
-        var headItem = new Item
-        {
-            Name = "Cool Helmet",
-            Description = "A cool helmet",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/helmet.png"
-        };
+        var headItem = TestEntityFactory.CreateItem("Cool Helmet", ItemTypes.EquippableOnHead, "A cool helmet", "assets/helmet.png");
         context.Items.Add(headItem);
         await context.SaveChangesAsync();
 
-        var userHeadItem = new UserItem { UserId = userId, ItemId = headItem.Id };
+        var userHeadItem = TestEntityFactory.CreateUserItem(userId, headItem.Id);
         context.UserItems.Add(userHeadItem);
         await context.SaveChangesAsync();
 
@@ -555,41 +381,17 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
 
-        var bodyItem = new Item
-        {
-            Name = "Epic Armor",
-            Description = "Epic armor",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/armor.png"
-        };
+        var bodyItem = TestEntityFactory.CreateItem("Epic Armor", ItemTypes.EquippableOnBody, "Epic armor", "assets/armor.png");
         context.Items.Add(bodyItem);
         await context.SaveChangesAsync();
 
-        var userBodyItem = new UserItem { UserId = userId, ItemId = bodyItem.Id };
+        var userBodyItem = TestEntityFactory.CreateUserItem(userId, bodyItem.Id);
         context.UserItems.Add(userBodyItem);
         await context.SaveChangesAsync();
 
@@ -614,49 +416,19 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
 
-        var headItem = new Item
-        {
-            Name = "Cool Helmet",
-            Description = "A cool helmet",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/helmet.png"
-        };
-        var bodyItem = new Item
-        {
-            Name = "Epic Armor",
-            Description = "Epic armor",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/armor.png"
-        };
+        var headItem = TestEntityFactory.CreateItem("Cool Helmet", ItemTypes.EquippableOnHead, "A cool helmet", "assets/helmet.png");
+        var bodyItem = TestEntityFactory.CreateItem("Epic Armor", ItemTypes.EquippableOnBody, "Epic armor", "assets/armor.png");
         context.Items.AddRange(headItem, bodyItem);
         await context.SaveChangesAsync();
 
-        var userHeadItem = new UserItem { UserId = userId, ItemId = headItem.Id };
-        var userBodyItem = new UserItem { UserId = userId, ItemId = bodyItem.Id };
+        var userHeadItem = TestEntityFactory.CreateUserItem(userId, headItem.Id);
+        var userBodyItem = TestEntityFactory.CreateUserItem(userId, bodyItem.Id);
         context.UserItems.AddRange(userHeadItem, userBodyItem);
         await context.SaveChangesAsync();
 
@@ -683,42 +455,18 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var headItem = new Item
-        {
-            Name = "Cool Helmet",
-            Description = "A cool helmet",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/helmet.png"
-        };
+        var headItem = TestEntityFactory.CreateItem("Cool Helmet", ItemTypes.EquippableOnHead, "A cool helmet", "assets/helmet.png");
         context.Items.Add(headItem);
         await context.SaveChangesAsync();
 
-        var userHeadItem = new UserItem { UserId = userId, ItemId = headItem.Id };
+        var userHeadItem = TestEntityFactory.CreateUserItem(userId, headItem.Id);
         context.UserItems.Add(userHeadItem);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF",
-            EquippedHeadUserItemId = userHeadItem.Id
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
+        customization.EquippedHeadUserItemId = userHeadItem.Id;
         context.UserCustomizations.Add(customization);
         await context.SaveChangesAsync();
 
@@ -745,28 +493,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
         await context.SaveChangesAsync();
 
@@ -789,28 +519,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
         await context.SaveChangesAsync();
 
@@ -835,50 +547,18 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userId = Guid.NewGuid();
         var otherUserId = Guid.NewGuid();
 
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
-        var otherUser = new User
-        {
-            Id = otherUserId,
-            UserName = "otheruser",
-            NormalizedUserName = "OTHERUSER",
-            Email = "other@example.com",
-            NormalizedEmail = "OTHER@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
+        var otherUser = TestEntityFactory.CreateUser("otheruser", "other@example.com", otherUserId);
         context.Users.AddRange(user, otherUser);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
 
-        var headItem = new Item
-        {
-            Name = "Other's Helmet",
-            Description = "Someone else's helmet",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/helmet.png"
-        };
+        var headItem = TestEntityFactory.CreateItem("Other's Helmet", ItemTypes.EquippableOnHead, "Someone else's helmet", "assets/helmet.png");
         context.Items.Add(headItem);
         await context.SaveChangesAsync();
 
-        var otherUserItem = new UserItem { UserId = otherUserId, ItemId = headItem.Id };
+        var otherUserItem = TestEntityFactory.CreateUserItem(otherUserId, headItem.Id);
         context.UserItems.Add(otherUserItem);
         await context.SaveChangesAsync();
 
@@ -903,50 +583,18 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userId = Guid.NewGuid();
         var otherUserId = Guid.NewGuid();
 
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
-        var otherUser = new User
-        {
-            Id = otherUserId,
-            UserName = "otheruser",
-            NormalizedUserName = "OTHERUSER",
-            Email = "other@example.com",
-            NormalizedEmail = "OTHER@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
+        var otherUser = TestEntityFactory.CreateUser("otheruser", "other@example.com", otherUserId);
         context.Users.AddRange(user, otherUser);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
 
-        var bodyItem = new Item
-        {
-            Name = "Other's Armor",
-            Description = "Someone else's armor",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/armor.png"
-        };
+        var bodyItem = TestEntityFactory.CreateItem("Other's Armor", ItemTypes.EquippableOnBody, "Someone else's armor", "assets/armor.png");
         context.Items.Add(bodyItem);
         await context.SaveChangesAsync();
 
-        var otherUserItem = new UserItem { UserId = otherUserId, ItemId = bodyItem.Id };
+        var otherUserItem = TestEntityFactory.CreateUserItem(otherUserId, bodyItem.Id);
         context.UserItems.Add(otherUserItem);
         await context.SaveChangesAsync();
 
@@ -969,41 +617,17 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
 
-        var wrongTypeItem = new Item
-        {
-            Name = "Sword",
-            Description = "A sword, not a helmet",
-            Type = ItemTypes.EquippableOnBody, // Wrong type!
-            ThumbnailUrl = "assets/sword.png"
-        };
+        var wrongTypeItem = TestEntityFactory.CreateItem("Sword", ItemTypes.EquippableOnBody, "A sword, not a helmet", "assets/sword.png");
         context.Items.Add(wrongTypeItem);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = userId, ItemId = wrongTypeItem.Id };
+        var userItem = TestEntityFactory.CreateUserItem(userId, wrongTypeItem.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
@@ -1028,41 +652,17 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = "#FF0000",
-            BodyColor = "#00FF00",
-            TailColor = "#0000FF",
-            EyeColor = "#FFFF00",
-            WingColor = "#FF00FF",
-            HornColor = "#00FFFF",
-            MarkingsColor = "#FFFFFF"
-        };
+        var customization = TestEntityFactory.CreateUserCustomization(userId);
         context.UserCustomizations.Add(customization);
 
-        var wrongTypeItem = new Item
-        {
-            Name = "Helmet",
-            Description = "A helmet, not body armor",
-            Type = ItemTypes.EquippableOnHead, // Wrong type!
-            ThumbnailUrl = "assets/helmet.png"
-        };
+        var wrongTypeItem = TestEntityFactory.CreateItem("Helmet", ItemTypes.EquippableOnHead, "A helmet, not body armor", "assets/helmet.png");
         context.Items.Add(wrongTypeItem);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = userId, ItemId = wrongTypeItem.Id };
+        var userItem = TestEntityFactory.CreateUserItem(userId, wrongTypeItem.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 
@@ -1087,28 +687,14 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var service = new UserItemService(_logger, context);
 
         var userId = Guid.NewGuid();
-        var user = new User
-        {
-            Id = userId,
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            PasswordHash = "AQAAAAIAAYagAAAAEDummyHashForTestingPurposesOnly"
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com", userId);
         context.Users.Add(user);
 
-        var headItem = new Item
-        {
-            Name = "Helmet",
-            Description = "A helmet",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/helmet.png"
-        };
+        var headItem = TestEntityFactory.CreateItem("Helmet", ItemTypes.EquippableOnHead, "A helmet", "assets/helmet.png");
         context.Items.Add(headItem);
         await context.SaveChangesAsync();
 
-        var userItem = new UserItem { UserId = userId, ItemId = headItem.Id };
+        var userItem = TestEntityFactory.CreateUserItem(userId, headItem.Id);
         context.UserItems.Add(userItem);
         await context.SaveChangesAsync();
 

@@ -91,14 +91,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var existingUser = new User
-        {
-            UserName = "existinguser",
-            NormalizedUserName = "EXISTINGUSER",
-            Email = "existing@example.com",
-            NormalizedEmail = "EXISTING@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var existingUser = TestEntityFactory.CreateUser("existinguser", "existing@example.com");
         await userManager.CreateAsync(existingUser, "Password123!");
 
         var dto = new RegisterDto
@@ -122,14 +115,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var existingUser = new User
-        {
-            UserName = "existinguser",
-            NormalizedUserName = "EXISTINGUSER",
-            Email = "existing@example.com",
-            NormalizedEmail = "EXISTING@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var existingUser = TestEntityFactory.CreateUser("existinguser", "existing@example.com");
         await userManager.CreateAsync(existingUser, "Password123!");
 
         var dto = new RegisterDto
@@ -157,14 +143,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         var dto = new LoginDto
@@ -215,14 +194,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         var dto = new LoginDto
@@ -245,14 +217,8 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = false // Not confirmed
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
+        user.EmailConfirmed = false; // Not confirmed
         await userManager.CreateAsync(user, "Password123!");
 
         var dto = new LoginDto
@@ -275,14 +241,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         // Create an existing game token
@@ -324,14 +283,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         // First login to get refresh token
@@ -382,14 +334,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         // Login and then logout
@@ -416,14 +361,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         var loginDto = new LoginDto { UserName = "testuser", Password = "Password123!" };
@@ -465,14 +403,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "OldPassword123!");
 
         var loginDto = new LoginDto { UserName = "testuser", Password = "OldPassword123!" };
@@ -501,14 +432,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         // Create two sessions
@@ -544,14 +468,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         var loginDto = new LoginDto { UserName = "testuser", Password = "Password123!" };
@@ -581,14 +498,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
         var userId = user.Id;
 
@@ -610,14 +520,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         var dto = new DeleteAccountDto { Password = "WrongPassword!" };
@@ -640,14 +543,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         var dto = new ForgotPasswordDto { Email = "test@example.com" };
@@ -696,14 +592,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "OldPassword123!");
 
         // Generate reset token
@@ -733,14 +622,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         // Create a session
@@ -798,14 +680,8 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = false
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
+        user.EmailConfirmed = false;
         await userManager.CreateAsync(user, "Password123!");
 
         var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -832,14 +708,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
         var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
 
-        var user = new User
-        {
-            UserName = "testuser",
-            NormalizedUserName = "TESTUSER",
-            Email = "test@example.com",
-            NormalizedEmail = "TEST@EXAMPLE.COM",
-            EmailConfirmed = true
-        };
+        var user = TestEntityFactory.CreateUser("testuser", "test@example.com");
         await userManager.CreateAsync(user, "Password123!");
 
         var dto = new ConfirmEmailDto
