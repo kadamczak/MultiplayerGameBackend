@@ -29,8 +29,8 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
     private string GenerateJwtToken(User user, IEnumerable<string> roles) =>
         JwtTokenHelper.GenerateJwtToken(user, roles);
 
-    private async Task<Item> CreateTestItem(string name, string type) =>
-        await TestDataHelper.CreateTestItem(webAppFactory.Services, name, type);
+    private async Task<Item> AddItemToDatabase(string name, string type) =>
+        await TestDataHelper.AddItemToDatabase(webAppFactory.Services, name, type);
 
     #endregion
 
@@ -44,7 +44,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         var token = GenerateJwtToken(user, new[] { "User" });
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
 
         // Act
         var response = await httpClient.GetAsync($"/v1/items/{item.Id}");
@@ -76,7 +76,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
     public async Task GetById_ShouldReturnUnauthorized_WhenNotAuthenticated()
     {
         // Arrange
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
 
         // Act
         var response = await httpClient.GetAsync($"/v1/items/{item.Id}");
@@ -97,8 +97,8 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         var token = GenerateJwtToken(user, new[] { "User" });
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        await CreateTestItem("Item 1", ItemTypes.Consumable);
-        await CreateTestItem("Item 2", ItemTypes.EquippableOnHead);
+        await AddItemToDatabase("Item 1", ItemTypes.Consumable);
+        await AddItemToDatabase("Item 2", ItemTypes.EquippableOnHead);
 
         // Act
         var response = await httpClient.GetAsync("/v1/items");
@@ -220,7 +220,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         var token = GenerateJwtToken(admin, new[] { "Admin" });
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        await CreateTestItem("Existing Item", ItemTypes.Consumable);
+        await AddItemToDatabase("Existing Item", ItemTypes.Consumable);
 
         var dto = new CreateUpdateItemDto
         {
@@ -268,7 +268,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         var token = GenerateJwtToken(admin, new[] { "Admin" });
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Original Item", ItemTypes.Consumable);
+        var item = await AddItemToDatabase("Original Item", ItemTypes.Consumable);
 
         var dto = new CreateUpdateItemDto
         {
@@ -322,7 +322,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         var token = GenerateJwtToken(user, new[] { "User" });
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Original Item", ItemTypes.Consumable);
+        var item = await AddItemToDatabase("Original Item", ItemTypes.Consumable);
 
         var dto = new CreateUpdateItemDto
         {
@@ -347,7 +347,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         var token = GenerateJwtToken(admin, new[] { "Admin" });
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Original Item", ItemTypes.Consumable);
+        var item = await AddItemToDatabase("Original Item", ItemTypes.Consumable);
 
         var dto = new CreateUpdateItemDto
         {
@@ -376,7 +376,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         var token = GenerateJwtToken(admin, new[] { "Admin" });
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Item to Delete", ItemTypes.Consumable);
+        var item = await AddItemToDatabase("Item to Delete", ItemTypes.Consumable);
 
         // Act
         var response = await httpClient.DeleteAsync($"/v1/items/{item.Id}");
@@ -412,7 +412,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         var token = GenerateJwtToken(user, new[] { "User" });
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Item to Delete", ItemTypes.Consumable);
+        var item = await AddItemToDatabase("Item to Delete", ItemTypes.Consumable);
 
         // Act
         var response = await httpClient.DeleteAsync($"/v1/items/{item.Id}");
@@ -425,7 +425,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
     public async Task Delete_ShouldReturnUnauthorized_WhenNotAuthenticated()
     {
         // Arrange
-        var item = await CreateTestItem("Item to Delete", ItemTypes.Consumable);
+        var item = await AddItemToDatabase("Item to Delete", ItemTypes.Consumable);
 
         // Act
         var response = await httpClient.DeleteAsync($"/v1/items/{item.Id}");

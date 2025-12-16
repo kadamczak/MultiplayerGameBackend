@@ -32,14 +32,14 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
     private string GenerateJwtToken(User user, IEnumerable<string> roles) =>
         JwtTokenHelper.GenerateJwtToken(user, roles);
 
-    private async Task<(Item headItem, Item bodyItem)> CreateTestItems() =>
-        await TestDataHelper.CreateTestHeadAndBodyItems(_factory.Services);
+    private async Task<(Item headItem, Item bodyItem)> AddHeadAndBodyItemsToDatabase() =>
+        await TestDataHelper.AddHeadAndBodyItemsToDatabase(_factory.Services);
 
-    private async Task<UserItem> CreateUserItem(Guid userId, int itemId) =>
-        await TestDataHelper.CreateUserItem(_factory.Services, userId, itemId);
+    private async Task<UserItem> AddUserItemToDatabase(Guid userId, int itemId) =>
+        await TestDataHelper.AddUserItemToDatabase(_factory.Services, userId, itemId);
 
-    private async Task CreateUserCustomization(Guid userId) =>
-        await TestDataHelper.CreateUserCustomization(_factory.Services, userId);
+    private async Task AddUserCustomizationToDatabase(Guid userId) =>
+        await TestDataHelper.AddUserCustomizationToDatabase(_factory.Services, userId);
 
     #endregion
 
@@ -53,9 +53,9 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (headItem, bodyItem) = await CreateTestItems();
-        await CreateUserItem(user.Id, headItem.Id);
-        await CreateUserItem(user.Id, bodyItem.Id);
+        var (headItem, bodyItem) = await AddHeadAndBodyItemsToDatabase();
+        await AddUserItemToDatabase(user.Id, headItem.Id);
+        await AddUserItemToDatabase(user.Id, bodyItem.Id);
 
         // Act
         var response = await _client.GetAsync("/v1/users/me/items");
@@ -105,9 +105,9 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (headItem, bodyItem) = await CreateTestItems();
-        await CreateUserItem(user.Id, headItem.Id);
-        await CreateUserItem(user.Id, bodyItem.Id);
+        var (headItem, bodyItem) = await AddHeadAndBodyItemsToDatabase();
+        await AddUserItemToDatabase(user.Id, headItem.Id);
+        await AddUserItemToDatabase(user.Id, bodyItem.Id);
 
         // Act - use PageSize=5 which is an allowed value
         var response = await _client.GetAsync("/v1/users/me/items?PagedQuery.PageNumber=1&PagedQuery.PageSize=5");
@@ -129,9 +129,9 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         var token = GenerateJwtToken(user1, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (headItem, bodyItem) = await CreateTestItems();
-        await CreateUserItem(user1.Id, headItem.Id);
-        await CreateUserItem(user2.Id, bodyItem.Id);
+        var (headItem, bodyItem) = await AddHeadAndBodyItemsToDatabase();
+        await AddUserItemToDatabase(user1.Id, headItem.Id);
+        await AddUserItemToDatabase(user2.Id, bodyItem.Id);
 
         // Act
         var response = await _client.GetAsync("/v1/users/me/items");
@@ -157,9 +157,9 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        await CreateUserCustomization(user.Id);
-        var (headItem, _) = await CreateTestItems();
-        var userHeadItem = await CreateUserItem(user.Id, headItem.Id);
+        await AddUserCustomizationToDatabase(user.Id);
+        var (headItem, _) = await AddHeadAndBodyItemsToDatabase();
+        var userHeadItem = await AddUserItemToDatabase(user.Id, headItem.Id);
 
         var dto = new UpdateEquippedUserItemsDto
         {
@@ -190,10 +190,10 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        await CreateUserCustomization(user.Id);
-        var (headItem, bodyItem) = await CreateTestItems();
-        var userHeadItem = await CreateUserItem(user.Id, headItem.Id);
-        var userBodyItem = await CreateUserItem(user.Id, bodyItem.Id);
+        await AddUserCustomizationToDatabase(user.Id);
+        var (headItem, bodyItem) = await AddHeadAndBodyItemsToDatabase();
+        var userHeadItem = await AddUserItemToDatabase(user.Id, headItem.Id);
+        var userBodyItem = await AddUserItemToDatabase(user.Id, bodyItem.Id);
 
         var dto = new UpdateEquippedUserItemsDto
         {
@@ -224,8 +224,8 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (headItem, _) = await CreateTestItems();
-        var userHeadItem = await CreateUserItem(user.Id, headItem.Id);
+        var (headItem, _) = await AddHeadAndBodyItemsToDatabase();
+        var userHeadItem = await AddUserItemToDatabase(user.Id, headItem.Id);
 
         // First equip an item
         using (var setupScope = _factory.Services.CreateScope())
@@ -314,8 +314,8 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (headItem, _) = await CreateTestItems();
-        var userHeadItem = await CreateUserItem(user.Id, headItem.Id);
+        var (headItem, _) = await AddHeadAndBodyItemsToDatabase();
+        var userHeadItem = await AddUserItemToDatabase(user.Id, headItem.Id);
 
         // Try to equip a head item as body item
         var dto = new UpdateEquippedUserItemsDto
@@ -340,9 +340,9 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         var token = GenerateJwtToken(user1, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        await CreateUserCustomization(user1.Id);
-        var (headItem, _) = await CreateTestItems();
-        var user2HeadItem = await CreateUserItem(user2.Id, headItem.Id);
+        await AddUserCustomizationToDatabase(user1.Id);
+        var (headItem, _) = await AddHeadAndBodyItemsToDatabase();
+        var user2HeadItem = await AddUserItemToDatabase(user2.Id, headItem.Id);
 
         var dto = new UpdateEquippedUserItemsDto
         {

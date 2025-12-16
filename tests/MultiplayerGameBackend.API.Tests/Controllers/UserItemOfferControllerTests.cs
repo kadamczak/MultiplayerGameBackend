@@ -32,17 +32,17 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
     private string GenerateJwtToken(User user, IEnumerable<string> roles) =>
         JwtTokenHelper.GenerateJwtToken(user, roles);
 
-    private async Task<Item> CreateTestItem(string name, string type) =>
-        await TestDataHelper.CreateTestItem(_factory.Services, name, type);
+    private async Task<Item> AddItemToDatabase(string name, string type) =>
+        await TestDataHelper.AddItemToDatabase(_factory.Services, name, type);
 
-    private async Task<UserItem> CreateUserItem(Guid userId, int itemId) =>
-        await TestDataHelper.CreateUserItem(_factory.Services, userId, itemId);
+    private async Task<UserItem> AddUserItemToDatabase(Guid userId, int itemId) =>
+        await TestDataHelper.AddUserItemToDatabase(_factory.Services, userId, itemId);
 
-    private async Task<UserItemOffer> CreateUserItemOffer(Guid sellerId, Guid userItemId, int price) =>
-        await TestDataHelper.CreateUserItemOffer(_factory.Services, sellerId, userItemId, price);
+    private async Task<UserItemOffer> AddUserItemOfferToDatabase(Guid sellerId, Guid userItemId, int price) =>
+        await TestDataHelper.AddUserItemOfferToDatabase(_factory.Services, sellerId, userItemId, price);
 
-    private async Task SetUserBalance(Guid userId, int balance) =>
-        await TestDataHelper.SetUserBalance(_factory.Services, userId, balance);
+    private async Task SetUserBalanceInDatabase(Guid userId, int balance) =>
+        await TestDataHelper.SetUserBalanceInDatabase(_factory.Services, userId, balance);
 
     #endregion
 
@@ -57,9 +57,9 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(seller.Id, item.Id);
-        await CreateUserItemOffer(seller.Id, userItem.Id, 100);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(seller.Id, item.Id);
+        await AddUserItemOfferToDatabase(seller.Id, userItem.Id, 100);
 
         // Act
         var response = await _client.GetAsync("/v1/users/offers?ShowActive=true");
@@ -111,13 +111,13 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item1 = await CreateTestItem("Item 1", ItemTypes.Consumable);
-        var item2 = await CreateTestItem("Item 2", ItemTypes.Consumable);
-        var userItem1 = await CreateUserItem(seller.Id, item1.Id);
-        var userItem2 = await CreateUserItem(seller.Id, item2.Id);
+        var item1 = await AddItemToDatabase("Item 1", ItemTypes.Consumable);
+        var item2 = await AddItemToDatabase("Item 2", ItemTypes.Consumable);
+        var userItem1 = await AddUserItemToDatabase(seller.Id, item1.Id);
+        var userItem2 = await AddUserItemToDatabase(seller.Id, item2.Id);
 
-        var activeOffer = await CreateUserItemOffer(seller.Id, userItem1.Id, 100);
-        var inactiveOffer = await CreateUserItemOffer(seller.Id, userItem2.Id, 200);
+        var activeOffer = await AddUserItemOfferToDatabase(seller.Id, userItem1.Id, 100);
+        var inactiveOffer = await AddUserItemOfferToDatabase(seller.Id, userItem2.Id, 200);
 
         // Mark one offer as inactive by setting buyer
         using (var scope = _factory.Services.CreateScope())
@@ -154,13 +154,13 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item1 = await CreateTestItem("Item 1", ItemTypes.Consumable);
-        var item2 = await CreateTestItem("Item 2", ItemTypes.Consumable);
-        var userItem1 = await CreateUserItem(seller.Id, item1.Id);
-        var userItem2 = await CreateUserItem(seller.Id, item2.Id);
+        var item1 = await AddItemToDatabase("Item 1", ItemTypes.Consumable);
+        var item2 = await AddItemToDatabase("Item 2", ItemTypes.Consumable);
+        var userItem1 = await AddUserItemToDatabase(seller.Id, item1.Id);
+        var userItem2 = await AddUserItemToDatabase(seller.Id, item2.Id);
 
-        await CreateUserItemOffer(seller.Id, userItem1.Id, 100);
-        var inactiveOffer = await CreateUserItemOffer(seller.Id, userItem2.Id, 200);
+        await AddUserItemOfferToDatabase(seller.Id, userItem1.Id, 100);
+        var inactiveOffer = await AddUserItemOfferToDatabase(seller.Id, userItem2.Id, 200);
 
         // Mark one offer as inactive
         using (var scope = _factory.Services.CreateScope())
@@ -199,8 +199,8 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(user.Id, item.Id);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(user.Id, item.Id);
 
         var dto = new CreateUserItemOfferDto
         {
@@ -270,8 +270,8 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(seller.Id, item.Id);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(seller.Id, item.Id);
 
         var dto = new CreateUserItemOfferDto
         {
@@ -294,9 +294,9 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(user.Id, item.Id);
-        await CreateUserItemOffer(user.Id, userItem.Id, 100);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(user.Id, item.Id);
+        await AddUserItemOfferToDatabase(user.Id, userItem.Id, 100);
 
         var dto = new CreateUserItemOfferDto
         {
@@ -319,8 +319,8 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(user.Id, item.Id);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(user.Id, item.Id);
 
         var dto = new CreateUserItemOfferDto
         {
@@ -343,8 +343,8 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(user.Id, item.Id);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(user.Id, item.Id);
 
         var dto = new CreateUserItemOfferDto
         {
@@ -371,9 +371,9 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(user.Id, item.Id);
-        var offer = await CreateUserItemOffer(user.Id, userItem.Id, 100);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(user.Id, item.Id);
+        var offer = await AddUserItemOfferToDatabase(user.Id, userItem.Id, 100);
 
         // Act
         var response = await _client.DeleteAsync($"/v1/users/offers/{offer.Id}");
@@ -422,9 +422,9 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(seller.Id, item.Id);
-        var offer = await CreateUserItemOffer(seller.Id, userItem.Id, 100);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(seller.Id, item.Id);
+        var offer = await AddUserItemOfferToDatabase(seller.Id, userItem.Id, 100);
 
         // Act
         var response = await _client.DeleteAsync($"/v1/users/offers/{offer.Id}");
@@ -446,12 +446,12 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(buyer, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        await SetUserBalance(buyer.Id, 500);
-        await SetUserBalance(seller.Id, 0); // Explicitly set seller balance to 0
+        await SetUserBalanceInDatabase(buyer.Id, 500);
+        await SetUserBalanceInDatabase(seller.Id, 0); // Explicitly set seller balance to 0
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(seller.Id, item.Id);
-        var offer = await CreateUserItemOffer(seller.Id, userItem.Id, 100);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(seller.Id, item.Id);
+        var offer = await AddUserItemOfferToDatabase(seller.Id, userItem.Id, 100);
 
         // Act
         var response = await _client.PostAsync($"/v1/users/offers/{offer.Id}/purchase", null);
@@ -513,11 +513,11 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(buyer, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        await SetUserBalance(buyer.Id, 50);
+        await SetUserBalanceInDatabase(buyer.Id, 50);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(seller.Id, item.Id);
-        var offer = await CreateUserItemOffer(seller.Id, userItem.Id, 100);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(seller.Id, item.Id);
+        var offer = await AddUserItemOfferToDatabase(seller.Id, userItem.Id, 100);
 
         // Act
         var response = await _client.PostAsync($"/v1/users/offers/{offer.Id}/purchase", null);
@@ -534,11 +534,11 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        await SetUserBalance(user.Id, 500);
+        await SetUserBalanceInDatabase(user.Id, 500);
 
-        var item = await CreateTestItem("Test Item", ItemTypes.Consumable);
-        var userItem = await CreateUserItem(user.Id, item.Id);
-        var offer = await CreateUserItemOffer(user.Id, userItem.Id, 100);
+        var item = await AddItemToDatabase("Test Item", ItemTypes.Consumable);
+        var userItem = await AddUserItemToDatabase(user.Id, item.Id);
+        var offer = await AddUserItemOfferToDatabase(user.Id, userItem.Id, 100);
 
         // Act
         var response = await _client.PostAsync($"/v1/users/offers/{offer.Id}/purchase", null);

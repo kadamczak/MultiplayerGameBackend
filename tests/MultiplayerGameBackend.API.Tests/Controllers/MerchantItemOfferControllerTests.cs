@@ -30,8 +30,8 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
     private string GenerateJwtToken(User user, IEnumerable<string> roles) =>
         JwtTokenHelper.GenerateJwtToken(user, roles);
 
-    private async Task<(InGameMerchant merchant, Item item, MerchantItemOffer offer)> CreateTestMerchantWithOffer(int price) =>
-        await TestDataHelper.CreateTestMerchantWithOffer(_factory.Services, price);
+    private async Task<(InGameMerchant merchant, Item item, MerchantItemOffer offer)> AddMerchantWithOfferToDatabase(int price) =>
+        await TestDataHelper.AddMerchantWithOfferToDatabase(_factory.Services, price);
 
     #endregion
 
@@ -45,7 +45,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (merchant, _, offer) = await CreateTestMerchantWithOffer(100);
+        var (merchant, _, offer) = await AddMerchantWithOfferToDatabase(100);
 
         // Act
         var response = await _client.GetAsync($"/v1/merchants/{merchant.Id}/offers");
@@ -103,7 +103,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
     public async Task GetOffers_ShouldReturnUnauthorized_WhenNotAuthenticated()
     {
         // Arrange
-        var (merchant, _, _) = await CreateTestMerchantWithOffer(100);
+        var (merchant, _, _) = await AddMerchantWithOfferToDatabase(100);
 
         // Act
         var response = await _client.GetAsync($"/v1/merchants/{merchant.Id}/offers");
@@ -169,7 +169,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (_, _, offer) = await CreateTestMerchantWithOffer(100);
+        var (_, _, offer) = await AddMerchantWithOfferToDatabase(100);
 
         // Act
         var response = await _client.PostAsync($"/v1/merchants/offers/{offer.Id}/purchase", null);
@@ -204,7 +204,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (_, _, offer) = await CreateTestMerchantWithOffer(100);
+        var (_, _, offer) = await AddMerchantWithOfferToDatabase(100);
 
         // Act
         var response = await _client.PostAsync($"/v1/merchants/offers/{offer.Id}/purchase", null);
@@ -238,7 +238,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
     public async Task PurchaseOffer_ShouldReturnUnauthorized_WhenNotAuthenticated()
     {
         // Arrange
-        var (_, _, offer) = await CreateTestMerchantWithOffer(100);
+        var (_, _, offer) = await AddMerchantWithOfferToDatabase(100);
 
         // Act
         var response = await _client.PostAsync($"/v1/merchants/offers/{offer.Id}/purchase", null);
@@ -263,7 +263,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (_, _, offer) = await CreateTestMerchantWithOffer(150);
+        var (_, _, offer) = await AddMerchantWithOfferToDatabase(150);
 
         // Act
         var response = await _client.PostAsync($"/v1/merchants/offers/{offer.Id}/purchase", null);
@@ -294,7 +294,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
         var token = GenerateJwtToken(user, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var (merchant, item1, offer1) = await CreateTestMerchantWithOffer(100);
+        var (merchant, item1, offer1) = await AddMerchantWithOfferToDatabase(100);
         
         // Create second offer from same merchant
         using var scope2 = _factory.Services.CreateScope();
@@ -342,7 +342,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
         dbUser2!.Balance = 200;
         await context.SaveChangesAsync();
 
-        var (_, _, offer) = await CreateTestMerchantWithOffer(100);
+        var (_, _, offer) = await AddMerchantWithOfferToDatabase(100);
 
         // Act - User 1 purchases
         var token1 = GenerateJwtToken(user1, new[] { "User" });

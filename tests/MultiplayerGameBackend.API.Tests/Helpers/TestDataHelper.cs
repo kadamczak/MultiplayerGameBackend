@@ -7,7 +7,7 @@ namespace MultiplayerGameBackend.API.Tests.Helpers;
 
 public static class TestDataHelper
 {
-    public static async Task<Item> CreateTestItem(
+    public static async Task<Item> AddItemToDatabase(
         IServiceProvider serviceProvider,
         string name,
         string type,
@@ -31,7 +31,7 @@ public static class TestDataHelper
         return item;
     }
 
-    public static async Task<(Item headItem, Item bodyItem)> CreateTestHeadAndBodyItems(IServiceProvider serviceProvider)
+    public static async Task<(Item headItem, Item bodyItem)> AddHeadAndBodyItemsToDatabase(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
@@ -58,7 +58,7 @@ public static class TestDataHelper
         return (headItem, bodyItem);
     }
 
-    public static async Task<UserItem> CreateUserItem(
+    public static async Task<UserItem> AddUserItemToDatabase(
         IServiceProvider serviceProvider,
         Guid userId,
         int itemId)
@@ -78,7 +78,7 @@ public static class TestDataHelper
         return userItem;
     }
 
-    public static async Task CreateUserCustomization(
+    public static async Task AddUserCustomizationToDatabase(
         IServiceProvider serviceProvider,
         Guid userId,
         string? headColor = null,
@@ -108,7 +108,7 @@ public static class TestDataHelper
         await context.SaveChangesAsync();
     }
 
-    public static async Task<UserItemOffer> CreateUserItemOffer(
+    public static async Task<UserItemOffer> AddUserItemOfferToDatabase(
         IServiceProvider serviceProvider,
         Guid sellerId,
         Guid userItemId,
@@ -131,7 +131,7 @@ public static class TestDataHelper
         return offer;
     }
 
-    public static async Task<InGameMerchant> CreateTestMerchant(IServiceProvider serviceProvider)
+    public static async Task<InGameMerchant> AddMerchantToDatabase(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
@@ -143,7 +143,7 @@ public static class TestDataHelper
         return merchant;
     }
 
-    public static async Task<MerchantItemOffer> CreateMerchantItemOffer(
+    public static async Task<MerchantItemOffer> AddMerchantItemOfferToDatabase(
         IServiceProvider serviceProvider,
         int merchantId,
         int itemId,
@@ -165,18 +165,18 @@ public static class TestDataHelper
         return offer;
     }
 
-    public static async Task<(InGameMerchant merchant, Item item, MerchantItemOffer offer)> CreateTestMerchantWithOffer(
+    public static async Task<(InGameMerchant merchant, Item item, MerchantItemOffer offer)> AddMerchantWithOfferToDatabase(
         IServiceProvider serviceProvider,
         int price)
     {
-        var merchant = await CreateTestMerchant(serviceProvider);
-        var item = await CreateTestItem(serviceProvider, "Test Item", ItemTypes.Consumable);
-        var offer = await CreateMerchantItemOffer(serviceProvider, merchant.Id, item.Id, price);
+        var merchant = await AddMerchantToDatabase(serviceProvider);
+        var item = await AddItemToDatabase(serviceProvider, "Test Item", ItemTypes.Consumable);
+        var offer = await AddMerchantItemOfferToDatabase(serviceProvider, merchant.Id, item.Id, price);
 
         return (merchant, item, offer);
     }
 
-    public static async Task SetUserBalance(
+    public static async Task SetUserBalanceInDatabase(
         IServiceProvider serviceProvider,
         Guid userId,
         int balance)
