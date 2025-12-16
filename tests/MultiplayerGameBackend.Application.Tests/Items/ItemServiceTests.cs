@@ -4,9 +4,7 @@ using MultiplayerGameBackend.Application.Items;
 using MultiplayerGameBackend.Application.Items.Requests;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
-using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
-using MultiplayerGameBackend.Tests.Shared.Factories;
 using MultiplayerGameBackend.Tests.Shared.Helpers;
 using NSubstitute;
 

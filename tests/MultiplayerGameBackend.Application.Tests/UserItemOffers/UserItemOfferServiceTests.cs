@@ -5,9 +5,9 @@ using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Domain.Constants;
-using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 using MultiplayerGameBackend.Tests.Shared.Factories;
+using MultiplayerGameBackend.Tests.Shared.Helpers;
 using NSubstitute;
 
 namespace MultiplayerGameBackend.Application.Tests.UserItemOffers;
@@ -35,24 +35,18 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com");
-        context.Users.AddRange(seller, buyer);
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var buyer = await DatabaseHelper.CreateAndSaveUser(userManager, "buyer", "buyer@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
+        
+        var userItem1 = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
+        var userItem2 = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
 
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem1 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        var userItem2 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        context.UserItems.AddRange(userItem1, userItem2);
-        await context.SaveChangesAsync();
-
-        var activeOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem1.Id, 100);
-        var soldOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem2.Id, 200, buyer.Id, DateTime.UtcNow);
+        var activeOffer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem1.Id, 100);
+        var soldOffer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem2.Id, 200, buyer.Id, DateTime.UtcNow);
         soldOffer.PublishedAt = DateTime.UtcNow.AddDays(-1);
-        context.UserItemOffers.AddRange(activeOffer, soldOffer);
         await context.SaveChangesAsync();
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
@@ -73,24 +67,18 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com");
-        context.Users.AddRange(seller, buyer);
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var buyer = await DatabaseHelper.CreateAndSaveUser(userManager, "buyer", "buyer@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
 
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var userItem1 = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
+        var userItem2 = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
 
-        var userItem1 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        var userItem2 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        context.UserItems.AddRange(userItem1, userItem2);
-        await context.SaveChangesAsync();
-
-        var activeOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem1.Id, 100);
-        var soldOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem2.Id, 200, buyer.Id, DateTime.UtcNow);
+        var activeOffer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem1.Id, 100);
+        var soldOffer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem2.Id, 200, buyer.Id, DateTime.UtcNow);
         soldOffer.PublishedAt = DateTime.UtcNow.AddDays(-1);
-        context.UserItemOffers.AddRange(activeOffer, soldOffer);
         await context.SaveChangesAsync();
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
@@ -112,24 +100,17 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(seller);
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var item1 = await DatabaseHelper.CreateAndSaveItem(context, "Magic Sword", ItemTypes.EquippableOnBody, "A magical sword", "sword.png");
+        var item2 = await DatabaseHelper.CreateAndSaveItem(context, "Health Potion", ItemTypes.Consumable, "Restores health", "potion.png");
 
-        var item1 = TestEntityFactory.CreateItem("Magic Sword", ItemTypes.EquippableOnBody, "A magical sword", "sword.png");
-        var item2 = TestEntityFactory.CreateItem("Health Potion", ItemTypes.Consumable, "Restores health", "potion.png");
-        context.Items.AddRange(item1, item2);
-        await context.SaveChangesAsync();
+        var userItem1 = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item1.Id);
+        var userItem2 = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item2.Id);
 
-        var userItem1 = TestEntityFactory.CreateUserItem(seller.Id, item1.Id);
-        var userItem2 = TestEntityFactory.CreateUserItem(seller.Id, item2.Id);
-        context.UserItems.AddRange(userItem1, userItem2);
-        await context.SaveChangesAsync();
-
-        var offer1 = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem1.Id, 100);
-        var offer2 = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem2.Id, 50);
-        context.UserItemOffers.AddRange(offer1, offer2);
-        await context.SaveChangesAsync();
+        await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem1.Id, 100);
+        await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem2.Id, 50);
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10, SearchPhrase = "sword" };
 
@@ -148,23 +129,16 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(seller);
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
 
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var userItem1 = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
+        var userItem2 = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
 
-        var userItem1 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        var userItem2 = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        context.UserItems.AddRange(userItem1, userItem2);
-        await context.SaveChangesAsync();
-
-        var expensiveOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem1.Id, 200);
-        var cheapOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem2.Id, 50);
-        context.UserItemOffers.AddRange(expensiveOffer, cheapOffer);
-        await context.SaveChangesAsync();
+        await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem1.Id, 200);
+        await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem2.Id, 50);
 
         var query = new PagedQuery
         {
@@ -190,25 +164,17 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(seller);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
 
         // Create 5 offers
         for (int i = 1; i <= 5; i++)
         {
-            var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-            context.UserItems.Add(userItem);
-            await context.SaveChangesAsync();
-
-            var offer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, i * 10);
-            context.UserItemOffers.Add(offer);
+            var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
+            await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem.Id, i * 10);
         }
-        await context.SaveChangesAsync();
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 2 };
 
@@ -232,17 +198,11 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(user);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem = TestEntityFactory.CreateUserItem(user.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, user.Id, item.Id);
 
         var dto = new CreateUserItemOfferDto
         {
@@ -267,10 +227,9 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(user);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
 
         var dto = new CreateUserItemOfferDto
         {
@@ -290,18 +249,12 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var owner = TestEntityFactory.CreateUser("owner", "owner@example.com");
-        var otherUser = TestEntityFactory.CreateUser("other", "other@example.com");
-        context.Users.AddRange(owner, otherUser);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem = TestEntityFactory.CreateUserItem(owner.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
+        var owner = await DatabaseHelper.CreateAndSaveUser(userManager, "owner", "owner@example.com", "Password123!");
+        var otherUser = await DatabaseHelper.CreateAndSaveUser(userManager, "other", "other@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, owner.Id, item.Id);
 
         var dto = new CreateUserItemOfferDto
         {
@@ -321,21 +274,12 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(user);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem = TestEntityFactory.CreateUserItem(user.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        var existingOffer = TestEntityFactory.CreateUserItemOffer(user.Id, userItem.Id, 100);
-        context.UserItemOffers.Add(existingOffer);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, user.Id, item.Id);
+        await DatabaseHelper.CreateAndSaveUserItemOffer(context, user.Id, userItem.Id, 100);
 
         var dto = new CreateUserItemOfferDto
         {
@@ -355,23 +299,16 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com");
-        context.Users.AddRange(seller, buyer);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var buyer = await DatabaseHelper.CreateAndSaveUser(userManager, "buyer", "buyer@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
 
         // Create item that was sold
-        var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        var soldOffer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, 100, buyer.Id, DateTime.UtcNow);
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
+        var soldOffer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem.Id, 100, buyer.Id, DateTime.UtcNow);
         soldOffer.PublishedAt = DateTime.UtcNow.AddDays(-1);
-        context.UserItemOffers.Add(soldOffer);
         await context.SaveChangesAsync();
 
         // Now seller has it back somehow and wants to sell again
@@ -403,21 +340,12 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(user);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem = TestEntityFactory.CreateUserItem(user.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateUserItemOffer(user.Id, userItem.Id, 100);
-        context.UserItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, user.Id, item.Id);
+        var offer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, user.Id, userItem.Id, 100);
 
         // Act
         await service.DeleteOffer(user.Id, offer.Id, CancellationToken.None);
@@ -433,10 +361,9 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var user = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(user);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(
@@ -450,22 +377,13 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var owner = TestEntityFactory.CreateUser("owner", "owner@example.com");
-        var otherUser = TestEntityFactory.CreateUser("other", "other@example.com");
-        context.Users.AddRange(owner, otherUser);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem = TestEntityFactory.CreateUserItem(owner.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateUserItemOffer(owner.Id, userItem.Id, 100);
-        context.UserItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var owner = await DatabaseHelper.CreateAndSaveUser(userManager, "owner", "owner@example.com", "Password123!");
+        var otherUser = await DatabaseHelper.CreateAndSaveUser(userManager, "other", "other@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, owner.Id, item.Id);
+        var offer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, owner.Id, userItem.Id, 100);
 
         // Act & Assert
         await Assert.ThrowsAsync<ForbidException>(
@@ -483,22 +401,14 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com", balance: 100);
-        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com", balance: 500);
-        context.Users.AddRange(seller, buyer);
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!", balance: 100);
+        var buyer = await DatabaseHelper.CreateAndSaveUser(userManager, "buyer", "buyer@example.com", "Password123!", balance: 500);
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
 
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync(); // Save users and items
-
-        var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, 150);
-        context.UserItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
+        var offer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem.Id, 150);
 
         // Act
         await service.PurchaseOffer(buyer.Id, offer.Id, CancellationToken.None);
@@ -525,11 +435,9 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com");
-        buyer.Balance = 500;
-        context.Users.Add(buyer);
-        await context.SaveChangesAsync();
+        var buyer = await DatabaseHelper.CreateAndSaveUser(userManager, "buyer", "buyer@example.com", "Password123!", balance: 500);
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(
@@ -543,21 +451,12 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var user = TestEntityFactory.CreateUser("user", "user@example.com", balance: 500);
-        context.Users.Add(user);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem = TestEntityFactory.CreateUserItem(user.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateUserItemOffer(user.Id, userItem.Id, 100);
-        context.UserItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@example.com", "Password123!", balance: 500);
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, user.Id, item.Id);
+        var offer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, user.Id, userItem.Id, 100);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<UnprocessableEntityException>(
@@ -573,21 +472,12 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com");
-        context.Users.Add(seller);
-
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, 100);
-        context.UserItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
+        var offer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem.Id, 100);
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(
@@ -601,22 +491,14 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var service = new UserItemOfferService(_logger, context);
+        var userManager = IdentityHelper.CreateUserManager(context);
 
-        var seller = TestEntityFactory.CreateUser("seller", "seller@example.com", balance: 100);
-        var buyer = TestEntityFactory.CreateUser("buyer", "buyer@example.com", balance: 50); // Not enough
-        context.Users.AddRange(seller, buyer);
+        var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!", balance: 100);
+        var buyer = await DatabaseHelper.CreateAndSaveUser(userManager, "buyer", "buyer@example.com", "Password123!", balance: 50); // Not enough
+        var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.Consumable, "Test", "test.png");
 
-        var item = TestEntityFactory.CreateItem("Test Item", ItemTypes.Consumable, "Test", "test.png");
-        context.Items.Add(item);
-        await context.SaveChangesAsync(); // Save users and items
-
-        var userItem = TestEntityFactory.CreateUserItem(seller.Id, item.Id);
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        var offer = TestEntityFactory.CreateUserItemOffer(seller.Id, userItem.Id, 100);
-        context.UserItemOffers.Add(offer);
-        await context.SaveChangesAsync();
+        var userItem = await DatabaseHelper.CreateAndSaveUserItem(context, seller.Id, item.Id);
+        var offer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem.Id, 100);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<UnprocessableEntityException>(
@@ -629,4 +511,3 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
 
     #endregion
 }
-
