@@ -33,13 +33,13 @@ public class UserItemControllerTests : IClassFixture<CustomWebApplicationFactory
         JwtTokenHelper.GenerateJwtToken(user, roles);
 
     private async Task<(Item headItem, Item bodyItem)> AddHeadAndBodyItemsToDatabase() =>
-        await TestDataHelper.AddHeadAndBodyItemsToDatabase(_factory.Services);
+        await TestDatabaseHelper.AddHeadAndBodyItemsToDatabase(_factory.Services);
 
     private async Task<UserItem> AddUserItemToDatabase(Guid userId, int itemId) =>
-        await TestDataHelper.AddUserItemToDatabase(_factory.Services, userId, itemId);
+        await TestDatabaseHelper.AddUserItemToDatabase(_factory.Services, userId, itemId);
 
     private async Task AddUserCustomizationToDatabase(Guid userId) =>
-        await TestDataHelper.AddUserCustomizationToDatabase(_factory.Services, userId);
+        await TestDatabaseHelper.AddUserCustomizationToDatabase(_factory.Services, userId);
 
     #endregion
 

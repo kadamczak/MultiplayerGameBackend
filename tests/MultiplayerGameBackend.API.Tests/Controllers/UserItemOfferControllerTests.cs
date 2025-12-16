@@ -33,16 +33,16 @@ public class UserItemOfferControllerTests : IClassFixture<CustomWebApplicationFa
         JwtTokenHelper.GenerateJwtToken(user, roles);
 
     private async Task<Item> AddItemToDatabase(string name, string type) =>
-        await TestDataHelper.AddItemToDatabase(_factory.Services, name, type);
+        await TestDatabaseHelper.AddItemToDatabase(_factory.Services, name, type);
 
     private async Task<UserItem> AddUserItemToDatabase(Guid userId, int itemId) =>
-        await TestDataHelper.AddUserItemToDatabase(_factory.Services, userId, itemId);
+        await TestDatabaseHelper.AddUserItemToDatabase(_factory.Services, userId, itemId);
 
     private async Task<UserItemOffer> AddUserItemOfferToDatabase(Guid sellerId, Guid userItemId, int price) =>
-        await TestDataHelper.AddUserItemOfferToDatabase(_factory.Services, sellerId, userItemId, price);
+        await TestDatabaseHelper.AddUserItemOfferToDatabase(_factory.Services, sellerId, userItemId, price);
 
     private async Task SetUserBalanceInDatabase(Guid userId, int balance) =>
-        await TestDataHelper.SetUserBalanceInDatabase(_factory.Services, userId, balance);
+        await TestDatabaseHelper.SetUserBalanceInDatabase(_factory.Services, userId, balance);
 
     #endregion
 

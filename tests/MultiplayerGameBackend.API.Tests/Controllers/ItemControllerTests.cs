@@ -30,7 +30,7 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
         JwtTokenHelper.GenerateJwtToken(user, roles);
 
     private async Task<Item> AddItemToDatabase(string name, string type) =>
-        await TestDataHelper.AddItemToDatabase(webAppFactory.Services, name, type);
+        await TestDatabaseHelper.AddItemToDatabase(webAppFactory.Services, name, type);
 
     #endregion
 

@@ -5,7 +5,7 @@ using MultiplayerGameBackend.Infrastructure.Persistence;
 
 namespace MultiplayerGameBackend.API.Tests.Helpers;
 
-public static class TestDataHelper
+public static class TestDatabaseHelper
 {
     public static async Task<Item> AddItemToDatabase(
         IServiceProvider serviceProvider,

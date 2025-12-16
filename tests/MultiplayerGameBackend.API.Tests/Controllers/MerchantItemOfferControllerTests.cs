@@ -31,7 +31,7 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
         JwtTokenHelper.GenerateJwtToken(user, roles);
 
     private async Task<(InGameMerchant merchant, Item item, MerchantItemOffer offer)> AddMerchantWithOfferToDatabase(int price) =>
-        await TestDataHelper.AddMerchantWithOfferToDatabase(_factory.Services, price);
+        await TestDatabaseHelper.AddMerchantWithOfferToDatabase(_factory.Services, price);
 
     #endregion
 
