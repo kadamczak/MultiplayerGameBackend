@@ -165,5 +165,24 @@ public static class TestEntityFactory
             NormalizedName = roleName.ToUpper()
         };
     }
+    
+    /// <summary>
+    /// Creates a test friend request
+    /// </summary>
+    public static FriendRequest CreateFriendRequest(
+        Guid requesterId,
+        Guid receiverId,
+        string status = FriendRequestStatuses.Pending,
+        DateTime? respondedAt = null)
+    {
+        return new FriendRequest
+        {
+            RequesterId = requesterId,
+            ReceiverId = receiverId,
+            Status = status,
+            CreatedAt = DateTime.UtcNow,
+            RespondedAt = respondedAt
+        };
+    }
 }
 
