@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
+using MultiplayerGameBackend.Tests.Shared.Helpers;
 
 namespace MultiplayerGameBackend.API.Tests.TestHelpers;
 
@@ -16,46 +16,15 @@ public static class TestDatabaseHelper
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var item = new Item
-        {
-            Name = name,
-            Description = description ?? $"Test {name}",
-            Type = type,
-            ThumbnailUrl = thumbnailUrl ?? "test.png"
-        };
-
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        return item;
+        return await DatabaseHelper.CreateAndSaveItem(context, name, type, description, thumbnailUrl);
     }
 
-    public static async Task<(Item headItem, Item bodyItem)> AddHeadAndBodyItemsToDatabase(IServiceProvider serviceProvider)
+    public static async Task<(Item headItem, Item bodyItem)> AddHeadAndBodyItemsToDatabase(
+        IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var headItem = new Item
-        {
-            Name = "Iron Helmet",
-            Description = "A sturdy iron helmet",
-            Type = ItemTypes.EquippableOnHead,
-            ThumbnailUrl = "assets/helmet.png"
-        };
-
-        var bodyItem = new Item
-        {
-            Name = "Steel Sword",
-            Description = "A sharp steel sword",
-            Type = ItemTypes.EquippableOnBody,
-            ThumbnailUrl = "assets/sword.png"
-        };
-
-        context.Items.AddRange(headItem, bodyItem);
-        await context.SaveChangesAsync();
-
-        return (headItem, bodyItem);
+        return await DatabaseHelper.CreateAndSaveHeadAndBodyItems(context);
     }
 
     public static async Task<UserItem> AddUserItemToDatabase(
@@ -65,20 +34,10 @@ public static class TestDatabaseHelper
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var userItem = new UserItem
-        {
-            UserId = userId,
-            ItemId = itemId
-        };
-
-        context.UserItems.Add(userItem);
-        await context.SaveChangesAsync();
-
-        return userItem;
+        return await DatabaseHelper.CreateAndSaveUserItem(context, userId, itemId);
     }
 
-    public static async Task AddUserCustomizationToDatabase(
+    public static async Task<UserCustomization> AddUserCustomizationToDatabase(
         IServiceProvider serviceProvider,
         Guid userId,
         string? headColor = null,
@@ -91,21 +50,8 @@ public static class TestDatabaseHelper
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var customization = new UserCustomization
-        {
-            UserId = userId,
-            HeadColor = headColor ?? "#FF0000",
-            BodyColor = bodyColor ?? "#00FF00",
-            TailColor = tailColor ?? "#0000FF",
-            EyeColor = eyeColor ?? "#FFFF00",
-            WingColor = wingColor ?? "#FF00FF",
-            HornColor = hornColor ?? "#00FFFF",
-            MarkingsColor = markingsColor ?? "#FFFFFF"
-        };
-
-        context.UserCustomizations.Add(customization);
-        await context.SaveChangesAsync();
+        return await DatabaseHelper.CreateAndSaveUserCustomization(
+            context, userId, headColor, bodyColor, tailColor, eyeColor, wingColor, hornColor, markingsColor);
     }
 
     public static async Task<UserItemOffer> AddUserItemOfferToDatabase(
@@ -116,31 +62,15 @@ public static class TestDatabaseHelper
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var offer = new UserItemOffer
-        {
-            UserItemId = userItemId,
-            SellerId = sellerId,
-            Price = price,
-            PublishedAt = DateTime.UtcNow
-        };
-
-        context.UserItemOffers.Add(offer);
-        await context.SaveChangesAsync();
-
-        return offer;
+        return await DatabaseHelper.CreateAndSaveUserItemOffer(context, sellerId, userItemId, price);
     }
 
-    public static async Task<InGameMerchant> AddMerchantToDatabase(IServiceProvider serviceProvider)
+    public static async Task<InGameMerchant> AddMerchantToDatabase(
+        IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var merchant = new InGameMerchant();
-        context.InGameMerchants.Add(merchant);
-        await context.SaveChangesAsync();
-
-        return merchant;
+        return await DatabaseHelper.CreateAndSaveMerchant(context);
     }
 
     public static async Task<MerchantItemOffer> AddMerchantItemOfferToDatabase(
@@ -151,29 +81,16 @@ public static class TestDatabaseHelper
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var offer = new MerchantItemOffer
-        {
-            MerchantId = merchantId,
-            ItemId = itemId,
-            Price = price
-        };
-
-        context.MerchantItemOffers.Add(offer);
-        await context.SaveChangesAsync();
-
-        return offer;
+        return await DatabaseHelper.CreateAndSaveMerchantItemOffer(context, merchantId, itemId, price);
     }
 
     public static async Task<(InGameMerchant merchant, Item item, MerchantItemOffer offer)> AddMerchantWithOfferToDatabase(
         IServiceProvider serviceProvider,
         int price)
     {
-        var merchant = await AddMerchantToDatabase(serviceProvider);
-        var item = await AddItemToDatabase(serviceProvider, "Test Item", ItemTypes.Consumable);
-        var offer = await AddMerchantItemOfferToDatabase(serviceProvider, merchant.Id, item.Id, price);
-
-        return (merchant, item, offer);
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
+        return await DatabaseHelper.CreateAndSaveMerchantWithOffer(context, price);
     }
 
     public static async Task SetUserBalanceInDatabase(
@@ -183,13 +100,7 @@ public static class TestDatabaseHelper
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var user = await context.Users.FindAsync(userId);
-        if (user != null)
-        {
-            user.Balance = balance;
-            await context.SaveChangesAsync();
-        }
+        await DatabaseHelper.UpdateUserBalance(context, userId, balance);
     }
 }
 
