@@ -1,12 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using MultiplayerGameBackend.API.Tests.Common;
+using MultiplayerGameBackend.API.Tests.Helpers;
 using MultiplayerGameBackend.Application.MerchantItemOffers.Responses;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
@@ -31,63 +27,11 @@ public class MerchantItemOfferControllerTests : IClassFixture<CustomWebApplicati
 
     #region Helper Methods
 
-    private string GenerateJwtToken(User user, IEnumerable<string> roles)
-    {
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.UserName!),
-            new(ClaimTypes.Email, user.Email!)
-        };
+    private string GenerateJwtToken(User user, IEnumerable<string> roles) =>
+        JwtTokenHelper.GenerateJwtToken(user, roles);
 
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            "ThisIsAVeryLongSecretKeyForTestingPurposesOnly1234567890"));
-
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: "TestIssuer",
-            audience: "TestAudience",
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(30),
-            signingCredentials: creds
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    private async Task<(InGameMerchant merchant, Item item, MerchantItemOffer offer)> CreateTestMerchantWithOffer(int price)
-    {
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var merchant = new InGameMerchant();
-        context.InGameMerchants.Add(merchant);
-        await context.SaveChangesAsync();
-
-        var item = new Item
-        {
-            Name = "Test Item",
-            Description = "A test item",
-            Type = ItemTypes.Consumable,
-            ThumbnailUrl = "item.png"
-        };
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        var offer = new MerchantItemOffer
-        {
-            MerchantId = merchant.Id,
-            ItemId = item.Id,
-            Price = price
-        };
-        context.MerchantItemOffers.Add(offer);
-        await context.SaveChangesAsync();
-
-        return (merchant, item, offer);
-    }
+    private async Task<(InGameMerchant merchant, Item item, MerchantItemOffer offer)> CreateTestMerchantWithOffer(int price) =>
+        await TestDataHelper.CreateTestMerchantWithOffer(_factory.Services, price);
 
     #endregion
 

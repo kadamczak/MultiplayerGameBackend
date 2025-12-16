@@ -29,6 +29,7 @@ public class GetUserItemsDtoValidator : AbstractValidator<GetUserItemsDto>
         
         RuleFor(x => x.PagedQuery.SortBy)
             .Must((query, sortBy) => SortByValues.Contains(sortBy))
+            .When(x => x.PagedQuery.SortBy != null)
             .WithMessage((query, sortBy) => $"SortBy must be one of: {string.Join(", ", SortByValues)}.");
     }
 }

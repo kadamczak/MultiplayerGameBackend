@@ -1,17 +1,11 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using MultiplayerGameBackend.API.Tests.Common;
+using MultiplayerGameBackend.API.Tests.Helpers;
 using MultiplayerGameBackend.Application.Items.Requests;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
-using MultiplayerGameBackend.Infrastructure.Persistence;
 
 namespace MultiplayerGameBackend.API.Tests.Controllers;
 
@@ -32,52 +26,11 @@ public class ItemControllerTests : IClassFixture<CustomWebApplicationFactory>, I
 
     #region Helper Methods
 
-    private string GenerateJwtToken(User user, IEnumerable<string> roles)
-    {
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.UserName!),
-            new(ClaimTypes.Email, user.Email!)
-        };
+    private string GenerateJwtToken(User user, IEnumerable<string> roles) =>
+        JwtTokenHelper.GenerateJwtToken(user, roles);
 
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        // Use hardcoded values for testing since configuration may not be available
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            "ThisIsAVeryLongSecretKeyForTestingPurposesOnly1234567890"));
-
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: "TestIssuer",
-            audience: "TestAudience",
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(30),
-            signingCredentials: creds
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    private async Task<Item> CreateTestItem(string name, string type)
-    {
-        using var scope = webAppFactory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-
-        var item = new Item
-        {
-            Name = name,
-            Description = $"Test {name}",
-            Type = type,
-            ThumbnailUrl = "test.png"
-        };
-
-        context.Items.Add(item);
-        await context.SaveChangesAsync();
-
-        return item;
-    }
+    private async Task<Item> CreateTestItem(string name, string type) =>
+        await TestDataHelper.CreateTestItem(webAppFactory.Services, name, type);
 
     #endregion
 
