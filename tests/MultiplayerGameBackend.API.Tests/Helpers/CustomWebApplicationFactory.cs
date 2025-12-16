@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
@@ -51,6 +53,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
             {
                 options.UseNpgsql(_dbContainer.GetConnectionString());
             });
+            
+            // Replace email service with a mock that does nothing
+            services.RemoveAll<IEmailService>();
+            services.AddSingleton<IEmailService>(new MockEmailService());
         });
     }
     
@@ -128,3 +134,16 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
     }
 }
 
+// Mock email service for testing
+public class MockEmailService : IEmailService
+{
+    public Task SendPasswordResetEmailAsync(User user, string email, string resetToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task SendEmailConfirmationAsync(User user, string email, string confirmationToken)
+    {
+        return Task.CompletedTask;
+    }
+}
