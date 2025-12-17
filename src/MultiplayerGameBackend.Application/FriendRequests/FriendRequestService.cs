@@ -222,7 +222,7 @@ public class FriendRequestService(
                 new Dictionary<string, Expression<Func<FriendRequest, object>>>
                 {
                     { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
-                    { "RequesterUsername", fr => fr.Requester.UserName! }
+                    { nameof(User.UserName), fr => fr.Requester.UserName! }
                 },
                 defaultSort: fr => fr.CreatedAt);
 
@@ -261,7 +261,7 @@ public class FriendRequestService(
                 new Dictionary<string, Expression<Func<FriendRequest, object>>>
                 {
                     { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
-                    { "ReceiverUsername", fr => fr.Receiver.UserName! }
+                    { nameof(User.UserName), fr => fr.Receiver.UserName! }
                 },
                 defaultSort: fr => fr.CreatedAt);
 
@@ -285,7 +285,6 @@ public class FriendRequestService(
     public async Task<PagedResult<ReadFriendDto>> GetFriends(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)
     {
         logger.LogInformation("Fetching friends for user {CurrentUserId}", currentUserId);
-
         var searchPhraseLower = query.SearchPhrase?.ToLower();
         
         var baseQuery = dbContext.FriendRequests
@@ -298,46 +297,26 @@ public class FriendRequestService(
             .ApplySearchFilter(
                 searchPhraseLower,
                 fr => (fr.RequesterId == currentUserId && fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!)) ||
-                      (fr.ReceiverId == currentUserId && fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!)));
+                      (fr.ReceiverId == currentUserId && fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!)))
+            .ApplySorting(
+                query.SortBy,
+                query.SortDirection,
+                new Dictionary<string, Expression<Func<FriendRequest, object>>>
+                {
+                    { nameof(FriendRequest.RespondedAt), fr => fr.RespondedAt ?? fr.CreatedAt },
+                    { nameof(User.UserName), fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName! }
+                },
+                defaultSort: fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!);
 
-        // Project to friend info
-        var friendsQuery = baseQuery.Select(fr => new
-        {
-            UserId = fr.RequesterId == currentUserId ? fr.ReceiverId : fr.RequesterId,
-            Username = fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!,
-            ProfilePictureUrl = fr.RequesterId == currentUserId ? fr.Receiver.ProfilePictureUrl : fr.Requester.ProfilePictureUrl,
-            FriendsSince = fr.RespondedAt ?? fr.CreatedAt
-        });
-
-        // Apply sorting - manual approach for anonymous types
-        if (query.SortBy == "FriendsSince")
-        {
-            friendsQuery = query.SortDirection == SortDirection.Ascending
-                ? friendsQuery.OrderBy(f => f.FriendsSince)
-                : friendsQuery.OrderByDescending(f => f.FriendsSince);
-        }
-        else
-        {
-            // Default to Username sorting
-            friendsQuery = query.SortDirection == SortDirection.Ascending
-                ? friendsQuery.OrderBy(f => f.Username)
-                : friendsQuery.OrderByDescending(f => f.Username);
-        }
-
-        var totalCount = await friendsQuery.CountAsync(cancellationToken);
-
-        var friends = await friendsQuery
-            .ApplyPaging(query)
-            .Select(f => new ReadFriendDto
+        return await baseQuery
+            .Select(fr => new ReadFriendDto
             {
-                UserId = f.UserId,
-                Username = f.Username,
-                ProfilePictureUrl = f.ProfilePictureUrl,
-                FriendsSince = f.FriendsSince
+                UserId = fr.RequesterId == currentUserId ? fr.ReceiverId : fr.RequesterId,
+                Username = fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!,
+                ProfilePictureUrl = fr.RequesterId == currentUserId ? fr.Receiver.ProfilePictureUrl : fr.Requester.ProfilePictureUrl,
+                FriendsSince = fr.RespondedAt ?? fr.CreatedAt
             })
-            .ToListAsync(cancellationToken);
-
-        return new PagedResult<ReadFriendDto>(friends, totalCount, query.PageSize, query.PageNumber);
+            .ToPagedResultAsync(query, cancellationToken);
     }
 }
 
