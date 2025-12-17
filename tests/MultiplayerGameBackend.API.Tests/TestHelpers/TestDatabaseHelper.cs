@@ -95,5 +95,14 @@ public static class TestDatabaseHelper
         int balance) =>
         ExecuteWithContext(serviceProvider, context =>
             DatabaseHelper.UpdateUserBalance(context, userId, balance));
+
+    public static Task<FriendRequest> AddFriendRequestToDatabase(
+        IServiceProvider serviceProvider,
+        Guid requesterId,
+        Guid receiverId,
+        string status = "Pending",
+        DateTime? respondedAt = null) =>
+        ExecuteWithContext(serviceProvider, context =>
+            DatabaseHelper.CreateAndSaveFriendRequest(context, requesterId, receiverId, status, respondedAt));
 }
 
