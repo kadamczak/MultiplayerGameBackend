@@ -1,9 +1,12 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.API.Services;
 using MultiplayerGameBackend.Application.Common;
+using MultiplayerGameBackend.Application.Extensions;
 using MultiplayerGameBackend.Application.FriendRequests;
 using MultiplayerGameBackend.Application.FriendRequests.Requests;
+using MultiplayerGameBackend.Application.FriendRequests.Requests.Validators;
 using MultiplayerGameBackend.Application.FriendRequests.Responses;
 using MultiplayerGameBackend.Application.Friends;
 using MultiplayerGameBackend.Application.Friends.Responses;
@@ -16,7 +19,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 [Authorize]
 public class FriendRequestController(
     IFriendRequestService friendRequestService,
-    IUserContext userContext) : ControllerBase
+    IUserContext userContext,
+    GetFriendRequestsDtoValidator getFriendRequestsDtoValidator) : ControllerBase
 {
     [HttpPost("requests")]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -79,19 +83,27 @@ public class FriendRequestController(
 
     [HttpGet("requests/received")]
     [ProducesResponseType(typeof(PagedResult<ReadFriendRequestDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetReceivedFriendRequests([FromQuery] PagedQuery query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetReceivedFriendRequests([FromQuery] GetFriendRequestsDto dto, CancellationToken cancellationToken)
     {
+        var validationResult = await getFriendRequestsDtoValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid)
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
+        
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        var result = await friendRequestService.GetReceivedFriendRequests(Guid.Parse(currentUser.Id), query, cancellationToken);
+        var result = await friendRequestService.GetReceivedFriendRequests(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("requests/sent")]
     [ProducesResponseType(typeof(PagedResult<ReadFriendRequestDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSentFriendRequests([FromQuery] PagedQuery query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSentFriendRequests([FromQuery] GetFriendRequestsDto dto, CancellationToken cancellationToken)
     {
+        var validationResult = await getFriendRequestsDtoValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid)
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
+        
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        var result = await friendRequestService.GetSentFriendRequests(Guid.Parse(currentUser.Id), query, cancellationToken);
+        var result = await friendRequestService.GetSentFriendRequests(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return Ok(result);
     }
 

@@ -456,9 +456,10 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await DatabaseHelper.CreateAndSaveFriendRequest(context, user.Id, requester3.Id); // Sent by user - should NOT be returned
 
         var query = new Application.Common.PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetFriendRequestsDto() { PagedQuery = query };
 
         // Act
-        var result = await friendService.GetReceivedFriendRequests(user.Id, query, CancellationToken.None);
+        var result = await friendService.GetReceivedFriendRequests(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.Single(result.Items);
@@ -481,9 +482,10 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await DatabaseHelper.CreateAndSaveFriendRequest(context, requester2.Id, user.Id);
 
         var query = new Application.Common.PagedQuery { PageNumber = 1, PageSize = 10, SearchPhrase = "alice" };
+        var dto = new GetFriendRequestsDto() { PagedQuery = query };
 
         // Act
-        var result = await friendService.GetReceivedFriendRequests(user.Id, query, CancellationToken.None);
+        var result = await friendService.GetReceivedFriendRequests(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.Single(result.Items);
@@ -511,10 +513,11 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await DatabaseHelper.CreateAndSaveFriendRequest(context, user.Id, receiver2.Id, FriendRequestStatuses.Rejected); // Rejected - should NOT be returned
         await DatabaseHelper.CreateAndSaveFriendRequest(context, receiver3.Id, user.Id); // Received by user - should NOT be returned
 
-        var query = new Application.Common.PagedQuery { PageNumber = 1, PageSize = 10 };
+        var query = new Common.PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetFriendRequestsDto() { PagedQuery = query };
 
         // Act
-        var result = await friendService.GetSentFriendRequests(user.Id, query, CancellationToken.None);
+        var result = await friendService.GetSentFriendRequests(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.Single(result.Items);
@@ -599,7 +602,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         { 
             PageNumber = 1, 
             PageSize = 10, 
-            SortBy = "Username", 
+            SortBy = "UserName", 
             SortDirection = SortDirection.Ascending 
         };
 

@@ -1,4 +1,5 @@
 using FluentValidation;
+using MultiplayerGameBackend.Application.Common.Validators;
 
 namespace MultiplayerGameBackend.Application.UserItemOffers.Requests.Validators;
 
@@ -11,22 +12,11 @@ public class GetOffersDtoValidator : AbstractValidator<GetOffersDto>
 
     public GetOffersDtoValidator()
     {
-        RuleFor(x => x.PagedQuery.PageNumber)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("Page number must be at least 1.");
-        
-        RuleFor(x => x.PagedQuery.PageSize)
-            .Must(pageSize => AllowedPageSizes.Contains(pageSize))
-            .WithMessage($"Page size must be one of: {string.Join(", ", AllowedPageSizes)}.");
-        
-        RuleFor(x => x.PagedQuery.SearchPhrase)
-            .MaximumLength(MaxSearchPhraseLength)
-            .When(x => x.PagedQuery.SearchPhrase != null)
-            .WithMessage($"Search phrase must be at most {MaxSearchPhraseLength} characters long.");
-        
-        RuleFor(x => x.PagedQuery.SortDirection)
-            .IsInEnum()
-            .WithMessage("Sort direction must be either 'Ascending' or 'Descending'.");
+        RuleFor(x => x.PagedQuery)
+            .SetValidator(new PagedQueryValidator(
+                allowedPageSizes: AllowedPageSizes,
+                sortByValues: null, // Custom validation below
+                maxSearchPhraseLength: MaxSearchPhraseLength));
         
         RuleFor(x => x.PagedQuery.SortBy)
             .Must((query, sortBy) => ValidateSortBy(sortBy, query.ShowActive))

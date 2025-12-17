@@ -204,10 +204,10 @@ public class FriendRequestService(
         logger.LogInformation("Friend removed successfully");
     }
 
-    public async Task<PagedResult<ReadFriendRequestDto>> GetReceivedFriendRequests(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResult<ReadFriendRequestDto>> GetReceivedFriendRequests(Guid currentUserId, GetFriendRequestsDto dto, CancellationToken cancellationToken)
     {
         logger.LogInformation("Fetching received friend requests for user {CurrentUserId}", currentUserId);
-        var searchPhraseLower = query.SearchPhrase?.ToLower();
+        var searchPhraseLower = dto.PagedQuery.SearchPhrase?.ToLower();
         
         var baseQuery = dbContext.FriendRequests
             .AsNoTracking()
@@ -217,8 +217,8 @@ public class FriendRequestService(
                 searchPhraseLower,
                 fr => fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!))
             .ApplySorting(
-                query.SortBy,
-                query.SortDirection,
+                dto.PagedQuery.SortBy,
+                dto.PagedQuery.SortDirection,
                 new Dictionary<string, Expression<Func<FriendRequest, object>>>
                 {
                     { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
@@ -240,13 +240,13 @@ public class FriendRequestService(
                 CreatedAt = fr.CreatedAt,
                 RespondedAt = fr.RespondedAt
             })
-            .ToPagedResultAsync(query, cancellationToken);
+            .ToPagedResultAsync(dto.PagedQuery, cancellationToken);
     }
 
-    public async Task<PagedResult<ReadFriendRequestDto>> GetSentFriendRequests(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResult<ReadFriendRequestDto>> GetSentFriendRequests(Guid currentUserId, GetFriendRequestsDto dto, CancellationToken cancellationToken)
     {
         logger.LogInformation("Fetching sent friend requests for user {CurrentUserId}", currentUserId);
-        var searchPhraseLower = query.SearchPhrase?.ToLower();
+        var searchPhraseLower = dto.PagedQuery.SearchPhrase?.ToLower();
         
         var baseQuery = dbContext.FriendRequests
             .AsNoTracking()
@@ -256,8 +256,8 @@ public class FriendRequestService(
                 searchPhraseLower,
                 fr => fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!))
             .ApplySorting(
-                query.SortBy,
-                query.SortDirection,
+                dto.PagedQuery.SortBy,
+                dto.PagedQuery.SortDirection,
                 new Dictionary<string, Expression<Func<FriendRequest, object>>>
                 {
                     { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
@@ -279,7 +279,7 @@ public class FriendRequestService(
                 CreatedAt = fr.CreatedAt,
                 RespondedAt = fr.RespondedAt
             })
-            .ToPagedResultAsync(query, cancellationToken);
+            .ToPagedResultAsync(dto.PagedQuery, cancellationToken);
     }
 
     public async Task<PagedResult<ReadFriendDto>> GetFriends(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)

@@ -12,8 +12,8 @@ public interface IFriendRequestService
     Task RejectFriendRequest(Guid currentUserId, Guid requestId, CancellationToken cancellationToken);
     Task CancelFriendRequest(Guid currentUserId, Guid requestId, CancellationToken cancellationToken);
     Task RemoveFriend(Guid currentUserId, Guid friendUserId, CancellationToken cancellationToken);
-    Task<PagedResult<ReadFriendRequestDto>> GetReceivedFriendRequests(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken);
-    Task<PagedResult<ReadFriendRequestDto>> GetSentFriendRequests(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken);
+    Task<PagedResult<ReadFriendRequestDto>> GetReceivedFriendRequests(Guid currentUserId, GetFriendRequestsDto dto, CancellationToken cancellationToken);
+    Task<PagedResult<ReadFriendRequestDto>> GetSentFriendRequests(Guid currentUserId, GetFriendRequestsDto dto, CancellationToken cancellationToken);
     Task<PagedResult<ReadFriendDto>> GetFriends(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken);
 }
 
