@@ -206,40 +206,26 @@ public class FriendRequestService(
     public async Task<PagedResult<ReadFriendRequestDto>> GetReceivedFriendRequests(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)
     {
         logger.LogInformation("Fetching received friend requests for user {CurrentUserId}", currentUserId);
-
         var searchPhraseLower = query.SearchPhrase?.ToLower();
+        
         var baseQuery = dbContext.FriendRequests
             .AsNoTracking()
             .Where(fr => fr.ReceiverId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
             .Include(fr => fr.Requester)
-            .Where(fr => searchPhraseLower == null || fr.Requester.UserName!.ToLower().Contains(searchPhraseLower));
+            .ApplySearchFilter(
+                searchPhraseLower,
+                fr => fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!))
+            .ApplySorting(
+                query.SortBy,
+                query.SortDirection,
+                new Dictionary<string, Expression<Func<FriendRequest, object>>>
+                {
+                    { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
+                    { "RequesterUsername", fr => fr.Requester.UserName! }
+                },
+                defaultSort: fr => fr.CreatedAt);
 
-        var totalCount = await baseQuery.CountAsync(cancellationToken);
-
-        if (query.SortBy is not null)
-        {
-            var columnsSelector = new Dictionary<string, Expression<Func<FriendRequest, object>>>
-            {
-                { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
-                { "RequesterUsername", fr => fr.Requester.UserName! }
-            };
-
-            var selectedColumn = columnsSelector.GetValueOrDefault(query.SortBy);
-            if (selectedColumn is not null)
-            {
-                baseQuery = query.SortDirection == SortDirection.Ascending
-                    ? baseQuery.OrderBy(selectedColumn)
-                    : baseQuery.OrderByDescending(selectedColumn);
-            }
-        }
-        else
-        {
-            baseQuery = baseQuery.OrderByDescending(fr => fr.CreatedAt);
-        }
-
-        var friendRequests = await baseQuery
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
+        return await baseQuery
             .Select(fr => new ReadFriendRequestDto
             {
                 Id = fr.Id,
@@ -253,48 +239,32 @@ public class FriendRequestService(
                 CreatedAt = fr.CreatedAt,
                 RespondedAt = fr.RespondedAt
             })
-            .ToListAsync(cancellationToken);
-
-        return new PagedResult<ReadFriendRequestDto>(friendRequests, totalCount, query.PageSize, query.PageNumber);
+            .ToPagedResultAsync(query, cancellationToken);
     }
 
     public async Task<PagedResult<ReadFriendRequestDto>> GetSentFriendRequests(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)
     {
         logger.LogInformation("Fetching sent friend requests for user {CurrentUserId}", currentUserId);
-
         var searchPhraseLower = query.SearchPhrase?.ToLower();
+        
         var baseQuery = dbContext.FriendRequests
             .AsNoTracking()
             .Where(fr => fr.RequesterId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
             .Include(fr => fr.Receiver)
-            .Where(fr => searchPhraseLower == null || fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower));
+            .ApplySearchFilter(
+                searchPhraseLower,
+                fr => fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!))
+            .ApplySorting(
+                query.SortBy,
+                query.SortDirection,
+                new Dictionary<string, Expression<Func<FriendRequest, object>>>
+                {
+                    { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
+                    { "ReceiverUsername", fr => fr.Receiver.UserName! }
+                },
+                defaultSort: fr => fr.CreatedAt);
 
-        var totalCount = await baseQuery.CountAsync(cancellationToken);
-
-        if (query.SortBy is not null)
-        {
-            var columnsSelector = new Dictionary<string, Expression<Func<FriendRequest, object>>>
-            {
-                { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
-                { "ReceiverUsername", fr => fr.Receiver.UserName! }
-            };
-
-            var selectedColumn = columnsSelector.GetValueOrDefault(query.SortBy);
-            if (selectedColumn is not null)
-            {
-                baseQuery = query.SortDirection == SortDirection.Ascending
-                    ? baseQuery.OrderBy(selectedColumn)
-                    : baseQuery.OrderByDescending(selectedColumn);
-            }
-        }
-        else
-        {
-            baseQuery = baseQuery.OrderByDescending(fr => fr.CreatedAt);
-        }
-
-        var friendRequests = await baseQuery
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
+        return await baseQuery
             .Select(fr => new ReadFriendRequestDto
             {
                 Id = fr.Id,
@@ -308,9 +278,7 @@ public class FriendRequestService(
                 CreatedAt = fr.CreatedAt,
                 RespondedAt = fr.RespondedAt
             })
-            .ToListAsync(cancellationToken);
-
-        return new PagedResult<ReadFriendRequestDto>(friendRequests, totalCount, query.PageSize, query.PageNumber);
+            .ToPagedResultAsync(query, cancellationToken);
     }
 
     public async Task<PagedResult<ReadFriendDto>> GetFriends(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)
@@ -318,27 +286,21 @@ public class FriendRequestService(
         logger.LogInformation("Fetching friends for user {CurrentUserId}", currentUserId);
 
         var searchPhraseLower = query.SearchPhrase?.ToLower();
+        
         var baseQuery = dbContext.FriendRequests
             .AsNoTracking()
             .Where(fr =>
                 (fr.RequesterId == currentUserId || fr.ReceiverId == currentUserId) &&
                 fr.Status == FriendRequestStatuses.Accepted)
             .Include(fr => fr.Requester)
-            .Include(fr => fr.Receiver);
+            .Include(fr => fr.Receiver)
+            .ApplySearchFilter(
+                searchPhraseLower,
+                fr => (fr.RequesterId == currentUserId && fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!)) ||
+                      (fr.ReceiverId == currentUserId && fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!)));
 
-        // Filter by search phrase on the friend's username
-        IQueryable<FriendRequest> filteredQuery = baseQuery;
-        if (searchPhraseLower is not null)
-        {
-            filteredQuery = filteredQuery.Where(fr =>
-                (fr.RequesterId == currentUserId && fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower)) ||
-                (fr.ReceiverId == currentUserId && fr.Requester.UserName!.ToLower().Contains(searchPhraseLower)));
-        }
-
-        var totalCount = await filteredQuery.CountAsync(cancellationToken);
-
-        // Create a projection that gets the friend user info
-        var friendsQuery = filteredQuery.Select(fr => new
+        // Project to friend info
+        var friendsQuery = baseQuery.Select(fr => new
         {
             UserId = fr.RequesterId == currentUserId ? fr.ReceiverId : fr.RequesterId,
             Username = fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!,
@@ -346,26 +308,25 @@ public class FriendRequestService(
             FriendsSince = fr.RespondedAt ?? fr.CreatedAt
         });
 
-        if (query.SortBy is not null)
+        // Apply sorting - manual approach for anonymous types
+        if (query.SortBy == "FriendsSince")
         {
-
-            // Default sort by username
-            friendsQuery = query.SortBy == "FriendsSince"
-                ? (query.SortDirection == SortDirection.Ascending
-                    ? friendsQuery.OrderBy(f => f.FriendsSince)
-                    : friendsQuery.OrderByDescending(f => f.FriendsSince))
-                : (query.SortDirection == SortDirection.Ascending
-                    ? friendsQuery.OrderBy(f => f.Username)
-                    : friendsQuery.OrderByDescending(f => f.Username));
+            friendsQuery = query.SortDirection == SortDirection.Ascending
+                ? friendsQuery.OrderBy(f => f.FriendsSince)
+                : friendsQuery.OrderByDescending(f => f.FriendsSince);
         }
         else
         {
-            friendsQuery = friendsQuery.OrderBy(f => f.Username);
+            // Default to Username sorting
+            friendsQuery = query.SortDirection == SortDirection.Ascending
+                ? friendsQuery.OrderBy(f => f.Username)
+                : friendsQuery.OrderByDescending(f => f.Username);
         }
 
+        var totalCount = await friendsQuery.CountAsync(cancellationToken);
+
         var friends = await friendsQuery
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize)
+            .ApplyPaging(query)
             .Select(f => new ReadFriendDto
             {
                 UserId = f.UserId,
