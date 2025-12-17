@@ -33,10 +33,7 @@ public class FriendRequestService(
 
         // Check if already friends
         var existingAcceptedRequest = await dbContext.FriendRequests
-            .AnyAsync(fr =>
-                ((fr.RequesterId == currentUserId && fr.ReceiverId == dto.ReceiverId) ||
-                 (fr.RequesterId == dto.ReceiverId && fr.ReceiverId == currentUserId)) &&
-                fr.Status == FriendRequestStatuses.Accepted, cancellationToken);
+            .AnyAsync(FriendRequest.AreFriends(currentUserId, receiver.Id), cancellationToken);
 
         if (existingAcceptedRequest)
             throw new ConflictException(new Dictionary<string, string[]>
@@ -46,10 +43,7 @@ public class FriendRequestService(
 
         // Check if there's already a pending request
         var existingPendingRequest = await dbContext.FriendRequests
-            .FirstOrDefaultAsync(fr =>
-                ((fr.RequesterId == currentUserId && fr.ReceiverId == dto.ReceiverId) ||
-                 (fr.RequesterId == dto.ReceiverId && fr.ReceiverId == currentUserId)) &&
-                fr.Status == FriendRequestStatuses.Pending, cancellationToken);
+            .FirstOrDefaultAsync(FriendRequest.HasPendingRequest(currentUserId, dto.ReceiverId), cancellationToken);
 
         if (existingPendingRequest is not null)
         {
@@ -78,9 +72,7 @@ public class FriendRequestService(
 
         // Check friend count limit
         var friendCount = await dbContext.FriendRequests
-            .CountAsync(fr =>
-                (fr.RequesterId == currentUserId || fr.ReceiverId == currentUserId) &&
-                fr.Status == FriendRequestStatuses.Accepted, cancellationToken);
+            .CountAsync(FriendRequest.IsFriendshipWithUser(currentUserId), cancellationToken);
 
         if (friendCount >= FriendRequest.Constraints.MaxFriendsPerUser)
             throw new BadRequest($"You have reached the maximum number of friends ({FriendRequest.Constraints.MaxFriendsPerUser}).");
@@ -118,18 +110,14 @@ public class FriendRequestService(
 
         // Check friend count limit for receiver
         var receiverFriendCount = await dbContext.FriendRequests
-            .CountAsync(fr =>
-                (fr.RequesterId == currentUserId || fr.ReceiverId == currentUserId) &&
-                fr.Status == FriendRequestStatuses.Accepted, cancellationToken);
+            .CountAsync(FriendRequest.IsFriendshipWithUser(currentUserId), cancellationToken);
 
         if (receiverFriendCount >= FriendRequest.Constraints.MaxFriendsPerUser)
             throw new BadRequest($"You have reached the maximum number of friends ({FriendRequest.Constraints.MaxFriendsPerUser}).");
 
         // Check friend count limit for requester
         var requesterFriendCount = await dbContext.FriendRequests
-            .CountAsync(fr =>
-                (fr.RequesterId == friendRequest.RequesterId || fr.ReceiverId == friendRequest.RequesterId) &&
-                fr.Status == FriendRequestStatuses.Accepted, cancellationToken);
+            .CountAsync(FriendRequest.IsFriendshipWithUser(friendRequest.RequesterId), cancellationToken);
 
         if (requesterFriendCount >= FriendRequest.Constraints.MaxFriendsPerUser)
             throw new BadRequest($"The requester has reached the maximum number of friends ({FriendRequest.Constraints.MaxFriendsPerUser}).");
@@ -193,10 +181,7 @@ public class FriendRequestService(
             throw new BadRequest("Invalid friend user ID.");
 
         var friendRequest = await dbContext.FriendRequests
-            .FirstOrDefaultAsync(fr =>
-                ((fr.RequesterId == currentUserId && fr.ReceiverId == friendUserId) ||
-                 (fr.RequesterId == friendUserId && fr.ReceiverId == currentUserId)) &&
-                fr.Status == FriendRequestStatuses.Accepted, cancellationToken);
+            .FirstOrDefaultAsync(FriendRequest.AreFriends(currentUserId, friendUserId), cancellationToken);
 
         if (friendRequest is null)
             throw new NotFoundException(nameof(User), nameof(User.Id), "user ID", friendUserId.ToString());

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using MultiplayerGameBackend.Domain.Constants;
 
 namespace MultiplayerGameBackend.Domain.Entities;
@@ -23,4 +24,25 @@ public class FriendRequest
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     public DateTime? RespondedAt { get; set; }
+    
+    public static Expression<Func<FriendRequest, bool>> AreFriends(Guid userId1, Guid userId2)
+    {
+        return fr =>
+            ((fr.RequesterId == userId1 && fr.ReceiverId == userId2) ||
+             (fr.RequesterId == userId2 && fr.ReceiverId == userId1)) &&
+            fr.Status == FriendRequestStatuses.Accepted;
+    }
+
+    public static Expression<Func<FriendRequest, bool>> HasPendingRequest(Guid userId1, Guid userId2)
+    {
+        return fr =>
+            ((fr.RequesterId == userId1 && fr.ReceiverId == userId2) ||
+             (fr.RequesterId == userId2 && fr.ReceiverId == userId1)) &&
+            fr.Status == FriendRequestStatuses.Pending;
+    }
+    
+    public static Expression<Func<FriendRequest, bool>> IsFriendshipWithUser(Guid userId)
+    {
+        return fr => (fr.RequesterId == userId || fr.ReceiverId == userId) && fr.Status == FriendRequestStatuses.Accepted;
+    }
 }
