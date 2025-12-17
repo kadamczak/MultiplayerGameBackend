@@ -235,7 +235,7 @@ public class FriendRequestService(
             .ApplyPaging(dto.PagedQuery)
             .ToListAsync(cancellationToken);
 
-        var mappedRequests = friendRequests.Select(fr => friendRequestMapper.Map(fr)!).ToList();
+        var mappedRequests = friendRequests.Select(fr => friendRequestMapper.MapToReadFriendRequestDto(fr)!).ToList();
         return new PagedResult<ReadFriendRequestDto>(mappedRequests, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
 
@@ -275,7 +275,7 @@ public class FriendRequestService(
             .ApplyPaging(dto.PagedQuery);
 
         var friendRequests = await dataQuery.ToListAsync(cancellationToken);
-        var mappedRequests = friendRequests.Select(fr => friendRequestMapper.Map(fr)!).ToList();
+        var mappedRequests = friendRequests.Select(fr => friendRequestMapper.MapToReadFriendRequestDto(fr)!).ToList();
         
         return new PagedResult<ReadFriendRequestDto>(mappedRequests, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
@@ -306,15 +306,14 @@ public class FriendRequestService(
                 },
                 defaultSort: fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!);
 
-        return await baseQuery
-            .Select(fr => new ReadFriendDto
-            {
-                UserId = fr.RequesterId == currentUserId ? fr.ReceiverId : fr.RequesterId,
-                Username = fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!,
-                ProfilePictureUrl = fr.RequesterId == currentUserId ? fr.Receiver.ProfilePictureUrl : fr.Requester.ProfilePictureUrl,
-                FriendsSince = fr.RespondedAt ?? fr.CreatedAt
-            })
-            .ToPagedResultAsync(query, cancellationToken);
+        var totalCount = await baseQuery.CountAsync(cancellationToken);
+
+        var friendRequests = await baseQuery
+            .ApplyPaging(query)
+            .ToListAsync(cancellationToken);
+
+        var mappedFriends = friendRequests.Select(fr => friendRequestMapper.MapToReadFriendDto(fr, currentUserId)!).ToList();
+        return new PagedResult<ReadFriendDto>(mappedFriends, totalCount, query.PageSize, query.PageNumber);
     }
 }
 
