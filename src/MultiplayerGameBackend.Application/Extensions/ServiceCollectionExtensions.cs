@@ -29,5 +29,6 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<ItemMapper>();
         services.AddScoped<UserCustomizationMapper>();
+        services.AddScoped<FriendRequestMapper>();
     }
 }

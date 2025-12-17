@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
+using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.FriendRequests.Requests;
 using MultiplayerGameBackend.Application.FriendRequests.Responses;
 using MultiplayerGameBackend.Application.Friends.Responses;
@@ -14,7 +15,8 @@ namespace MultiplayerGameBackend.Application.FriendRequests;
 
 public class FriendRequestService(
     ILogger<FriendRequestService> logger,
-    IMultiplayerGameDbContext dbContext) : IFriendRequestService
+    IMultiplayerGameDbContext dbContext,
+    FriendRequestMapper friendRequestMapper) : IFriendRequestService
 {
     public async Task<Guid> SendFriendRequest(Guid currentUserId, SendFriendRequestDto dto, CancellationToken cancellationToken)
     {
@@ -213,6 +215,7 @@ public class FriendRequestService(
             .AsNoTracking()
             .Where(fr => fr.ReceiverId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
             .Include(fr => fr.Requester)
+            .Include(fr => fr.Receiver)
             .ApplySearchFilter(
                 searchPhraseLower,
                 fr => fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!))
@@ -226,21 +229,14 @@ public class FriendRequestService(
                 },
                 defaultSort: fr => fr.CreatedAt);
 
-        return await baseQuery
-            .Select(fr => new ReadFriendRequestDto
-            {
-                Id = fr.Id,
-                RequesterId = fr.RequesterId,
-                RequesterUsername = fr.Requester.UserName!,
-                RequesterProfilePictureUrl = fr.Requester.ProfilePictureUrl,
-                ReceiverId = fr.ReceiverId,
-                ReceiverUsername = fr.Receiver.UserName!,
-                ReceiverProfilePictureUrl = fr.Receiver.ProfilePictureUrl,
-                Status = fr.Status,
-                CreatedAt = fr.CreatedAt,
-                RespondedAt = fr.RespondedAt
-            })
-            .ToPagedResultAsync(dto.PagedQuery, cancellationToken);
+        var totalCount = await baseQuery.CountAsync(cancellationToken);
+        
+        var friendRequests = await baseQuery
+            .ApplyPaging(dto.PagedQuery)
+            .ToListAsync(cancellationToken);
+
+        var mappedRequests = friendRequests.Select(fr => friendRequestMapper.Map(fr)!).ToList();
+        return new PagedResult<ReadFriendRequestDto>(mappedRequests, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
 
     public async Task<PagedResult<ReadFriendRequestDto>> GetSentFriendRequests(Guid currentUserId, GetFriendRequestsDto dto, CancellationToken cancellationToken)
@@ -251,6 +247,7 @@ public class FriendRequestService(
         var baseQuery = dbContext.FriendRequests
             .AsNoTracking()
             .Where(fr => fr.RequesterId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
+            .Include(fr => fr.Requester)
             .Include(fr => fr.Receiver)
             .ApplySearchFilter(
                 searchPhraseLower,
@@ -265,21 +262,14 @@ public class FriendRequestService(
                 },
                 defaultSort: fr => fr.CreatedAt);
 
-        return await baseQuery
-            .Select(fr => new ReadFriendRequestDto
-            {
-                Id = fr.Id,
-                RequesterId = fr.RequesterId,
-                RequesterUsername = fr.Requester.UserName!,
-                RequesterProfilePictureUrl = fr.Requester.ProfilePictureUrl,
-                ReceiverId = fr.ReceiverId,
-                ReceiverUsername = fr.Receiver.UserName!,
-                ReceiverProfilePictureUrl = fr.Receiver.ProfilePictureUrl,
-                Status = fr.Status,
-                CreatedAt = fr.CreatedAt,
-                RespondedAt = fr.RespondedAt
-            })
-            .ToPagedResultAsync(dto.PagedQuery, cancellationToken);
+        var totalCount = await baseQuery.CountAsync(cancellationToken);
+        
+        var friendRequests = await baseQuery
+            .ApplyPaging(dto.PagedQuery)
+            .ToListAsync(cancellationToken);
+
+        var mappedRequests = friendRequests.Select(fr => friendRequestMapper.Map(fr)!).ToList();
+        return new PagedResult<ReadFriendRequestDto>(mappedRequests, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
 
     public async Task<PagedResult<ReadFriendDto>> GetFriends(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)

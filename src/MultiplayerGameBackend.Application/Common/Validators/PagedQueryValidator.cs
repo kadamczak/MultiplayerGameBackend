@@ -19,14 +19,14 @@ public class PagedQueryValidator : AbstractValidator<PagedQuery>
             .Must(pageSize => pageSizes.Contains(pageSize))
             .WithMessage($"Page size must be one of: {string.Join(", ", pageSizes)}.");
         
-        RuleFor(x => x.SortDirection)
-            .IsInEnum()
-            .WithMessage("Sort direction must be either 'Ascending' or 'Descending'.");
-
         RuleFor(x => x.SearchPhrase)
             .MaximumLength(maxSearchPhraseLength)
             .When(x => x.SearchPhrase != null)
             .WithMessage($"Search phrase must be at most {maxSearchPhraseLength} characters long.");
+        
+        RuleFor(x => x.SortDirection)
+            .IsInEnum()
+            .WithMessage("Sort direction must be either 'Ascending' or 'Descending'.");
         
         if (sortByValues != null && sortByValues.Length > 0)
         {
@@ -37,4 +37,3 @@ public class PagedQueryValidator : AbstractValidator<PagedQuery>
         }
     }
 }
-
