@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserItemService, UserItemService>();
         services.AddScoped<IUserItemOfferService, UserItemOfferService>();
         services.AddScoped<IMerchantItemOfferService, MerchantItemOfferService>();
-        services.AddScoped<IFriendService, FriendService>();
+        services.AddScoped<IFriendRequestService, FriendRequestService>();
         
         services.AddScoped<ItemMapper>();
         services.AddScoped<UserCustomizationMapper>();

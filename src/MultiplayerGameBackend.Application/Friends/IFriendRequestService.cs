@@ -4,7 +4,7 @@ using MultiplayerGameBackend.Application.Friends.Responses;
 
 namespace MultiplayerGameBackend.Application.Friends;
 
-public interface IFriendService
+public interface IFriendRequestService
 {
     Task<Guid> SendFriendRequest(Guid currentUserId, SendFriendRequestDto dto, CancellationToken cancellationToken);
     Task AcceptFriendRequest(Guid currentUserId, Guid requestId, CancellationToken cancellationToken);

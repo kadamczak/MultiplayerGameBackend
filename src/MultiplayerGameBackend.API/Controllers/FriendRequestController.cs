@@ -12,8 +12,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 [ApiController]
 [Route("v1/friends")]
 [Authorize]
-public class FriendController(
-    IFriendService friendService,
+public class FriendRequestController(
+    IFriendRequestService friendRequestService,
     IUserContext userContext) : ControllerBase
 {
     [HttpPost("requests")]
@@ -24,7 +24,7 @@ public class FriendController(
     public async Task<IActionResult> SendFriendRequest(SendFriendRequestDto dto, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        var requestId = await friendService.SendFriendRequest(Guid.Parse(currentUser.Id), dto, cancellationToken);
+        var requestId = await friendRequestService.SendFriendRequest(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return CreatedAtAction(nameof(SendFriendRequest), new { id = requestId }, null);
     }
 
@@ -36,7 +36,7 @@ public class FriendController(
     public async Task<IActionResult> AcceptFriendRequest(Guid requestId, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        await friendService.AcceptFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
+        await friendRequestService.AcceptFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
         return NoContent();
     }
 
@@ -48,7 +48,7 @@ public class FriendController(
     public async Task<IActionResult> RejectFriendRequest(Guid requestId, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        await friendService.RejectFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
+        await friendRequestService.RejectFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
         return NoContent();
     }
 
@@ -60,7 +60,7 @@ public class FriendController(
     public async Task<IActionResult> CancelFriendRequest(Guid requestId, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        await friendService.CancelFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
+        await friendRequestService.CancelFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
         return NoContent();
     }
 
@@ -71,7 +71,7 @@ public class FriendController(
     public async Task<IActionResult> RemoveFriend(Guid friendUserId, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        await friendService.RemoveFriend(Guid.Parse(currentUser.Id), friendUserId, cancellationToken);
+        await friendRequestService.RemoveFriend(Guid.Parse(currentUser.Id), friendUserId, cancellationToken);
         return NoContent();
     }
 
@@ -80,7 +80,7 @@ public class FriendController(
     public async Task<IActionResult> GetReceivedFriendRequests([FromQuery] PagedQuery query, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        var result = await friendService.GetReceivedFriendRequests(Guid.Parse(currentUser.Id), query, cancellationToken);
+        var result = await friendRequestService.GetReceivedFriendRequests(Guid.Parse(currentUser.Id), query, cancellationToken);
         return Ok(result);
     }
 
@@ -89,7 +89,7 @@ public class FriendController(
     public async Task<IActionResult> GetSentFriendRequests([FromQuery] PagedQuery query, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        var result = await friendService.GetSentFriendRequests(Guid.Parse(currentUser.Id), query, cancellationToken);
+        var result = await friendRequestService.GetSentFriendRequests(Guid.Parse(currentUser.Id), query, cancellationToken);
         return Ok(result);
     }
 
@@ -98,7 +98,7 @@ public class FriendController(
     public async Task<IActionResult> GetFriends([FromQuery] PagedQuery query, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        var result = await friendService.GetFriends(Guid.Parse(currentUser.Id), query, cancellationToken);
+        var result = await friendRequestService.GetFriends(Guid.Parse(currentUser.Id), query, cancellationToken);
         return Ok(result);
     }
 }

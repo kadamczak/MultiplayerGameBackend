@@ -11,9 +11,9 @@ using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.Application.Friends;
 
-public class FriendService(
-    ILogger<FriendService> logger,
-    IMultiplayerGameDbContext dbContext) : IFriendService
+public class FriendRequestService(
+    ILogger<FriendRequestService> logger,
+    IMultiplayerGameDbContext dbContext) : IFriendRequestService
 {
     public async Task<Guid> SendFriendRequest(Guid currentUserId, SendFriendRequestDto dto, CancellationToken cancellationToken)
     {
