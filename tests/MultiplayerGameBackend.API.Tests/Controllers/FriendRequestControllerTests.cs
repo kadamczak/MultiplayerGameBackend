@@ -645,7 +645,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act - search for "ali" (should match "alice")
-        var response = await _client.GetAsync("/v1/friends/requests/received?SearchPhrase=ali");
+        var response = await _client.GetAsync("/v1/friends/requests/received?PagedQuery.SearchPhrase=ali");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -677,7 +677,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.GetAsync("/v1/friends/requests/received?SortBy=CreatedAt&SortDirection=Ascending");
+        var response = await _client.GetAsync("/v1/friends/requests/received?PagedQuery.SortBy=CreatedAt&PagedQuery.SortDirection=Ascending");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -706,7 +706,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.GetAsync("/v1/friends/requests/received?SortBy=CreatedAt&SortDirection=Descending");
+        var response = await _client.GetAsync("/v1/friends/requests/received?PagedQuery.SortBy=CreatedAt&PagedQuery.SortDirection=Descending");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -733,7 +733,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.GetAsync("/v1/friends/requests/received?SortBy=UserName&SortDirection=Ascending");
+        var response = await _client.GetAsync("/v1/friends/requests/received?PagedQuery.SortBy=UserName&PagedQuery.SortDirection=Ascending");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -762,7 +762,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act - Get page 1 with page size 3
-        var response1 = await _client.GetAsync("/v1/friends/requests/received?PageNumber=1&PageSize=3");
+        var response1 = await _client.GetAsync("/v1/friends/requests/received?PagedQuery.PageNumber=1&PagedQuery.PageSize=3");
         
         // Assert page 1
         Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
@@ -772,7 +772,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal(3, result1.Items.Count());
 
         // Act - Get page 2 with page size 3
-        var response2 = await _client.GetAsync("/v1/friends/requests/received?PageNumber=2&PageSize=3");
+        var response2 = await _client.GetAsync("/v1/friends/requests/received?PagedQuery.PageNumber=2&PagedQuery.PageSize=3");
         
         // Assert page 2
         Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
@@ -782,7 +782,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal(3, result2.Items.Count());
 
         // Act - Get page 3 with page size 3
-        var response3 = await _client.GetAsync("/v1/friends/requests/received?PageNumber=3&PageSize=3");
+        var response3 = await _client.GetAsync("/v1/friends/requests/received?PagedQuery.PageNumber=3&PagedQuery.PageSize=3");
         
         // Assert page 3
         Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
@@ -799,29 +799,29 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         var receiver = await _factory.CreateTestUser("receiver", "receiver@example.com", "Password123!");
         var alice = await _factory.CreateTestUser("alice", "alice@example.com", "Password123!");
         var alvin = await _factory.CreateTestUser("alvin", "alvin@example.com", "Password123!");
-        var amanda = await _factory.CreateTestUser("amanda", "amanda@example.com", "Password123!");
+        var almanda = await _factory.CreateTestUser("almanda", "amanda@example.com", "Password123!");
         var bob = await _factory.CreateTestUser("bob", "bob@example.com", "Password123!");
 
         await AddFriendRequestToDatabase(alice.Id, receiver.Id);
         await AddFriendRequestToDatabase(alvin.Id, receiver.Id);
-        await AddFriendRequestToDatabase(amanda.Id, receiver.Id);
+        await AddFriendRequestToDatabase(almanda.Id, receiver.Id);
         await AddFriendRequestToDatabase(bob.Id, receiver.Id);
 
         var token = GenerateJwtToken(receiver, new[] { "User" });
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act - Filter by "al", sort by username ascending, page size 2
-        var response = await _client.GetAsync("/v1/friends/requests/received?SearchPhrase=al&SortBy=UserName&SortDirection=Ascending&PageNumber=1&PageSize=2");
+        var response = await _client.GetAsync("/v1/friends/requests/received?PagedQuery.SearchPhrase=al&PagedQuery.SortBy=UserName&PagedQuery.SortDirection=Ascending&PagedQuery.PageNumber=1&PagedQuery.PageSize=2");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var result = await response.Content.ReadFromJsonAsync<PagedResult<ReadFriendRequestDto>>();
         Assert.NotNull(result);
-        Assert.Equal(3, result.TotalItemsCount); // alice, alvin, amanda
+        Assert.Equal(3, result.TotalItemsCount); // alice, alvin
         Assert.Equal(2, result.Items.Count()); // Page size 2
         var items = result.Items.ToList();
         Assert.Equal("alice", items[0].RequesterUsername);
-        Assert.Equal("alvin", items[1].RequesterUsername);
+        Assert.Equal("almanda", items[1].RequesterUsername);
     }
 
     #endregion
@@ -900,7 +900,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act - search for "ob" (should match "bob")
-        var response = await _client.GetAsync("/v1/friends/requests/sent?SearchPhrase=ob");
+        var response = await _client.GetAsync("/v1/friends/requests/sent?PagedQuery.SearchPhrase=ob");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -931,7 +931,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.GetAsync("/v1/friends/requests/sent?SortBy=CreatedAt&SortDirection=Ascending");
+        var response = await _client.GetAsync("/v1/friends/requests/sent?PagedQuery.SortBy=CreatedAt&PagedQuery.SortDirection=Ascending");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -960,7 +960,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.GetAsync("/v1/friends/requests/sent?SortBy=CreatedAt&SortDirection=Descending");
+        var response = await _client.GetAsync("/v1/friends/requests/sent?PagedQuery.SortBy=CreatedAt&PagedQuery.SortDirection=Descending");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -987,7 +987,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.GetAsync("/v1/friends/requests/sent?SortBy=UserName&SortDirection=Ascending");
+        var response = await _client.GetAsync("/v1/friends/requests/sent?PagedQuery.SortBy=UserName&PagedQuery.SortDirection=Ascending");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -1016,7 +1016,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act - Get page 1 with page size 2
-        var response1 = await _client.GetAsync("/v1/friends/requests/sent?PageNumber=1&PageSize=2");
+        var response1 = await _client.GetAsync("/v1/friends/requests/sent?PagedQuery.PageNumber=1&PagedQuery.PageSize=2");
         
         // Assert page 1
         Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
@@ -1026,7 +1026,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal(2, result1.Items.Count());
 
         // Act - Get page 2 with page size 2
-        var response2 = await _client.GetAsync("/v1/friends/requests/sent?PageNumber=2&PageSize=2");
+        var response2 = await _client.GetAsync("/v1/friends/requests/sent?PagedQuery.PageNumber=2&PagedQuery.PageSize=2");
         
         // Assert page 2
         Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
@@ -1036,7 +1036,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal(2, result2.Items.Count());
 
         // Act - Get page 3 with page size 2
-        var response3 = await _client.GetAsync("/v1/friends/requests/sent?PageNumber=3&PageSize=2");
+        var response3 = await _client.GetAsync("/v1/friends/requests/sent?PagedQuery.PageNumber=3&PagedQuery.PageSize=2");
         
         // Assert page 3
         Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
@@ -1065,7 +1065,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act - Filter by "user", sort by username ascending, page size 2
-        var response = await _client.GetAsync("/v1/friends/requests/sent?SearchPhrase=user&SortBy=UserName&SortDirection=Ascending&PageNumber=1&PageSize=2");
+        var response = await _client.GetAsync("/v1/friends/requests/sent?PagedQuery.SearchPhrase=user&PagedQuery.SortBy=UserName&PagedQuery.SortDirection=Ascending&PagedQuery.PageNumber=1&PagedQuery.PageSize=2");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

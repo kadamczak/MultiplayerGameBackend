@@ -244,7 +244,18 @@ public class FriendRequestService(
         logger.LogInformation("Fetching sent friend requests for user {CurrentUserId}", currentUserId);
         var searchPhraseLower = dto.PagedQuery.SearchPhrase?.ToLower();
         
-        var baseQuery = dbContext.FriendRequests
+        // Build base query for counting (without includes for performance)
+        var countQuery = dbContext.FriendRequests
+            .AsNoTracking()
+            .Where(fr => fr.RequesterId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
+            .ApplySearchFilter(
+                searchPhraseLower,
+                fr => fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!));
+
+        var totalCount = await countQuery.CountAsync(cancellationToken);
+        
+        // Build query for fetching data (with includes and sorting)
+        var dataQuery = dbContext.FriendRequests
             .AsNoTracking()
             .Where(fr => fr.RequesterId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
             .Include(fr => fr.Requester)
@@ -260,15 +271,12 @@ public class FriendRequestService(
                     { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
                     { nameof(User.UserName), fr => fr.Receiver.UserName! }
                 },
-                defaultSort: fr => fr.CreatedAt);
+                defaultSort: fr => fr.CreatedAt)
+            .ApplyPaging(dto.PagedQuery);
 
-        var totalCount = await baseQuery.CountAsync(cancellationToken);
-        
-        var friendRequests = await baseQuery
-            .ApplyPaging(dto.PagedQuery)
-            .ToListAsync(cancellationToken);
-
+        var friendRequests = await dataQuery.ToListAsync(cancellationToken);
         var mappedRequests = friendRequests.Select(fr => friendRequestMapper.Map(fr)!).ToList();
+        
         return new PagedResult<ReadFriendRequestDto>(mappedRequests, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
 

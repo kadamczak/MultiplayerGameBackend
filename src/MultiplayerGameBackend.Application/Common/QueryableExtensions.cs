@@ -24,21 +24,18 @@ public static class QueryableExtensions
         Dictionary<string, Expression<Func<T, object>>> columnSelectors,
         Expression<Func<T, object>>? defaultSort = null)
     {
-        if (sortBy is not null)
-        {
-            var selectedColumn = columnSelectors.GetValueOrDefault(sortBy);
-            if (selectedColumn is not null)
-            {
-                return sortDirection == SortDirection.Ascending
-                    ? query.OrderBy(selectedColumn)
-                    : query.OrderByDescending(selectedColumn);
-            }
-        }
-        else if (defaultSort is not null)
+        Expression<Func<T, object>>? sortExpression = null;
+        
+        if (!string.IsNullOrWhiteSpace(sortBy))
+            sortExpression = columnSelectors.GetValueOrDefault(sortBy);
+
+        sortExpression ??= defaultSort;
+        
+        if (sortExpression is not null)
         {
             return sortDirection == SortDirection.Ascending
-                ? query.OrderBy(defaultSort)
-                : query.OrderByDescending(defaultSort);
+                ? query.OrderBy(sortExpression)
+                : query.OrderByDescending(sortExpression);
         }
 
         return query;
