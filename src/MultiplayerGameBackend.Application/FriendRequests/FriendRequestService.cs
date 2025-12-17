@@ -2,14 +2,15 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
-using MultiplayerGameBackend.Application.Friends.Requests;
+using MultiplayerGameBackend.Application.FriendRequests.Requests;
+using MultiplayerGameBackend.Application.FriendRequests.Responses;
 using MultiplayerGameBackend.Application.Friends.Responses;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 
-namespace MultiplayerGameBackend.Application.Friends;
+namespace MultiplayerGameBackend.Application.FriendRequests;
 
 public class FriendRequestService(
     ILogger<FriendRequestService> logger,

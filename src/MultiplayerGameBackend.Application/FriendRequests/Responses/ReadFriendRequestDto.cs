@@ -1,4 +1,4 @@
-namespace MultiplayerGameBackend.Application.Friends.Responses;
+namespace MultiplayerGameBackend.Application.FriendRequests.Responses;
 
 public class ReadFriendRequestDto
 {

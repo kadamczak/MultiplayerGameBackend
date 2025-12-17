@@ -1,13 +1,13 @@
 using Microsoft.Extensions.Logging;
-using MultiplayerGameBackend.Application.Friends;
-using MultiplayerGameBackend.Application.Friends.Requests;
+using MultiplayerGameBackend.Application.FriendRequests;
+using MultiplayerGameBackend.Application.FriendRequests.Requests;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Exceptions;
 using MultiplayerGameBackend.Tests.Shared.Helpers;
 using NSubstitute;
 
-namespace MultiplayerGameBackend.Application.Tests.Friends;
+namespace MultiplayerGameBackend.Application.Tests.FriendRequests;
 
 [Collection("Database")]
 public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime

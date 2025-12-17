@@ -1,8 +1,9 @@
 using MultiplayerGameBackend.Application.Common;
-using MultiplayerGameBackend.Application.Friends.Requests;
+using MultiplayerGameBackend.Application.FriendRequests.Requests;
+using MultiplayerGameBackend.Application.FriendRequests.Responses;
 using MultiplayerGameBackend.Application.Friends.Responses;
 
-namespace MultiplayerGameBackend.Application.Friends;
+namespace MultiplayerGameBackend.Application.FriendRequests;
 
 public interface IFriendRequestService
 {

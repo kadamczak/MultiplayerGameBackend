@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Application.Common.Mappings;
+using MultiplayerGameBackend.Application.FriendRequests;
 using MultiplayerGameBackend.Application.Friends;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.MerchantItemOffers;

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace MultiplayerGameBackend.Application.Friends.Requests;
+namespace MultiplayerGameBackend.Application.FriendRequests.Requests;
 
 public class SendFriendRequestDto
 {
