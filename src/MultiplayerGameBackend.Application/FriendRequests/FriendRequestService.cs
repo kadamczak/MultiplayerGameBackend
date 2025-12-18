@@ -1,10 +1,10 @@
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.FriendRequests.Requests;
 using MultiplayerGameBackend.Application.FriendRequests.Responses;
+using MultiplayerGameBackend.Application.FriendRequests.Specifications;
 using MultiplayerGameBackend.Application.Friends.Responses;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Constants;
@@ -33,7 +33,7 @@ public class FriendRequestService(
 
         // Check if already friends
         var existingAcceptedRequest = await dbContext.FriendRequests
-            .AnyAsync(FriendRequest.AreFriends(currentUserId, receiver.Id), cancellationToken);
+            .AnyAsync(FriendRequestSpecifications.AreFriends(currentUserId, receiver.Id), cancellationToken);
 
         if (existingAcceptedRequest)
             throw new ConflictException(new Dictionary<string, string[]>
@@ -43,7 +43,7 @@ public class FriendRequestService(
 
         // Check if there's already a pending request
         var existingPendingRequest = await dbContext.FriendRequests
-            .FirstOrDefaultAsync(FriendRequest.HasPendingRequest(currentUserId, dto.ReceiverId), cancellationToken);
+            .FirstOrDefaultAsync(FriendRequestSpecifications.HavePendingRequest(currentUserId, dto.ReceiverId), cancellationToken);
 
         if (existingPendingRequest is not null)
         {
@@ -65,14 +65,14 @@ public class FriendRequestService(
 
         // Check pending request limit
         var pendingRequestCount = await dbContext.FriendRequests
-            .CountAsync(fr => fr.RequesterId == currentUserId && fr.Status == FriendRequestStatuses.Pending, cancellationToken);
+            .CountAsync(FriendRequestSpecifications.IsPendingRequestSentBy(currentUserId), cancellationToken);
 
         if (pendingRequestCount >= FriendRequest.Constraints.MaxPendingRequestsPerUser)
             throw new BadRequest($"You have reached the maximum number of pending friend requests ({FriendRequest.Constraints.MaxPendingRequestsPerUser}).");
 
-        // Check friend count limit
+        // Check friend limit for both users
         var friendCount = await dbContext.FriendRequests
-            .CountAsync(FriendRequest.IsFriendshipWithUser(currentUserId), cancellationToken);
+            .CountAsync(FriendRequestSpecifications.IsFriendshipWithUser(currentUserId), cancellationToken);
 
         if (friendCount >= FriendRequest.Constraints.MaxFriendsPerUser)
             throw new BadRequest($"You have reached the maximum number of friends ({FriendRequest.Constraints.MaxFriendsPerUser}).");
@@ -110,14 +110,14 @@ public class FriendRequestService(
 
         // Check friend count limit for receiver
         var receiverFriendCount = await dbContext.FriendRequests
-            .CountAsync(FriendRequest.IsFriendshipWithUser(currentUserId), cancellationToken);
+            .CountAsync(FriendRequestSpecifications.IsFriendshipWithUser(currentUserId), cancellationToken);
 
         if (receiverFriendCount >= FriendRequest.Constraints.MaxFriendsPerUser)
             throw new BadRequest($"You have reached the maximum number of friends ({FriendRequest.Constraints.MaxFriendsPerUser}).");
 
         // Check friend count limit for requester
         var requesterFriendCount = await dbContext.FriendRequests
-            .CountAsync(FriendRequest.IsFriendshipWithUser(friendRequest.RequesterId), cancellationToken);
+            .CountAsync(FriendRequestSpecifications.IsFriendshipWithUser(friendRequest.RequesterId), cancellationToken);
 
         if (requesterFriendCount >= FriendRequest.Constraints.MaxFriendsPerUser)
             throw new BadRequest($"The requester has reached the maximum number of friends ({FriendRequest.Constraints.MaxFriendsPerUser}).");
@@ -181,7 +181,7 @@ public class FriendRequestService(
             throw new BadRequest("Invalid friend user ID.");
 
         var friendRequest = await dbContext.FriendRequests
-            .FirstOrDefaultAsync(FriendRequest.AreFriends(currentUserId, friendUserId), cancellationToken);
+            .FirstOrDefaultAsync(FriendRequestSpecifications.AreFriends(currentUserId, friendUserId), cancellationToken);
 
         if (friendRequest is null)
             throw new NotFoundException(nameof(User), nameof(User.Id), "user ID", friendUserId.ToString());
@@ -196,31 +196,35 @@ public class FriendRequestService(
         logger.LogInformation("Fetching received friend requests for user {CurrentUserId}", currentUserId);
         var searchPhraseLower = dto.PagedQuery.SearchPhrase?.ToLower();
         
-        var baseQuery = dbContext.FriendRequests
+        // Build base query for counting (without includes for performance)
+        var countQuery = dbContext.FriendRequests
             .AsNoTracking()
-            .Where(fr => fr.ReceiverId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
+            .Where(FriendRequestSpecifications.IsPendingRequestReceivedBy(currentUserId))
+            .ApplySearchFilter(
+                searchPhraseLower,
+                FriendRequestSpecifications.SearchByRequesterUsername(searchPhraseLower!));
+
+        var totalCount = await countQuery.CountAsync(cancellationToken);
+        
+        // Build query for fetching data (with includes and sorting)
+        var dataQuery = dbContext.FriendRequests
+            .AsNoTracking()
+            .Where(FriendRequestSpecifications.IsPendingRequestReceivedBy(currentUserId))
             .Include(fr => fr.Requester)
             .Include(fr => fr.Receiver)
             .ApplySearchFilter(
                 searchPhraseLower,
-                fr => fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!))
+                FriendRequestSpecifications.SearchByRequesterUsername(searchPhraseLower!))
             .ApplySorting(
                 dto.PagedQuery.SortBy,
                 dto.PagedQuery.SortDirection,
-                new Dictionary<string, Expression<Func<FriendRequest, object>>>
-                {
-                    { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
-                    { nameof(User.UserName), fr => fr.Requester.UserName! }
-                },
-                defaultSort: fr => fr.CreatedAt);
+                FriendRequestSortingSelectors.ForReceivedRequests(),
+                defaultSort: fr => fr.CreatedAt)
+            .ApplyPaging(dto.PagedQuery);
 
-        var totalCount = await baseQuery.CountAsync(cancellationToken);
-        
-        var friendRequests = await baseQuery
-            .ApplyPaging(dto.PagedQuery)
-            .ToListAsync(cancellationToken);
-
+        var friendRequests = await dataQuery.ToListAsync(cancellationToken);
         var mappedRequests = friendRequests.Select(fr => friendRequestMapper.MapToReadFriendRequestDto(fr)!).ToList();
+        
         return new PagedResult<ReadFriendRequestDto>(mappedRequests, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
 
@@ -232,30 +236,26 @@ public class FriendRequestService(
         // Build base query for counting (without includes for performance)
         var countQuery = dbContext.FriendRequests
             .AsNoTracking()
-            .Where(fr => fr.RequesterId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
+            .Where(FriendRequestSpecifications.IsPendingRequestSentBy(currentUserId))
             .ApplySearchFilter(
                 searchPhraseLower,
-                fr => fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!));
+                FriendRequestSpecifications.SearchByReceiverUsername(searchPhraseLower!));
 
         var totalCount = await countQuery.CountAsync(cancellationToken);
         
         // Build query for fetching data (with includes and sorting)
         var dataQuery = dbContext.FriendRequests
             .AsNoTracking()
-            .Where(fr => fr.RequesterId == currentUserId && fr.Status == FriendRequestStatuses.Pending)
+            .Where(FriendRequestSpecifications.IsPendingRequestSentBy(currentUserId))
             .Include(fr => fr.Requester)
             .Include(fr => fr.Receiver)
             .ApplySearchFilter(
                 searchPhraseLower,
-                fr => fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!))
+                FriendRequestSpecifications.SearchByReceiverUsername(searchPhraseLower!))
             .ApplySorting(
                 dto.PagedQuery.SortBy,
                 dto.PagedQuery.SortDirection,
-                new Dictionary<string, Expression<Func<FriendRequest, object>>>
-                {
-                    { nameof(FriendRequest.CreatedAt), fr => fr.CreatedAt },
-                    { nameof(User.UserName), fr => fr.Receiver.UserName! }
-                },
+                FriendRequestSortingSelectors.ForSentRequests(),
                 defaultSort: fr => fr.CreatedAt)
             .ApplyPaging(dto.PagedQuery);
 
@@ -272,9 +272,7 @@ public class FriendRequestService(
         
         var baseQuery = dbContext.FriendRequests
             .AsNoTracking()
-            .Where(fr =>
-                (fr.RequesterId == currentUserId || fr.ReceiverId == currentUserId) &&
-                fr.Status == FriendRequestStatuses.Accepted)
+            .Where(FriendRequestSpecifications.IsFriendshipWithUser(currentUserId))
             .Include(fr => fr.Requester)
             .Include(fr => fr.Receiver)
             .ApplySearchFilter(
@@ -284,11 +282,7 @@ public class FriendRequestService(
             .ApplySorting(
                 query.SortBy,
                 query.SortDirection,
-                new Dictionary<string, Expression<Func<FriendRequest, object>>>
-                {
-                    { nameof(FriendRequest.RespondedAt), fr => fr.RespondedAt ?? fr.CreatedAt },
-                    { nameof(User.UserName), fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName! }
-                },
+                FriendRequestSortingSelectors.ForFriends(currentUserId),
                 defaultSort: fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!);
 
         var totalCount = await baseQuery.CountAsync(cancellationToken);
@@ -301,4 +295,3 @@ public class FriendRequestService(
         return new PagedResult<ReadFriendDto>(mappedFriends, totalCount, query.PageSize, query.PageNumber);
     }
 }
-
