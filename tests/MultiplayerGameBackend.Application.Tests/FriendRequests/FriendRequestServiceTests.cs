@@ -548,10 +548,11 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await DatabaseHelper.CreateAndSaveFriendRequest(context, friend2.Id, user.Id, FriendRequestStatuses.Accepted, DateTime.UtcNow);
         await DatabaseHelper.CreateAndSaveFriendRequest(context, user.Id, notFriend.Id); // Pending - should NOT be returned
 
-        var query = new Application.Common.PagedQuery { PageNumber = 1, PageSize = 10 };
+        var query = new Common.PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetFriendsDto() { PagedQuery = query };
 
         // Act
-        var result = await friendService.GetFriends(user.Id, query, CancellationToken.None);
+        var result = await friendService.GetFriends(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.Equal(2, result.Items.Count());
@@ -574,10 +575,11 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await DatabaseHelper.CreateAndSaveFriendRequest(context, user.Id, friend1.Id, FriendRequestStatuses.Accepted, DateTime.UtcNow);
         await DatabaseHelper.CreateAndSaveFriendRequest(context, user.Id, friend2.Id, FriendRequestStatuses.Accepted, DateTime.UtcNow);
 
-        var query = new Application.Common.PagedQuery { PageNumber = 1, PageSize = 10, SearchPhrase = "alice" };
+        var query = new Common.PagedQuery { PageNumber = 1, PageSize = 10, SearchPhrase = "alice" };
+        var dto = new GetFriendsDto() { PagedQuery = query };
 
         // Act
-        var result = await friendService.GetFriends(user.Id, query, CancellationToken.None);
+        var result = await friendService.GetFriends(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.Single(result.Items);
@@ -608,9 +610,10 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
             SortBy = "UserName", 
             SortDirection = SortDirection.Ascending 
         };
+        var dto = new GetFriendsDto() { PagedQuery = query };
 
         // Act
-        var result = await friendService.GetFriends(user.Id, query, CancellationToken.None);
+        var result = await friendService.GetFriends(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.Equal(3, result.Items.Count());
@@ -636,9 +639,10 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         }
 
         var query = new Application.Common.PagedQuery { PageNumber = 2, PageSize = 2 };
+        var dto = new GetFriendsDto() { PagedQuery = query };
 
         // Act
-        var result = await friendService.GetFriends(user.Id, query, CancellationToken.None);
+        var result = await friendService.GetFriends(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.Equal(2, result.Items.Count());

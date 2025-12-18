@@ -265,10 +265,10 @@ public class FriendRequestService(
         return new PagedResult<ReadFriendRequestDto>(mappedRequests, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
 
-    public async Task<PagedResult<ReadFriendDto>> GetFriends(Guid currentUserId, PagedQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResult<ReadFriendDto>> GetFriends(Guid currentUserId, GetFriendsDto dto, CancellationToken cancellationToken)
     {
         logger.LogInformation("Fetching friends for user {CurrentUserId}", currentUserId);
-        var searchPhraseLower = query.SearchPhrase?.ToLower();
+        var searchPhraseLower = dto.PagedQuery.SearchPhrase?.ToLower();
         
         // Build base query for counting (without includes for performance)
         var countQuery = dbContext.FriendRequests
@@ -290,15 +290,15 @@ public class FriendRequestService(
                 searchPhraseLower,
                 FriendRequestSpecifications.SearchByOtherUserName(searchPhraseLower, currentUserId))
             .ApplySorting(
-                query.SortBy,
-                query.SortDirection,
+                dto.PagedQuery.SortBy,
+                dto.PagedQuery.SortDirection,
                 FriendRequestSortingSelectors.ForFriends(currentUserId),
                 defaultSort: FriendRequestSpecifications.GetOtherUserName(currentUserId))
-            .ApplyPaging(query);
+            .ApplyPaging(dto.PagedQuery);
 
         var friendRequests = await dataQuery.ToListAsync(cancellationToken);
         var mappedFriends = friendRequests.Select(fr => friendRequestMapper.MapToReadFriendDto(fr, currentUserId)!).ToList();
         
-        return new PagedResult<ReadFriendDto>(mappedFriends, totalCount, query.PageSize, query.PageNumber);
+        return new PagedResult<ReadFriendDto>(mappedFriends, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
 }

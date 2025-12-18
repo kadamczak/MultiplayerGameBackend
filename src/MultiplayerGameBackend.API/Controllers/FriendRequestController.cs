@@ -20,7 +20,8 @@ namespace MultiplayerGameBackend.API.Controllers;
 public class FriendRequestController(
     IFriendRequestService friendRequestService,
     IUserContext userContext,
-    GetFriendRequestsDtoValidator getFriendRequestsDtoValidator) : ControllerBase
+    GetFriendRequestsDtoValidator getFriendRequestsDtoValidator,
+    GetFriendsDtoValidator getFriendsDtoValidator) : ControllerBase
 {
     [HttpPost("requests")]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -109,10 +110,14 @@ public class FriendRequestController(
 
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<ReadFriendDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetFriends([FromQuery] PagedQuery query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetFriends([FromQuery] GetFriendsDto dto, CancellationToken cancellationToken)
     {
+        var validationResult = await getFriendsDtoValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid)
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
+        
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
-        var result = await friendRequestService.GetFriends(Guid.Parse(currentUser.Id), query, cancellationToken);
+        var result = await friendRequestService.GetFriends(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return Ok(result);
     }
 }
