@@ -5,7 +5,6 @@ using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.FriendRequests.Requests;
 using MultiplayerGameBackend.Application.FriendRequests.Responses;
 using MultiplayerGameBackend.Application.FriendRequests.Specifications;
-using MultiplayerGameBackend.Application.Friends.Responses;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;

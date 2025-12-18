@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.API.Tests.TestHelpers;
 using MultiplayerGameBackend.Application.FriendRequests.Requests;
 using MultiplayerGameBackend.Application.FriendRequests.Responses;
-using MultiplayerGameBackend.Application.Friends.Responses;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;

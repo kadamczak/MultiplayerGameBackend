@@ -1,5 +1,4 @@
 using MultiplayerGameBackend.Application.FriendRequests.Responses;
-using MultiplayerGameBackend.Application.Friends.Responses;
 using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.Application.Common.Mappings;

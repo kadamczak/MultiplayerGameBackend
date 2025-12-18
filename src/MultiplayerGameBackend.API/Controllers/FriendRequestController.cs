@@ -1,4 +1,3 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.API.Services;
@@ -8,8 +7,6 @@ using MultiplayerGameBackend.Application.FriendRequests;
 using MultiplayerGameBackend.Application.FriendRequests.Requests;
 using MultiplayerGameBackend.Application.FriendRequests.Requests.Validators;
 using MultiplayerGameBackend.Application.FriendRequests.Responses;
-using MultiplayerGameBackend.Application.Friends;
-using MultiplayerGameBackend.Application.Friends.Responses;
 using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.API.Controllers;
