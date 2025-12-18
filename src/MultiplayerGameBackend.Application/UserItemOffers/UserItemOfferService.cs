@@ -1,15 +1,12 @@
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
-using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Interfaces;
-using MultiplayerGameBackend.Application.UserItemOffers.Responses;
-using MultiplayerGameBackend.Application.UserItems.Responses;
 using MultiplayerGameBackend.Application.Items.Responses;
+using MultiplayerGameBackend.Application.UserItemOffers.Responses;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Application.UserItemOffers.Specifications;
-using MultiplayerGameBackend.Domain.Constants;
+using MultiplayerGameBackend.Application.UserItems.Responses;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 
@@ -18,73 +15,56 @@ namespace MultiplayerGameBackend.Application.UserItemOffers;
 public class UserItemOfferService(ILogger<UserItemOfferService> logger,
     IMultiplayerGameDbContext dbContext) : IUserItemOfferService
 {
-    public async Task<PagedResult<ReadUserItemOfferDto>> GetOffers(PagedQuery query, bool showActive, CancellationToken cancellationToken)
+    public async Task<PagedResult<ReadUserItemOfferDto>> GetOffers(GetOffersDto dto, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Fetching user item offers");
-        var searchPhraseLower = query.SearchPhrase?.ToLower();
+        logger.LogInformation("Fetching user item offers (showActive: {ShowActive})", dto.ShowActive);
+        var searchPhraseLower = dto.PagedQuery.SearchPhrase?.ToLower();
         
-        var baseQuery = dbContext.UserItemOffers
-            .AsNoTracking();
+        // Build base query for counting (without includes for performance)
+        var countQuery = dbContext.UserItemOffers
+            .AsNoTracking()
+            .Where(dto.ShowActive ? UserItemOfferSpecifications.IsActive() : UserItemOfferSpecifications.IsInactive())
+            .ApplySearchFilter(
+                searchPhraseLower,
+                dto.ShowActive 
+                    ? UserItemOfferSpecifications.SearchInActiveOffers(searchPhraseLower!)
+                    : UserItemOfferSpecifications.SearchInInactiveOffers(searchPhraseLower!));
+
+        var totalCount = await countQuery.CountAsync(cancellationToken);
         
-        baseQuery = showActive 
-            ? baseQuery.Where(o => o.BuyerId == null)
-            : baseQuery.Where(o => o.BuyerId != null);
-        
-        baseQuery = baseQuery
+        // Build query for fetching data (with includes and sorting)
+        var dataQuery = dbContext.UserItemOffers
+            .AsNoTracking()
+            .Where(dto.ShowActive ? UserItemOfferSpecifications.IsActive() : UserItemOfferSpecifications.IsInactive())
             .Include(o => o.UserItem)
-            .ThenInclude(ui => ui!.Item)
+                .ThenInclude(ui => ui.Item)
             .Include(o => o.Seller)
-            .Include(o => o.Buyer);
-            
-        if (showActive)
-        {
-            baseQuery = baseQuery.Where(o => searchPhraseLower == null 
-                || o.UserItem.Item.Name.ToLower().Contains(searchPhraseLower)
-                || o.UserItem.Item.Type.ToLower().Contains(searchPhraseLower)
-                || o.Seller.UserName.ToLower().Contains(searchPhraseLower));
-        }
-        else
-        {
-            baseQuery = baseQuery.Where(o => searchPhraseLower == null 
-                || o.UserItem.Item.Name.ToLower().Contains(searchPhraseLower)
-                || o.UserItem.Item.Type.ToLower().Contains(searchPhraseLower)
-                || o.Seller.UserName.ToLower().Contains(searchPhraseLower)
-                || o.Buyer.UserName.ToLower().Contains(searchPhraseLower));
-        }
-            
-        var totalCount = await baseQuery.CountAsync(cancellationToken);
+            .Include(o => o.Buyer)
+            .ApplySearchFilter(
+                searchPhraseLower,
+                dto.ShowActive 
+                    ? UserItemOfferSpecifications.SearchInActiveOffers(searchPhraseLower!)
+                    : UserItemOfferSpecifications.SearchInInactiveOffers(searchPhraseLower!))
+            .ApplySorting(
+                dto.PagedQuery.SortBy,
+                dto.PagedQuery.SortDirection,
+                dto.ShowActive 
+                    ? UserItemOfferSortingSelectors.ForActiveOffers()
+                    : UserItemOfferSortingSelectors.ForInactiveOffers(),
+                defaultSort: o => o.PublishedAt)
+            .ApplyPaging(dto.PagedQuery);
 
-        if (query.SortBy is not null)
-        {
-            var columnsSelector =  showActive
-                ? UserItemOfferSortingSelectors.ForActiveOffers
-                : UserItemOfferSortingSelectors.ForInactiveOffers;
-
-            var selectedColumn = columnsSelector[query.SortBy];
-
-            baseQuery = query.SortDirection == SortDirection.Ascending
-                ? baseQuery.OrderBy(selectedColumn)
-                : baseQuery.OrderByDescending(selectedColumn);
-        }
-        
-        var offerEntities = baseQuery
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize);
-        
-        var offers = await offerEntities
+        var offers = await dataQuery
             .Select(o => new ReadUserItemOfferDto
             {
                 Id = o.Id,
                 Price = o.Price,
-                
                 SellerId = o.SellerId,
                 SellerUsername = o.Seller!.UserName,
                 PublishedAt = o.PublishedAt,
-                
                 BuyerId = o.BuyerId,
                 BuyerUsername = o.Buyer!.UserName,
                 BoughtAt = o.BoughtAt,
-                
                 UserItem = new ReadUserItemDto
                 {
                     Id = o.UserItem!.Id,
@@ -95,13 +75,15 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
                         Description = o.UserItem.Item.Description,
                         Type = o.UserItem.Item.Type,
                         ThumbnailUrl = o.UserItem.Item.ThumbnailUrl,
-                    }
+                    },
+                    ActiveOfferId = null,
+                    ActiveOfferPrice = null
                 }
             })
             .ToListAsync(cancellationToken);
         
-        var result = new PagedResult<ReadUserItemOfferDto>(offers, totalCount, query.PageSize, query.PageNumber);
-        return result;
+        logger.LogInformation("Fetched {Count} offers out of {TotalCount} total", offers.Count, totalCount);
+        return new PagedResult<ReadUserItemOfferDto>(offers, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
     
     public async Task CreateOffer(Guid userId, CreateUserItemOfferDto dto, CancellationToken cancellationToken)

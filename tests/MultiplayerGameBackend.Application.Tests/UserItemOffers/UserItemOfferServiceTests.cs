@@ -50,9 +50,10 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await context.SaveChangesAsync();
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetOffersDto() { PagedQuery = query, ShowActive = true };
 
         // Act
-        var result = await service.GetOffers(query, showActive: true, CancellationToken.None);
+        var result = await service.GetOffers(dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -82,9 +83,10 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await context.SaveChangesAsync();
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetOffersDto() { PagedQuery = query, ShowActive = false };
 
         // Act
-        var result = await service.GetOffers(query, showActive: false, CancellationToken.None);
+        var result = await service.GetOffers(dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -113,9 +115,10 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await DatabaseHelper.CreateAndSaveUserItemOffer(context, seller.Id, userItem2.Id, 50);
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10, SearchPhrase = "sword" };
+        var dto = new GetOffersDto() { PagedQuery = query, ShowActive = true };
 
         // Act
-        var result = await service.GetOffers(query, showActive: true, CancellationToken.None);
+        var result = await service.GetOffers(dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -147,9 +150,10 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
             SortBy = "Price",
             SortDirection = SortDirection.Ascending
         };
+        var dto = new GetOffersDto() { PagedQuery = query, ShowActive = true };
 
         // Act
-        var result = await service.GetOffers(query, showActive: true, CancellationToken.None);
+        var result = await service.GetOffers(dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -177,9 +181,10 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         }
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 2 };
+        var dto = new GetOffersDto() { PagedQuery = query, ShowActive = true };
 
         // Act
-        var result = await service.GetOffers(query, showActive: true, CancellationToken.None);
+        var result = await service.GetOffers(dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);

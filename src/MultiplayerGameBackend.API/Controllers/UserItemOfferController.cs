@@ -27,7 +27,7 @@ public class UserItemOfferController(IUserItemOfferService userItemOfferService,
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        var offers = await userItemOfferService.GetOffers(dto.PagedQuery, dto.ShowActive, cancellationToken);
+        var offers = await userItemOfferService.GetOffers(dto, cancellationToken);
         return Ok(offers);
     }
 

@@ -6,7 +6,7 @@ namespace MultiplayerGameBackend.Application.UserItemOffers;
 
 public interface IUserItemOfferService
 {
-    Task<PagedResult<ReadUserItemOfferDto>> GetOffers(PagedQuery query, bool showActive, CancellationToken cancellationToken);
+    Task<PagedResult<ReadUserItemOfferDto>> GetOffers(GetOffersDto dto, CancellationToken cancellationToken);
     Task CreateOffer(Guid userId, CreateUserItemOfferDto dto, CancellationToken cancellationToken);
     Task DeleteOffer(Guid userId, Guid offerId, CancellationToken cancellationToken);
     Task PurchaseOffer(Guid buyerId, Guid offerId, CancellationToken cancellationToken);
