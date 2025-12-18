@@ -37,14 +37,26 @@ public static class FriendRequestSpecifications
         return fr => fr.RequesterId == userId && fr.Status == FriendRequestStatuses.Pending;
     }
     
-    public static Expression<Func<FriendRequest, bool>> SearchByRequesterUsername(string searchPhrase)
+    public static Expression<Func<FriendRequest, bool>> SearchByRequesterUsername(string searchPhraseLower)
     {
-        return fr => fr.Requester.UserName!.ToLower().Contains(searchPhrase);
+        return fr => fr.Requester.UserName!.ToLower().Contains(searchPhraseLower);
     }
     
-    public static Expression<Func<FriendRequest, bool>> SearchByReceiverUsername(string searchPhrase)
+    public static Expression<Func<FriendRequest, bool>> SearchByReceiverUsername(string searchPhraseLower)
     {
-        return fr => fr.Receiver.UserName!.ToLower().Contains(searchPhrase);
+        return fr => fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower);
+    }
+    
+    public static Expression<Func<FriendRequest, bool>> SearchByOtherUserName(string searchPhraseLower, Guid currentUserId)
+    {
+        return fr =>
+            (fr.RequesterId == currentUserId && fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower)) ||
+            (fr.ReceiverId == currentUserId && fr.Requester.UserName!.ToLower().Contains(searchPhraseLower));
+    }
+    
+    public static Expression<Func<FriendRequest, object>> GetOtherUserName(Guid currentUserId)
+    {
+        return fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!;
     }
 }
 

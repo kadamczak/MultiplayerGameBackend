@@ -276,8 +276,7 @@ public class FriendRequestService(
             .Where(FriendRequestSpecifications.IsFriendshipWithUser(currentUserId))
             .ApplySearchFilter(
                 searchPhraseLower,
-                fr => (fr.RequesterId == currentUserId && fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!)) ||
-                      (fr.ReceiverId == currentUserId && fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!)));
+                FriendRequestSpecifications.SearchByOtherUserName(searchPhraseLower, currentUserId));
 
         var totalCount = await countQuery.CountAsync(cancellationToken);
         
@@ -289,13 +288,12 @@ public class FriendRequestService(
             .Include(fr => fr.Receiver)
             .ApplySearchFilter(
                 searchPhraseLower,
-                fr => (fr.RequesterId == currentUserId && fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!)) ||
-                      (fr.ReceiverId == currentUserId && fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!)))
+                FriendRequestSpecifications.SearchByOtherUserName(searchPhraseLower, currentUserId))
             .ApplySorting(
                 query.SortBy,
                 query.SortDirection,
                 FriendRequestSortingSelectors.ForFriends(currentUserId),
-                defaultSort: fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!)
+                defaultSort: FriendRequestSpecifications.GetOtherUserName(currentUserId))
             .ApplyPaging(query);
 
         var friendRequests = await dataQuery.ToListAsync(cancellationToken);
