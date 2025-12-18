@@ -5,10 +5,11 @@ namespace MultiplayerGameBackend.Application.UserItems.Specifications;
 
 public static class UserItemSpecifications
 {
-    public static Expression<Func<UserItem, bool>> SearchByNameTypeDescription(string searchPhraseLower)
+    public static Expression<Func<UserItem, bool>> SearchByNameTypeOrDescription(string searchPhraseLower)
     {
         return ui => ui.Item.Name.ToLower().Contains(searchPhraseLower)
                      || ui.Item.Type.ToLower().Contains(searchPhraseLower)
                      || ui.Item.Description.ToLower().Contains(searchPhraseLower);
     }
+    
 }

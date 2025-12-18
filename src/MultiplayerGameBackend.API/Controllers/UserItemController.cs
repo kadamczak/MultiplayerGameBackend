@@ -30,7 +30,7 @@ public class UserItemController(IUserItemService userItemService,
         var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
         var userId = Guid.Parse(currentUser.Id);
         
-        var userItems = await userItemService.GetCurrentUserItems(userId, dto.PagedQuery, cancellationToken);
+        var userItems = await userItemService.GetUserItems(userId, dto, cancellationToken);
         return Ok(userItems);
     }
     
