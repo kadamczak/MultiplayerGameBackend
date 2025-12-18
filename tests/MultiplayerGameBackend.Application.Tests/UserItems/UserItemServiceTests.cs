@@ -41,9 +41,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         await DatabaseHelper.CreateAndSaveUserItem(context, user.Id, item2.Id);
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(user.Id, query, CancellationToken.None);
+        var result = await service.GetUserItems(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -54,7 +55,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     }
 
     [Fact]
-    public async Task GetCurrentUserItems_ShouldReturnEmptyList_WhenUserHasNoItems()
+    public async Task GetUserItems_ShouldReturnEmptyList_WhenUserHasNoItems()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -62,9 +63,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
 
         var userId = Guid.NewGuid();
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(userId, query, CancellationToken.None);
+        var result = await service.GetUserItems(userId, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -73,7 +75,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     }
 
     [Fact]
-    public async Task GetCurrentUserItems_ShouldReturnOnlyUserItems_NotOtherUsersItems()
+    public async Task GetUserItems_ShouldReturnOnlyUserItems_NotOtherUsersItems()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -90,9 +92,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         await DatabaseHelper.CreateAndSaveUserItem(context, user2.Id, item2.Id);
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(user1.Id, query, CancellationToken.None);
+        var result = await service.GetUserItems(user1.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -101,7 +104,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     }
 
     [Fact]
-    public async Task GetCurrentUserItems_ShouldFilterBySearchPhrase()
+    public async Task GetUserItems_ShouldFilterBySearchPhrase()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -117,9 +120,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         await DatabaseHelper.CreateAndSaveUserItem(context, user.Id, item2.Id);
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10, SearchPhrase = "sword" };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(user.Id, query, CancellationToken.None);
+        var result = await service.GetUserItems(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -128,7 +132,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     }
 
     [Fact]
-    public async Task GetCurrentUserItems_ShouldSortByNameAscending()
+    public async Task GetUserItems_ShouldSortByNameAscending()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -150,9 +154,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
             SortBy = "Name",
             SortDirection = SortDirection.Ascending
         };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(user.Id, query, CancellationToken.None);
+        var result = await service.GetUserItems(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -162,7 +167,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     }
 
     [Fact]
-    public async Task GetCurrentUserItems_ShouldSortByNameDescending()
+    public async Task GetUserItems_ShouldSortByNameDescending()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -184,9 +189,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
             SortBy = "Name",
             SortDirection = SortDirection.Descending
         };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(user.Id, query, CancellationToken.None);
+        var result = await service.GetUserItems(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -196,7 +202,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     }
 
     [Fact]
-    public async Task GetCurrentUserItems_ShouldReturnPaginatedResults()
+    public async Task GetUserItems_ShouldReturnPaginatedResults()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -213,9 +219,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         }
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 2 };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(user.Id, query, CancellationToken.None);
+        var result = await service.GetUserItems(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -225,7 +232,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     }
 
     [Fact]
-    public async Task GetCurrentUserItems_ShouldIncludeActiveOfferInfo_WhenItemHasActiveOffer()
+    public async Task GetUserItems_ShouldIncludeActiveOfferInfo_WhenItemHasActiveOffer()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -238,9 +245,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         var offer = await DatabaseHelper.CreateAndSaveUserItemOffer(context, user.Id, userItem.Id, 100);
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(user.Id, query, CancellationToken.None);
+        var result = await service.GetUserItems(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
@@ -252,7 +260,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     }
 
     [Fact]
-    public async Task GetCurrentUserItems_ShouldNotIncludeActiveOfferInfo_WhenOfferIsSold()
+    public async Task GetUserItems_ShouldNotIncludeActiveOfferInfo_WhenOfferIsSold()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -266,9 +274,10 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         await DatabaseHelper.CreateAndSaveUserItemOffer(context, user.Id, userItem.Id, 100, buyer.Id, DateTime.UtcNow);
 
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
+        var dto = new GetUserItemsDto { PagedQuery = query };
 
         // Act
-        var result = await service.GetCurrentUserItems(user.Id, query, CancellationToken.None);
+        var result = await service.GetUserItems(user.Id, dto, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);

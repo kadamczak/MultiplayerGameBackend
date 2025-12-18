@@ -40,6 +40,8 @@ public class User : IdentityUser<Guid>
     public List<UserItem> UserItems { get; set; } = [];
     public List<UserItemOffer> SoldItemOffers { get; set; } = [];
     public List<UserItemOffer> BoughtItemOffers { get; set; } = [];
+    public List<FriendRequest> SentFriendRequests { get; set; } = [];
+    public List<FriendRequest> ReceivedFriendRequests { get; set; } = [];
     
     public UserCustomization? Customization { get; set; }
 }

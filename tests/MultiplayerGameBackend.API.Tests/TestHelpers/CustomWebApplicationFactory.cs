@@ -104,6 +104,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
         await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"AspNetUserTokens\" CASCADE");
         await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"AspNetUsers\" CASCADE");
         await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"AspNetRoles\" CASCADE");
+        await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"FriendRequests\" CASCADE");
     }
 
     public async Task<User> CreateTestUser(string username, string email, string password, string role = "User")

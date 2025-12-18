@@ -1,6 +1,8 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Application.Common.Mappings;
+using MultiplayerGameBackend.Application.FriendRequests;
+using MultiplayerGameBackend.Application.Friends;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.Items;
@@ -23,8 +25,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserItemService, UserItemService>();
         services.AddScoped<IUserItemOfferService, UserItemOfferService>();
         services.AddScoped<IMerchantItemOfferService, MerchantItemOfferService>();
+        services.AddScoped<IFriendRequestService, FriendRequestService>();
         
         services.AddScoped<ItemMapper>();
         services.AddScoped<UserCustomizationMapper>();
+        services.AddScoped<FriendRequestMapper>();
+        services.AddScoped<UserItemMapper>();
+        services.AddScoped<UserItemOfferMapper>();
     }
 }

@@ -228,5 +228,25 @@ public static class DatabaseHelper
     }
 
     #endregion
+
+    #region FriendRequest Helpers
+
+    /// <summary>
+    /// Creates and saves a friend request to the database
+    /// </summary>
+    public static async Task<FriendRequest> CreateAndSaveFriendRequest(
+        MultiplayerGameDbContext context,
+        Guid requesterId,
+        Guid receiverId,
+        string status = FriendRequestStatuses.Pending,
+        DateTime? respondedAt = null)
+    {
+        var friendRequest = TestEntityFactory.CreateFriendRequest(requesterId, receiverId, status, respondedAt);
+        context.FriendRequests.Add(friendRequest);
+        await context.SaveChangesAsync();
+        return friendRequest;
+    }
+
+    #endregion
 }
 

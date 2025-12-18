@@ -47,6 +47,7 @@ public class DatabaseFixture : IAsyncLifetime
         context.UserCustomizations.RemoveRange(context.UserCustomizations);
         context.Items.RemoveRange(context.Items);
         context.InGameMerchants.RemoveRange(context.InGameMerchants);
+        context.FriendRequests.RemoveRange(context.FriendRequests);
         
         // Clean Identity tables
         context.UserRoles.RemoveRange(context.UserRoles);

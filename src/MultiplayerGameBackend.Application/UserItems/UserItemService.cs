@@ -6,6 +6,7 @@ using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.UserItems.Requests;
 using MultiplayerGameBackend.Application.UserItems.Responses;
+using MultiplayerGameBackend.Application.UserItems.Specifications;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
@@ -15,41 +16,36 @@ namespace MultiplayerGameBackend.Application.UserItems;
 public class UserItemService(ILogger<UserItemService> logger,
     IMultiplayerGameDbContext dbContext) : IUserItemService
 {
-    public async Task<PagedResult<ReadUserItemDto>> GetCurrentUserItems(Guid userId,  PagedQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResult<ReadUserItemDto>> GetUserItems(Guid userId,  GetUserItemsDto dto, CancellationToken cancellationToken)
     {
-        var searchPhraseLower = query.SearchPhrase?.ToLower();
-        var baseQuery = dbContext.UserItems
+        logger.LogInformation("Fetching sent friend requests for user {CurrentUserId}", userId);
+        var searchPhraseLower = dto.PagedQuery.SearchPhrase?.ToLower();
+        
+        // Build base query for counting (without includes for performance)
+        var countQuery = dbContext.UserItems
+            .AsNoTracking()
+            .Where(ui => ui.UserId == userId)
+            .ApplySearchFilter(
+                searchPhraseLower,
+                UserItemSpecifications.SearchByNameTypeOrDescription(searchPhraseLower));
+
+        var totalCount = await countQuery.CountAsync(cancellationToken);
+        
+        var dataQuery = dbContext.UserItems
             .AsNoTracking()
             .Where(ui => ui.UserId == userId)
             .Include(ui => ui.Item)
-            .Where(o => searchPhraseLower == null 
-                        || o.Item.Name.ToLower().Contains(searchPhraseLower)
-                        || o.Item.Type.ToLower().Contains(searchPhraseLower)
-                        || o.Item.Description.ToLower().Contains(searchPhraseLower));
+            .ApplySearchFilter(
+                searchPhraseLower,
+                UserItemSpecifications.SearchByNameTypeOrDescription(searchPhraseLower))
+            .ApplySorting(
+                dto.PagedQuery.SortBy,
+                dto.PagedQuery.SortDirection,
+                UserItemSortingSelectors.ByNameTypeOrDescription(),
+                defaultSort: fr => fr.Item.Name)
+            .ApplyPaging(dto.PagedQuery);
         
-        var totalCount = await baseQuery.CountAsync(cancellationToken);
-        
-        if (query.SortBy is not null)
-        {
-            var columnsSelector =  new Dictionary<string, Expression<Func<UserItem, object>>>()
-            {
-                { nameof(Item.Name), r => r.Item.Name },
-                { nameof(Item.Type), r => r.Item.Type },
-                { nameof(Item.Description), r => r.Item.Description }
-            };
-
-            var selectedColumn = columnsSelector[query.SortBy];
-
-            baseQuery = query.SortDirection == SortDirection.Ascending
-                ? baseQuery.OrderBy(selectedColumn)
-                : baseQuery.OrderByDescending(selectedColumn);
-        }
-        
-        var userItemEntities = baseQuery
-            .Skip(query.PageSize * (query.PageNumber - 1))
-            .Take(query.PageSize);
-        
-        var userItems = await userItemEntities
+        var userItems = await dataQuery
             .Select(ui => new
             {
                 ui.Id,
@@ -75,9 +71,9 @@ public class UserItemService(ILogger<UserItemService> logger,
                 ActiveOfferPrice = x.ActiveOffer != null ? x.ActiveOffer.Price : null,
             })
             .ToListAsync(cancellationToken);
-
+        
         logger.LogInformation("Fetched {totalCount} items for user {UserId}", totalCount, userId);
-        var result = new PagedResult<ReadUserItemDto>(userItems, totalCount, query.PageSize, query.PageNumber);
+        var result = new PagedResult<ReadUserItemDto>(userItems, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
         return result;
     }
 
