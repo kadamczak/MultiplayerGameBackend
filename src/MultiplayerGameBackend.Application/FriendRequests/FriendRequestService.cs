@@ -270,7 +270,19 @@ public class FriendRequestService(
         logger.LogInformation("Fetching friends for user {CurrentUserId}", currentUserId);
         var searchPhraseLower = query.SearchPhrase?.ToLower();
         
-        var baseQuery = dbContext.FriendRequests
+        // Build base query for counting (without includes for performance)
+        var countQuery = dbContext.FriendRequests
+            .AsNoTracking()
+            .Where(FriendRequestSpecifications.IsFriendshipWithUser(currentUserId))
+            .ApplySearchFilter(
+                searchPhraseLower,
+                fr => (fr.RequesterId == currentUserId && fr.Receiver.UserName!.ToLower().Contains(searchPhraseLower!)) ||
+                      (fr.ReceiverId == currentUserId && fr.Requester.UserName!.ToLower().Contains(searchPhraseLower!)));
+
+        var totalCount = await countQuery.CountAsync(cancellationToken);
+        
+        // Build query for fetching data (with includes and sorting)
+        var dataQuery = dbContext.FriendRequests
             .AsNoTracking()
             .Where(FriendRequestSpecifications.IsFriendshipWithUser(currentUserId))
             .Include(fr => fr.Requester)
@@ -283,15 +295,12 @@ public class FriendRequestService(
                 query.SortBy,
                 query.SortDirection,
                 FriendRequestSortingSelectors.ForFriends(currentUserId),
-                defaultSort: fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!);
+                defaultSort: fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!)
+            .ApplyPaging(query);
 
-        var totalCount = await baseQuery.CountAsync(cancellationToken);
-
-        var friendRequests = await baseQuery
-            .ApplyPaging(query)
-            .ToListAsync(cancellationToken);
-
+        var friendRequests = await dataQuery.ToListAsync(cancellationToken);
         var mappedFriends = friendRequests.Select(fr => friendRequestMapper.MapToReadFriendDto(fr, currentUserId)!).ToList();
+        
         return new PagedResult<ReadFriendDto>(mappedFriends, totalCount, query.PageSize, query.PageNumber);
     }
 }
