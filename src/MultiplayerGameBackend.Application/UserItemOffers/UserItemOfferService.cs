@@ -8,6 +8,7 @@ using MultiplayerGameBackend.Application.UserItemOffers.Responses;
 using MultiplayerGameBackend.Application.UserItems.Responses;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
+using MultiplayerGameBackend.Application.UserItemOffers.Specifications;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
@@ -56,8 +57,8 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         if (query.SortBy is not null)
         {
             var columnsSelector =  showActive
-                ? ActiveColumnsSelector
-                : InactiveColumnsSelector;
+                ? UserItemOfferSortingSelectors.ForActiveOffers
+                : UserItemOfferSortingSelectors.ForInactiveOffers;
 
             var selectedColumn = columnsSelector[query.SortBy];
 
@@ -102,26 +103,6 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         var result = new PagedResult<ReadUserItemOfferDto>(offers, totalCount, query.PageSize, query.PageNumber);
         return result;
     }
-    
-    Dictionary<string, Expression<Func<UserItemOffer, object>>> ActiveColumnsSelector = new()
-    {
-        { nameof(UserItem.Item.Name), r => r.UserItem.Item.Name },
-        { nameof(UserItem.Item.Type), r => r.UserItem.Item.Type },
-        { "SellerUserName", r => r.Seller.UserName },
-        { nameof(UserItemOffer.Price), r => r.Price },
-        { nameof(UserItemOffer.PublishedAt), r => r.PublishedAt },
-    };
-    
-    Dictionary<string, Expression<Func<UserItemOffer, object>>> InactiveColumnsSelector = new()
-    {
-        { nameof(UserItem.Item.Name), r => r.UserItem.Item.Name },
-        { nameof(UserItem.Item.Type), r => r.UserItem.Item.Type },
-        { "SellerUserName", r => r.Seller.UserName },
-        { nameof(UserItemOffer.Price), r => r.Price },
-        { nameof(UserItemOffer.PublishedAt), r => r.PublishedAt },
-        { nameof(UserItemOffer.BoughtAt), r => r.BoughtAt },
-        { "BuyerUserName", r => r.Buyer.UserName },
-    };
     
     public async Task CreateOffer(Guid userId, CreateUserItemOfferDto dto, CancellationToken cancellationToken)
     {

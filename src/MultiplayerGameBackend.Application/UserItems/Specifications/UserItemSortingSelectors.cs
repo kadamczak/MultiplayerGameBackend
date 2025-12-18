@@ -3,7 +3,7 @@ using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.Application.UserItems.Specifications;
 
-public class UserItemSortingSelectors
+public static class UserItemSortingSelectors
 {
     public static Dictionary<string, Expression<Func<UserItem, object>>> ByNameTypeOrDescription()
         => new()
@@ -12,6 +12,4 @@ public class UserItemSortingSelectors
             { nameof(Item.Type), r => r.Item.Type },
             { nameof(Item.Description), r => r.Item.Description }
         };
-    
-    
 }
