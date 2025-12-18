@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
+using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Exceptions;
-using MultiplayerGameBackend.Tests.Shared.Factories;
 using MultiplayerGameBackend.Tests.Shared.Helpers;
 using NSubstitute;
 
@@ -16,11 +16,14 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
 {
     private readonly DatabaseFixture _fixture;
     private readonly ILogger<UserItemOfferService> _logger;
+    private readonly UserItemOfferMapper _userItemOfferMapper;
 
     public UserItemOfferServiceTests(DatabaseFixture fixture)
     {
         _fixture = fixture;
         _logger = Substitute.For<ILogger<UserItemOfferService>>();
+        var itemMapper = new ItemMapper();
+        _userItemOfferMapper = new UserItemOfferMapper(itemMapper);
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -34,7 +37,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -67,7 +70,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -101,7 +104,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -131,7 +134,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -167,7 +170,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -202,7 +205,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -231,7 +234,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -253,7 +256,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var owner = await DatabaseHelper.CreateAndSaveUser(userManager, "owner", "owner@example.com", "Password123!");
@@ -278,7 +281,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -303,7 +306,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -344,7 +347,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -365,7 +368,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -381,7 +384,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var owner = await DatabaseHelper.CreateAndSaveUser(userManager, "owner", "owner@example.com", "Password123!");
@@ -405,7 +408,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!", balance: 100);
@@ -439,7 +442,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var buyer = await DatabaseHelper.CreateAndSaveUser(userManager, "buyer", "buyer@example.com", "Password123!", balance: 500);
@@ -455,7 +458,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@example.com", "Password123!", balance: 500);
@@ -476,7 +479,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!");
@@ -495,7 +498,7 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemOfferService(_logger, context);
+        var service = new UserItemOfferService(_logger, context, _userItemOfferMapper);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var seller = await DatabaseHelper.CreateAndSaveUser(userManager, "seller", "seller@example.com", "Password123!", balance: 100);
@@ -512,7 +515,6 @@ public class UserItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
 
         Assert.Contains("Balance", exception.Errors.Keys);
     }
-
 
     #endregion
 }

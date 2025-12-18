@@ -1,19 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
+using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.Interfaces;
-using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.UserItemOffers.Responses;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Application.UserItemOffers.Specifications;
-using MultiplayerGameBackend.Application.UserItems.Responses;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.Application.UserItemOffers;
 
 public class UserItemOfferService(ILogger<UserItemOfferService> logger,
-    IMultiplayerGameDbContext dbContext) : IUserItemOfferService
+    IMultiplayerGameDbContext dbContext,
+    UserItemOfferMapper userItemOfferMapper) : IUserItemOfferService
 {
     public async Task<PagedResult<ReadUserItemOfferDto>> GetOffers(GetOffersDto dto, CancellationToken cancellationToken)
     {
@@ -54,33 +54,8 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
                 defaultSort: o => o.PublishedAt)
             .ApplyPaging(dto.PagedQuery);
 
-        var offers = await dataQuery
-            .Select(o => new ReadUserItemOfferDto
-            {
-                Id = o.Id,
-                Price = o.Price,
-                SellerId = o.SellerId,
-                SellerUsername = o.Seller!.UserName,
-                PublishedAt = o.PublishedAt,
-                BuyerId = o.BuyerId,
-                BuyerUsername = o.Buyer!.UserName,
-                BoughtAt = o.BoughtAt,
-                UserItem = new ReadUserItemDto
-                {
-                    Id = o.UserItem!.Id,
-                    Item = new ReadItemDto
-                    {
-                        Id = o.UserItem.Item!.Id,
-                        Name = o.UserItem.Item.Name,
-                        Description = o.UserItem.Item.Description,
-                        Type = o.UserItem.Item.Type,
-                        ThumbnailUrl = o.UserItem.Item.ThumbnailUrl,
-                    },
-                    ActiveOfferId = null,
-                    ActiveOfferPrice = null
-                }
-            })
-            .ToListAsync(cancellationToken);
+        var offerEntities = await dataQuery.ToListAsync(cancellationToken);
+        var offers = offerEntities.Select(o => userItemOfferMapper.MapToReadUserItemOfferDto(o)).ToList();
         
         logger.LogInformation("Fetched {Count} offers out of {TotalCount} total", offers.Count, totalCount);
         return new PagedResult<ReadUserItemOfferDto>(offers, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
