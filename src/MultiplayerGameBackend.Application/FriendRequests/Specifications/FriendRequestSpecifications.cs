@@ -27,6 +27,13 @@ public static class FriendRequestSpecifications
         return fr => (fr.RequesterId == userId || fr.ReceiverId == userId) && fr.Status == FriendRequestStatuses.Accepted;
     }
     
+    public static Expression<Func<FriendRequest, bool>> HasActiveRelationshipWith(Guid userId)
+    {
+        return fr =>
+            (fr.RequesterId == userId || fr.ReceiverId == userId) &&
+            (fr.Status == FriendRequestStatuses.Pending || fr.Status == FriendRequestStatuses.Accepted);
+    }
+    
     public static Expression<Func<FriendRequest, bool>> IsPendingRequestReceivedBy(Guid userId)
     {
         return fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatuses.Pending;
@@ -57,6 +64,11 @@ public static class FriendRequestSpecifications
     public static Expression<Func<FriendRequest, object>> GetOtherUserName(Guid currentUserId)
     {
         return fr => fr.RequesterId == currentUserId ? fr.Receiver.UserName! : fr.Requester.UserName!;
+    }
+    
+    public static Expression<Func<FriendRequest, Guid>> GetOtherUserId(Guid currentUserId)
+    {
+        return fr => fr.RequesterId == currentUserId ? fr.ReceiverId : fr.RequesterId;
     }
 }
 

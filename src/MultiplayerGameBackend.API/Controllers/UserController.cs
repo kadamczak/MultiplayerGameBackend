@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.API.Services;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Extensions;
-using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
@@ -17,6 +17,7 @@ namespace MultiplayerGameBackend.API.Controllers;
 [Authorize]
 public class UserController(
     ModifyUserRoleDtoValidator modifyUserRoleDtoValidator,
+    SearchUsersDtoValidator searchUsersDtoValidator,
     IUserService userService,
     IUserContext userContext) : ControllerBase
 {
@@ -124,5 +125,20 @@ public class UserController(
         
         await userService.DeleteProfilePicture(userId, cancellationToken);
         return NoContent();
+    }
+
+    [HttpGet("friendable")]
+    [ProducesResponseType(typeof(PagedResult<UserSearchResultDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> SearchFriendableUsers([FromQuery] SearchUsersDto dto, CancellationToken cancellationToken)
+    {
+        var validationResult = await searchUsersDtoValidator.ValidateAsync(dto, cancellationToken);
+        if (!validationResult.IsValid)
+            return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
+        
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var result = await userService.SearchFriendableUsers(Guid.Parse(currentUser.Id), dto, cancellationToken);
+        return Ok(result);
     }
 }

@@ -1,13 +1,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Common.Mappings;
-using MultiplayerGameBackend.Application.Identity;
+using MultiplayerGameBackend.Application.FriendRequests.Specifications;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Items.Responses;
 using MultiplayerGameBackend.Application.UserItems.Responses;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Responses;
+using MultiplayerGameBackend.Application.Users.Specifications;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Domain.Exceptions;
 
@@ -176,5 +178,54 @@ public class UserService(ILogger<UserService> logger,
         user.ProfilePictureUrl = null;
         await userManager.UpdateAsync(user);
         logger.LogInformation("Profile picture deleted for user {UserId}", userId);
+    }
+
+    public async Task<PagedResult<UserSearchResultDto>> SearchFriendableUsers(Guid currentUserId, SearchUsersDto dto, CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Searching users for user {CurrentUserId} with search phrase: {SearchPhrase}", 
+            currentUserId, dto.PagedQuery.SearchPhrase);
+        var searchPhraseLower = dto.PagedQuery.SearchPhrase?.ToLower();
+
+        // Get users that have any relationship (friend or pending request) with the current user
+        var usersWithRelationship = await dbContext.FriendRequests
+            .AsNoTracking()
+            .Where(FriendRequestSpecifications.HasActiveRelationshipWith(currentUserId))
+            .Select(FriendRequestSpecifications.GetOtherUserId(currentUserId))
+            .ToListAsync(cancellationToken);
+
+        // Build count query (without includes for performance)
+        var countQuery = dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.Id != currentUserId && !usersWithRelationship.Contains(u.Id))
+            .ApplySearchFilter(
+                searchPhraseLower,
+                UserSpecifications.SearchByUsername(searchPhraseLower!));
+
+        var totalCount = await countQuery.CountAsync(cancellationToken);
+
+        // Build data query (with sorting and paging)
+        var dataQuery = dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.Id != currentUserId && !usersWithRelationship.Contains(u.Id))
+            .ApplySearchFilter(
+                searchPhraseLower,
+                UserSpecifications.SearchByUsername(searchPhraseLower!))
+            .ApplySorting(
+                dto.PagedQuery.SortBy,
+                dto.PagedQuery.SortDirection,
+                UserSortingSelectors.ByUserName(),
+                defaultSort: u => u.UserName!)
+            .ApplyPaging(dto.PagedQuery);
+
+        var users = await dataQuery
+            .Select(u => new UserSearchResultDto
+            {
+                UserId = u.Id,
+                UserName = u.UserName!,
+                ProfilePictureUrl = u.ProfilePictureUrl
+            })
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<UserSearchResultDto>(users, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);
     }
 }
