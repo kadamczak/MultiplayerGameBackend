@@ -652,7 +652,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         Assert.NotNull(result);
         Assert.Equal(1, result.TotalItemsCount);
         Assert.Single(result.Items);
-        Assert.Equal("alice", result.Items.First().RequesterUsername);
+        Assert.Equal("alice", result.Items.First().RequesterUserName);
     }
 
     [Fact]
@@ -739,9 +739,9 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         var result = await response.Content.ReadFromJsonAsync<PagedResult<ReadFriendRequestDto>>();
         Assert.NotNull(result);
         var items = result.Items.ToList();
-        Assert.Equal("alice", items[0].RequesterUsername);
-        Assert.Equal("mike", items[1].RequesterUsername);
-        Assert.Equal("zack", items[2].RequesterUsername);
+        Assert.Equal("alice", items[0].RequesterUserName);
+        Assert.Equal("mike", items[1].RequesterUserName);
+        Assert.Equal("zack", items[2].RequesterUserName);
     }
 
     [Fact]
@@ -819,8 +819,8 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal(3, result.TotalItemsCount); // alice, alvin
         Assert.Equal(2, result.Items.Count()); // Page size 2
         var items = result.Items.ToList();
-        Assert.Equal("alice", items[0].RequesterUsername);
-        Assert.Equal("almanda", items[1].RequesterUsername);
+        Assert.Equal("alice", items[0].RequesterUserName);
+        Assert.Equal("almanda", items[1].RequesterUserName);
     }
 
     #endregion
@@ -907,7 +907,7 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         Assert.NotNull(result);
         Assert.Equal(1, result.TotalItemsCount);
         Assert.Single(result.Items);
-        Assert.Equal("bob", result.Items.First().ReceiverUsername);
+        Assert.Equal("bob", result.Items.First().ReceiverUserName);
     }
 
     [Fact]
@@ -993,9 +993,9 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         var result = await response.Content.ReadFromJsonAsync<PagedResult<ReadFriendRequestDto>>();
         Assert.NotNull(result);
         var items = result.Items.ToList();
-        Assert.Equal("alice", items[0].ReceiverUsername);
-        Assert.Equal("mike", items[1].ReceiverUsername);
-        Assert.Equal("zack", items[2].ReceiverUsername);
+        Assert.Equal("alice", items[0].ReceiverUserName);
+        Assert.Equal("mike", items[1].ReceiverUserName);
+        Assert.Equal("zack", items[2].ReceiverUserName);
     }
 
     [Fact]
@@ -1073,8 +1073,8 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         Assert.Equal(3, result.TotalItemsCount); // userA, userB, userC
         Assert.Equal(2, result.Items.Count()); // Page size 2
         var items = result.Items.ToList();
-        Assert.Equal("userA", items[0].ReceiverUsername);
-        Assert.Equal("userB", items[1].ReceiverUsername);
+        Assert.Equal("userA", items[0].ReceiverUserName);
+        Assert.Equal("userB", items[1].ReceiverUserName);
     }
 
     #endregion

@@ -492,7 +492,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
 
         // Assert
         Assert.Single(result.Items);
-        Assert.Equal("alice", result.Items.ElementAt(0).RequesterUsername);
+        Assert.Equal("alice", result.Items.ElementAt(0).RequesterUserName);
     }
 
     #endregion
@@ -583,7 +583,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
 
         // Assert
         Assert.Single(result.Items);
-        Assert.Equal("alice", result.Items.ElementAt(0).Username);
+        Assert.Equal("alice", result.Items.ElementAt(0).UserName);
     }
 
     [Fact]
@@ -617,9 +617,9 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
 
         // Assert
         Assert.Equal(3, result.Items.Count());
-        Assert.Equal("alice", result.Items.ElementAt(0).Username);
-        Assert.Equal("bob", result.Items.ElementAt(1).Username);
-        Assert.Equal("charlie", result.Items.ElementAt(2).Username);
+        Assert.Equal("alice", result.Items.ElementAt(0).UserName);
+        Assert.Equal("bob", result.Items.ElementAt(1).UserName);
+        Assert.Equal("charlie", result.Items.ElementAt(2).UserName);
     }
 
     [Fact]

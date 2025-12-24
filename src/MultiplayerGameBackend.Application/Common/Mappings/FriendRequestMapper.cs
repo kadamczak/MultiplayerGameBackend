@@ -14,10 +14,10 @@ public class FriendRequestMapper
         {
             Id = friendRequest.Id,
             RequesterId = friendRequest.RequesterId,
-            RequesterUsername = friendRequest.Requester.UserName!,
+            RequesterUserName = friendRequest.Requester.UserName!,
             RequesterProfilePictureUrl = friendRequest.Requester.ProfilePictureUrl,
             ReceiverId = friendRequest.ReceiverId,
-            ReceiverUsername = friendRequest.Receiver.UserName!,
+            ReceiverUserName = friendRequest.Receiver.UserName!,
             ReceiverProfilePictureUrl = friendRequest.Receiver.ProfilePictureUrl,
             Status = friendRequest.Status,
             CreatedAt = friendRequest.CreatedAt,
@@ -35,7 +35,7 @@ public class FriendRequestMapper
         return new ReadFriendDto
         {
             UserId = isFriendTheRequester ? friendRequest.RequesterId : friendRequest.ReceiverId,
-            Username = isFriendTheRequester ? friendRequest.Requester.UserName! : friendRequest.Receiver.UserName!,
+            UserName = isFriendTheRequester ? friendRequest.Requester.UserName! : friendRequest.Receiver.UserName!,
             ProfilePictureUrl = isFriendTheRequester ? friendRequest.Requester.ProfilePictureUrl : friendRequest.Receiver.ProfilePictureUrl,
             FriendsSince = friendRequest.RespondedAt ?? friendRequest.CreatedAt
         };
