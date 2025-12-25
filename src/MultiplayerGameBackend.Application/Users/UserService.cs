@@ -220,7 +220,7 @@ public class UserService(ILogger<UserService> logger,
         var users = await dataQuery
             .Select(u => new UserSearchResultDto
             {
-                UserId = u.Id,
+                Id = u.Id,
                 UserName = u.UserName!,
                 ProfilePictureUrl = u.ProfilePictureUrl
             })

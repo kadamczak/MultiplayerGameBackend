@@ -2,7 +2,7 @@ namespace MultiplayerGameBackend.Application.Users.Responses;
 
 public class UserSearchResultDto
 {
-    public Guid UserId { get; set; }
+    public Guid Id { get; set; }
     public string UserName { get; set; } = string.Empty;
     public string? ProfilePictureUrl { get; set; }
 }
