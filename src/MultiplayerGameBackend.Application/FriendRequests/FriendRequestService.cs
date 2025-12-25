@@ -144,11 +144,9 @@ public class FriendRequestService(
         if (friendRequest.Status != FriendRequestStatuses.Pending)
             throw new BadRequest("This friend request has already been responded to.");
 
-        friendRequest.Status = FriendRequestStatuses.Rejected;
-        friendRequest.RespondedAt = DateTime.UtcNow;
-
+        dbContext.FriendRequests.Remove(friendRequest);
         await dbContext.SaveChangesAsync(cancellationToken);
-        logger.LogInformation("Friend request {RequestId} rejected successfully", requestId);
+        logger.LogInformation("Friend request {RequestId} rejected and deleted successfully", requestId);
     }
 
     public async Task CancelFriendRequest(Guid userId, Guid requestId, CancellationToken cancellationToken)
