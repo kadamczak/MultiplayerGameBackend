@@ -327,13 +327,11 @@ public class FriendRequestControllerTests : IClassFixture<CustomWebApplicationFa
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        // Verify the friend request was rejected
+        // Verify the friend request was deleted
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<MultiplayerGameDbContext>();
-        var updatedRequest = await context.FriendRequests.FindAsync(friendRequest.Id);
-        Assert.NotNull(updatedRequest);
-        Assert.Equal(FriendRequestStatuses.Rejected, updatedRequest.Status);
-        Assert.NotNull(updatedRequest.RespondedAt);
+        var deletedRequest = await context.FriendRequests.FindAsync(friendRequest.Id);
+        Assert.Null(deletedRequest);
     }
 
     [Fact]

@@ -231,7 +231,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     #region RejectFriendRequest Tests
 
     [Fact]
-    public async Task RejectFriendRequest_ShouldRejectRequest_WhenValid()
+    public async Task RejectFriendRequest_ShouldDeleteRequest_WhenValid()
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
@@ -246,10 +246,8 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         await friendService.RejectFriendRequest(receiver.Id, request.Id, CancellationToken.None);
 
         // Assert
-        var updatedRequest = await context.FriendRequests.FindAsync(request.Id);
-        Assert.NotNull(updatedRequest);
-        Assert.Equal(FriendRequestStatuses.Rejected, updatedRequest.Status);
-        Assert.NotNull(updatedRequest.RespondedAt);
+        var deletedRequest = await context.FriendRequests.FindAsync(request.Id);
+        Assert.Null(deletedRequest);
     }
 
     [Fact]
@@ -513,7 +511,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
         var receiver3 = await DatabaseHelper.CreateAndSaveUser(userManager, "rec3", "rec3@test.com");
 
         await DatabaseHelper.CreateAndSaveFriendRequest(context, user.Id, receiver1.Id); // Pending - should be returned
-        await DatabaseHelper.CreateAndSaveFriendRequest(context, user.Id, receiver2.Id, FriendRequestStatuses.Rejected); // Rejected - should NOT be returned
+        await DatabaseHelper.CreateAndSaveFriendRequest(context, user.Id, receiver2.Id, FriendRequestStatuses.Accepted); // Accepted - should NOT be returned
         await DatabaseHelper.CreateAndSaveFriendRequest(context, receiver3.Id, user.Id); // Received by user - should NOT be returned
 
         var query = new Common.PagedQuery { PageNumber = 1, PageSize = 10 };
