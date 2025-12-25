@@ -1,10 +1,13 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.API.Middleware;
 
-public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
+public class ErrorHandlingMiddleware(
+    ILogger<ErrorHandlingMiddleware> logger,
+    ILocalizationService localizationService) : IMiddleware
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -32,7 +35,7 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
     
             await WriteValidationProblemAsync(context, new ValidationProblemDetails(conflict.Errors!)
             {
-                Title = "One or more conflicts occurred.",
+                Title = localizationService.GetString("Error.OneOrMoreConflicts"),
                 Status = StatusCodes.Status409Conflict
             });
         }
@@ -44,7 +47,7 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             {
                 await WriteValidationProblemAsync(context, new ValidationProblemDetails(unprocessableEntity.Errors)
                 {
-                    Title = "One or more errors occurred.",
+                    Title = localizationService.GetString("Error.OneOrMoreErrors"),
                     Status = StatusCodes.Status422UnprocessableEntity
                 });
             }
@@ -98,7 +101,7 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             logger.LogError(ex, ex.Message);
             await WriteProblemAsync(context, new ProblemDetails
             {
-                Title = "Something went wrong.",
+                Title = localizationService.GetString("Error.SomethingWentWrong"),
                 Status = StatusCodes.Status500InternalServerError
             });
         }

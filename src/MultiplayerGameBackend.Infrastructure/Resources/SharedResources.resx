@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- General Error Messages -->
+  <data name="Error.SomethingWentWrong" xml:space="preserve">
+    <value>Something went wrong.</value>
+  </data>
+  <data name="Error.OneOrMoreConflicts" xml:space="preserve">
+    <value>One or more conflicts occurred.</value>
+  </data>
+  <data name="Error.OneOrMoreErrors" xml:space="preserve">
+    <value>One or more errors occurred.</value>
+  </data>
+  
+  <!-- Authentication/Authorization Errors -->
+  <data name="Error.UserMustBeAuthenticated" xml:space="preserve">
+    <value>User must be authenticated.</value>
+  </data>
+  <data name="Error.InvalidCredentials" xml:space="preserve">
+    <value>Invalid credentials.</value>
+  </data>
+  <data name="Error.InvalidToken" xml:space="preserve">
+    <value>Invalid token.</value>
+  </data>
+  <data name="Error.RefreshTokenExpired" xml:space="preserve">
+    <value>Refresh token has expired.</value>
+  </data>
+  <data name="Error.UserAlreadyExists" xml:space="preserve">
+    <value>User already exists.</value>
+  </data>
+  <data name="Error.EmailAlreadyConfirmed" xml:space="preserve">
+    <value>Email is already confirmed.</value>
+  </data>
+  <data name="Error.EmailNotConfirmed" xml:space="preserve">
+    <value>Email is not confirmed.</value>
+  </data>
+  <data name="Error.TwoFactorNotEnabled" xml:space="preserve">
+    <value>Two-factor authentication is not enabled.</value>
+  </data>
+  <data name="Error.PasswordDoesNotMeetRequirements" xml:space="preserve">
+    <value>Password does not meet requirements.</value>
+  </data>
+  
+  <!-- Friend Request Errors -->
+  <data name="Error.CannotSendFriendRequestToYourself" xml:space="preserve">
+    <value>You cannot send a friend request to yourself.</value>
+  </data>
+  <data name="Error.AlreadyFriends" xml:space="preserve">
+    <value>You are already friends with this user.</value>
+  </data>
+  <data name="Error.PendingFriendRequestExists" xml:space="preserve">
+    <value>A pending friend request already exists between you and this user.</value>
+  </data>
+  <data name="Error.MaxPendingRequestsReached" xml:space="preserve">
+    <value>You have reached the maximum number of pending friend requests ({0}).</value>
+  </data>
+  <data name="Error.MaxFriendsReached" xml:space="preserve">
+    <value>You have reached the maximum number of friends ({0}).</value>
+  </data>
+  <data name="Error.RequesterMaxFriendsReached" xml:space="preserve">
+    <value>The requester has reached the maximum number of friends ({0}).</value>
+  </data>
+  <data name="Error.FriendRequestAlreadyResponded" xml:space="preserve">
+    <value>This friend request has already been responded to.</value>
+  </data>
+  <data name="Error.CanOnlyAcceptRequestsSentToYou" xml:space="preserve">
+    <value>You can only accept friend requests sent to you.</value>
+  </data>
+  <data name="Error.CanOnlyRejectRequestsSentToYou" xml:space="preserve">
+    <value>You can only reject friend requests sent to you.</value>
+  </data>
+  <data name="Error.CanOnlyCancelPendingRequests" xml:space="preserve">
+    <value>You can only cancel pending friend requests.</value>
+  </data>
+  <data name="Error.InvalidFriendUserId" xml:space="preserve">
+    <value>Invalid friend user ID.</value>
+  </data>
+  
+  <!-- Item Errors -->
+  <data name="Error.NoFileUploaded" xml:space="preserve">
+    <value>No file uploaded.</value>
+  </data>
+  
+  <!-- User Item Offer Errors -->
+  <data name="Error.CannotBuyOwnOffer" xml:space="preserve">
+    <value>You cannot buy your own offer.</value>
+  </data>
+  <data name="Error.InsufficientBalance" xml:space="preserve">
+    <value>Insufficient balance.</value>
+  </data>
+  <data name="Error.CannotUpdateSoldOffer" xml:space="preserve">
+    <value>Cannot update an offer that has already been sold.</value>
+  </data>
+  <data name="Error.CannotCancelSoldOffer" xml:space="preserve">
+    <value>Cannot cancel an offer that has already been sold.</value>
+  </data>
+  
+  <!-- Merchant Item Offer Errors -->
+  <data name="Error.CannotAffordMerchantOffer" xml:space="preserve">
+    <value>You cannot afford this offer.</value>
+  </data>
+  
+  <!-- Not Found Errors -->
+  <data name="Error.NotFound" xml:space="preserve">
+    <value>{0} with {1} '{2}' was not found.</value>
+  </data>
+  <data name="Error.UserNotFound" xml:space="preserve">
+    <value>User not found.</value>
+  </data>
+  <data name="Error.ReceiverNotFound" xml:space="preserve">
+    <value>Receiver not found.</value>
+  </data>
+  
+  <!-- Validation Errors -->
+  <data name="Validation.Required" xml:space="preserve">
+    <value>The {0} field is required.</value>
+  </data>
+  <data name="Validation.InvalidEmail" xml:space="preserve">
+    <value>Invalid email address.</value>
+  </data>
+  <data name="Validation.StringLength" xml:space="preserve">
+    <value>The {0} must be between {2} and {1} characters.</value>
+  </data>
+  <data name="Validation.MinLength" xml:space="preserve">
+    <value>The {0} must be at least {1} characters.</value>
+  </data>
+  <data name="Validation.MaxLength" xml:space="preserve">
+    <value>The {0} must be at most {1} characters.</value>
+  </data>
+  <data name="Validation.Range" xml:space="preserve">
+    <value>The {0} must be between {1} and {2}.</value>
+  </data>
+  <data name="Validation.InvalidValue" xml:space="preserve">
+    <value>Invalid value for {0}.</value>
+  </data>
+</root>
+

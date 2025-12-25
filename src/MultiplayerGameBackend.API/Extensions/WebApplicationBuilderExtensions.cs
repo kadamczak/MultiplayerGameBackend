@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.Text;
+using Microsoft.AspNetCore.Localization;
 using MultiplayerGameBackend.API.Middleware;
 using MultiplayerGameBackend.API.Services;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
+using MultiplayerGameBackend.Infrastructure.Localization;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -16,6 +19,30 @@ public static class WebApplicationBuilderExtensions
 {
     public static void AddPresentation(this WebApplicationBuilder builder)
     {
+        // Configure localization
+        builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+        
+        builder.Services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var supportedCultures = new[]
+            {
+                new CultureInfo("en"),
+                new CultureInfo("pl")
+            };
+            
+            options.DefaultRequestCulture = new RequestCulture("en");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+            
+            // Add Accept-Language header provider first (priority)
+            options.RequestCultureProviders = new List<IRequestCultureProvider>
+            {
+                new AcceptLanguageHeaderRequestCultureProvider(),
+                new QueryStringRequestCultureProvider(),
+                new CookieRequestCultureProvider()
+            };
+        });
+        
         builder.Services.AddIdentityCore<User>(options =>
             {
                 options.User.RequireUniqueEmail = true;

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.API.Services;
 using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Extensions;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Users;
 using MultiplayerGameBackend.Application.Users.Requests;
 using MultiplayerGameBackend.Application.Users.Requests.Validators;
@@ -19,7 +20,8 @@ public class UserController(
     ModifyUserRoleDtoValidator modifyUserRoleDtoValidator,
     SearchUsersDtoValidator searchUsersDtoValidator,
     IUserService userService,
-    IUserContext userContext) : ControllerBase
+    IUserContext userContext,
+    ILocalizationService localizationService) : ControllerBase
 {
     [HttpPost("{userId:guid}/roles")]
     [Authorize(Roles = UserRoles.Admin)]
@@ -62,7 +64,7 @@ public class UserController(
         [FromQuery] bool includeUserItems = false,
         CancellationToken cancellationToken = default)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         var userGameInfo = await userService.GetCurrentUserGameInfo(userId, includeCustomization, includeUserItems, cancellationToken);
@@ -76,7 +78,7 @@ public class UserController(
     public async Task<IActionResult> UpdateUserAppearance(UpdateUserAppearanceDto dto,
         CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         await userService.UpdateUserAppearance(userId, dto, cancellationToken);
@@ -91,12 +93,12 @@ public class UserController(
     [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
     public async Task<IActionResult> UploadProfilePicture(IFormFile file, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         // Validate file size
         if (file.Length == 0)
-            throw new BadRequest("No file uploaded.");
+            throw new BadRequest(localizationService.GetString(LocalizationKeys.Errors.NoFileUploaded));
 
         if (file.Length > Domain.Entities.User.Constraints.ProfilePictureMaxSizeBytes)
             throw new PayloadTooLargeException("Max file size is 2 MB." );
@@ -120,7 +122,7 @@ public class UserController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProfilePicture(CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         await userService.DeleteProfilePicture(userId, cancellationToken);
@@ -137,7 +139,7 @@ public class UserController(
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var result = await userService.SearchFriendableUsers(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return Ok(result);
     }

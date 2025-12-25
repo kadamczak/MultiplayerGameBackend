@@ -7,6 +7,7 @@ using MultiplayerGameBackend.Application.FriendRequests;
 using MultiplayerGameBackend.Application.FriendRequests.Requests;
 using MultiplayerGameBackend.Application.FriendRequests.Requests.Validators;
 using MultiplayerGameBackend.Application.FriendRequests.Responses;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Exceptions;
 
 namespace MultiplayerGameBackend.API.Controllers;
@@ -17,6 +18,7 @@ namespace MultiplayerGameBackend.API.Controllers;
 public class FriendRequestController(
     IFriendRequestService friendRequestService,
     IUserContext userContext,
+    ILocalizationService localizationService,
     GetFriendRequestsDtoValidator getFriendRequestsDtoValidator,
     GetFriendsDtoValidator getFriendsDtoValidator) : ControllerBase
 {
@@ -27,7 +29,7 @@ public class FriendRequestController(
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> SendFriendRequest(SendFriendRequestDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var requestId = await friendRequestService.SendFriendRequest(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return CreatedAtAction(nameof(SendFriendRequest), new { id = requestId }, null);
     }
@@ -39,7 +41,7 @@ public class FriendRequestController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AcceptFriendRequest(Guid requestId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         await friendRequestService.AcceptFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
         return NoContent();
     }
@@ -51,7 +53,7 @@ public class FriendRequestController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RejectFriendRequest(Guid requestId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         await friendRequestService.RejectFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
         return NoContent();
     }
@@ -63,7 +65,7 @@ public class FriendRequestController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CancelFriendRequest(Guid requestId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         await friendRequestService.CancelFriendRequest(Guid.Parse(currentUser.Id), requestId, cancellationToken);
         return NoContent();
     }
@@ -74,7 +76,7 @@ public class FriendRequestController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RemoveFriend(Guid friendUserId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         await friendRequestService.RemoveFriend(Guid.Parse(currentUser.Id), friendUserId, cancellationToken);
         return NoContent();
     }
@@ -87,7 +89,7 @@ public class FriendRequestController(
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var result = await friendRequestService.GetReceivedFriendRequests(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return Ok(result);
     }
@@ -100,7 +102,7 @@ public class FriendRequestController(
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var result = await friendRequestService.GetSentFriendRequests(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return Ok(result);
     }
@@ -113,7 +115,7 @@ public class FriendRequestController(
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var result = await friendRequestService.GetFriends(Guid.Parse(currentUser.Id), dto, cancellationToken);
         return Ok(result);
     }

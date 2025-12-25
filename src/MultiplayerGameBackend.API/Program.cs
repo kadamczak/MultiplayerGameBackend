@@ -27,6 +27,7 @@ try
     app.UseMiddleware<RequestTimeLoggingMiddleware>();
 
     app.UseSerilogRequestLogging();
+    app.UseRequestLocalization();
     
     if (app.Environment.IsDevelopment())
     {
