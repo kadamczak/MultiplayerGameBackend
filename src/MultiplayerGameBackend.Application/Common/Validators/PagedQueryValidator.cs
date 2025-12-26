@@ -1,4 +1,6 @@
+using MultiplayerGameBackend.Application.Common.Validators;
 using FluentValidation;
+using MultiplayerGameBackend.Application.Common;
 
 namespace MultiplayerGameBackend.Application.Common.Validators;
 
@@ -13,27 +15,34 @@ public class PagedQueryValidator : AbstractValidator<PagedQuery>
         
         RuleFor(x => x.PageNumber)
             .GreaterThanOrEqualTo(1)
-            .WithMessage("Page number must be at least 1.");
+            .WithMessage(ValidatorLocalizer.GetString(LocalizationKeys.Validation.InvalidPageNumber));
         
         RuleFor(x => x.PageSize)
             .Must(pageSize => pageSizes.Contains(pageSize))
-            .WithMessage($"Page size must be one of: {string.Join(", ", pageSizes)}.");
+            .WithMessage(ValidatorLocalizer.GetString(
+                LocalizationKeys.Validation.PageSizeMustBeOneOf, 
+                string.Join(", ", pageSizes)));
         
         RuleFor(x => x.SearchPhrase)
             .MaximumLength(maxSearchPhraseLength)
             .When(x => x.SearchPhrase != null)
-            .WithMessage($"Search phrase must be at most {maxSearchPhraseLength} characters long.");
+            .WithMessage(ValidatorLocalizer.GetString(
+                LocalizationKeys.Validation.SearchPhraseTooLong, 
+                maxSearchPhraseLength));
         
         RuleFor(x => x.SortDirection)
             .IsInEnum()
-            .WithMessage("Sort direction must be either 'Ascending' or 'Descending'.");
+            .WithMessage(ValidatorLocalizer.GetString((LocalizationKeys.Validation.SortDirectionRequired)));
         
         if (sortByValues != null && sortByValues.Length > 0)
         {
             RuleFor(x => x.SortBy)
                 .Must(sortBy => sortByValues.Contains(sortBy))
                 .When(x => x.SortBy != null)
-                .WithMessage($"SortBy must be one of: {string.Join(", ", sortByValues)}.");
+                .WithMessage(ValidatorLocalizer.GetString(
+                    LocalizationKeys.Validation.SortByMustBeOneOf, 
+                    string.Join(", ", sortByValues)));
         }
     }
 }
+

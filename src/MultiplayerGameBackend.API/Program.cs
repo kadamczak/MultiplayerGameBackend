@@ -2,7 +2,8 @@ using MultiplayerGameBackend.API.Extensions;
 using MultiplayerGameBackend.API.Middleware;
 using Serilog;
 using MultiplayerGameBackend.Application.Extensions;
-using MultiplayerGameBackend.Domain.Entities;
+using MultiplayerGameBackend.Application.Common.Validators;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Infrastructure.Extensions;
 using MultiplayerGameBackend.Infrastructure.Seeders;
 
@@ -14,6 +15,13 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
 
     var app = builder.Build();
+    
+    // Initialize validator localizer
+    using (var scope = app.Services.CreateScope())
+    {
+        var localizationService = scope.ServiceProvider.GetRequiredService<ILocalizationService>();
+        ValidatorLocalizer.Initialize(localizationService);
+    }
     
     // Only run seeder if not in testing environment
     if (!app.Environment.IsEnvironment("Testing"))

@@ -1,3 +1,5 @@
+using MultiplayerGameBackend.Application.Common.Validators;
+using MultiplayerGameBackend.Application.Common;
 using FluentValidation;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Entities;
@@ -9,23 +11,34 @@ public class CreateUpdateItemDtoValidator : AbstractValidator<CreateUpdateItemDt
     public  CreateUpdateItemDtoValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required.")
+            .NotEmpty().WithMessage(ValidatorLocalizer.GetString(LocalizationKeys.Validation.NameRequired))
             .Length(Item.Constraints.NameMinLength, Item.Constraints.NameMaxLength)
-            .WithMessage($"Name must be between {Item.Constraints.NameMinLength} and {Item.Constraints.NameMaxLength} characters long.");
+            .WithMessage(ValidatorLocalizer.GetString(
+                LocalizationKeys.Validation.NameLength,
+                Item.Constraints.NameMinLength,
+                Item.Constraints.NameMaxLength));
         
         RuleFor(x => x.Description)
-            .NotEmpty().WithMessage("Description is required.")
+            .NotEmpty().WithMessage(ValidatorLocalizer.GetString(LocalizationKeys.Validation.DescriptionRequired))
             .Length(Item.Constraints.DescriptionMinLength, Item.Constraints.DescriptionMaxLength)
-            .WithMessage($"Description must be between {Item.Constraints.DescriptionMinLength} and {Item.Constraints.DescriptionMaxLength} characters long.");
+            .WithMessage(ValidatorLocalizer.GetString(
+                LocalizationKeys.Validation.DescriptionLength,
+                Item.Constraints.DescriptionMinLength,
+                Item.Constraints.DescriptionMaxLength));
         
         RuleFor(x => x.ThumbnailUrl)
-            .NotEmpty().WithMessage("Thumbnail URL is required.")
+            .NotEmpty().WithMessage(ValidatorLocalizer.GetString(LocalizationKeys.Validation.Required, "Thumbnail URL"))
             .MaximumLength(Item.Constraints.ThumbnailUrlMaxLength)
-            .WithMessage($"Thumbnail URL can be maximally {Item.Constraints.ThumbnailUrlMaxLength} characters long.");
+            .WithMessage(ValidatorLocalizer.GetString(
+                LocalizationKeys.Validation.MaxLength,
+                "Thumbnail URL",
+                Item.Constraints.ThumbnailUrlMaxLength));
         
         RuleFor(x => x.Type)
-            .NotEmpty().WithMessage("Type is required.")
+            .NotEmpty().WithMessage(ValidatorLocalizer.GetString(LocalizationKeys.Validation.TypeRequired))
             .Must(ItemTypes.IsValidItemType)
-            .WithMessage($"Item must be one of the following: {string.Join(", ", ItemTypes.AllItemTypes)}");
+            .WithMessage(ValidatorLocalizer.GetString(
+                LocalizationKeys.Validation.InvalidValue,
+                string.Join(", ", ItemTypes.AllItemTypes)));
     }
 }

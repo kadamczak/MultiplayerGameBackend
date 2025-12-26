@@ -83,6 +83,29 @@ public static class LocalizationKeys
         public const string MaxLength = "Validation.MaxLength";
         public const string Range = "Validation.Range";
         public const string InvalidValue = "Validation.InvalidValue";
+        public const string SortByMustBeOneOf = "Validation.SortByMustBeOneOf";
+        public const string PageSizeMustBeOneOf = "Validation.PageSizeMustBeOneOf";
+        public const string SearchPhraseTooLong = "Validation.SearchPhraseTooLong";
+        public const string PasswordsDoNotMatch = "Validation.PasswordsDoNotMatch";
+        public const string InvalidPageNumber = "Validation.InvalidPageNumber";
+        public const string CurrentPasswordRequired = "Validation.CurrentPasswordRequired";
+        public const string NewPasswordRequired = "Validation.NewPasswordRequired";
+        public const string PasswordLength = "Validation.PasswordLength";
+        public const string PasswordMustContainUppercase = "Validation.PasswordMustContainUppercase";
+        public const string PasswordMustContainLowercase = "Validation.PasswordMustContainLowercase";
+        public const string PasswordMustContainDigit = "Validation.PasswordMustContainDigit";
+        public const string UsernameRequired = "Validation.UsernameRequired";
+        public const string UsernameLength = "Validation.UsernameLength";
+        public const string EmailRequired = "Validation.EmailRequired";
+        public const string PasswordRequired = "Validation.PasswordRequired";
+        public const string ConfirmPasswordRequired = "Validation.ConfirmPasswordRequired";
+        public const string RoleNameRequired = "Validation.RoleNameRequired";
+        public const string NameRequired = "Validation.NameRequired";
+        public const string NameLength = "Validation.NameLength";
+        public const string DescriptionRequired = "Validation.DescriptionRequired";
+        public const string DescriptionLength = "Validation.DescriptionLength";
+        public const string TypeRequired = "Validation.TypeRequired";
+        public const string SortDirectionRequired = "Validation.SortDirectionRequired";
     }
     
     public static class Entities

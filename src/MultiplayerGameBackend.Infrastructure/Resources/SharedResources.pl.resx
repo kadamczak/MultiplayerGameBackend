@@ -245,6 +245,75 @@
   <data name="Validation.InvalidValue" xml:space="preserve">
     <value>Nieprawidłowa wartość dla {0}.</value>
   </data>
+  <data name="Validation.SortByMustBeOneOf" xml:space="preserve">
+    <value>Sortowanie musi być jedną z wartości: {0}.</value>
+  </data>
+  <data name="Validation.PageSizeMustBeOneOf" xml:space="preserve">
+    <value>Rozmiar strony musi być jedną z wartości: {0}.</value>
+  </data>
+  <data name="Validation.SearchPhraseTooLong" xml:space="preserve">
+    <value>Hasło wyszukiwania nie może przekraczać {0} znaków.</value>
+  </data>
+  <data name="Validation.PasswordsDoNotMatch" xml:space="preserve">
+    <value>Hasła nie są zgodne.</value>
+  </data>
+  <data name="Validation.InvalidPageNumber" xml:space="preserve">
+    <value>PageNumber musi być większy niż 0.</value>
+  </data>
+  <data name="Validation.CurrentPasswordRequired" xml:space="preserve">
+    <value>Obecne hasło jest wymagane.</value>
+  </data>
+  <data name="Validation.NewPasswordRequired" xml:space="preserve">
+    <value>Nowe hasło jest wymagane.</value>
+  </data>
+  <data name="Validation.PasswordLength" xml:space="preserve">
+    <value>Hasło musi mieć długość od {0} do {1} znaków.</value>
+  </data>
+  <data name="Validation.PasswordMustContainUppercase" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną wielką literę.</value>
+  </data>
+  <data name="Validation.PasswordMustContainLowercase" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną małą literę.</value>
+  </data>
+  <data name="Validation.PasswordMustContainDigit" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną cyfrę.</value>
+  </data>
+  <data name="Validation.UsernameRequired" xml:space="preserve">
+    <value>Nazwa użytkownika jest wymagana.</value>
+  </data>
+  <data name="Validation.UsernameLength" xml:space="preserve">
+    <value>Nazwa użytkownika musi mieć długość od {0} do {1} znaków.</value>
+  </data>
+  <data name="Validation.EmailRequired" xml:space="preserve">
+    <value>Email jest wymagany.</value>
+  </data>
+  <data name="Validation.PasswordRequired" xml:space="preserve">
+    <value>Hasło jest wymagane.</value>
+  </data>
+  <data name="Validation.ConfirmPasswordRequired" xml:space="preserve">
+    <value>Potwierdzenie hasła jest wymagane.</value>
+  </data>
+  <data name="Validation.RoleNameRequired" xml:space="preserve">
+    <value>Nazwa roli jest wymagana.</value>
+  </data>
+  <data name="Validation.NameRequired" xml:space="preserve">
+    <value>Nazwa jest wymagana.</value>
+  </data>
+  <data name="Validation.NameLength" xml:space="preserve">
+    <value>Nazwa musi mieć długość od {0} do {1} znaków.</value>
+  </data>
+  <data name="Validation.DescriptionRequired" xml:space="preserve">
+    <value>Opis jest wymagany.</value>
+  </data>
+  <data name="Validation.DescriptionLength" xml:space="preserve">
+    <value>Opis musi mieć długość od {0} do {1} znaków.</value>
+  </data>
+  <data name="Validation.TypeRequired" xml:space="preserve">
+    <value>Typ jest wymagany.</value>
+  </data>
+  <data name="Validation.SortDirectionRequired" xml:space="preserve">
+    <value>Kierunek sortowania musi być 'Rosnący' lub 'Malejący'.</value>
+  </data>
   
   <!-- Entity Names -->
   <data name="Entity.User" xml:space="preserve">
