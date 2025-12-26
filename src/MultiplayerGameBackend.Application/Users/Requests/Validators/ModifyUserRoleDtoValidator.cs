@@ -2,7 +2,6 @@ using MultiplayerGameBackend.Application.Common.Validators;
 using MultiplayerGameBackend.Application.Common;
 using FluentValidation;
 using MultiplayerGameBackend.Domain.Constants;
-using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.Application.Users.Requests.Validators;
 
