@@ -19,8 +19,7 @@ public static class WebApplicationBuilderExtensions
 {
     public static void AddPresentation(this WebApplicationBuilder builder)
     {
-        // Configure localization
-        builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+        builder.Services.AddLocalization();
         
         builder.Services.Configure<RequestLocalizationOptions>(options =>
         {

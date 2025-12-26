@@ -20,6 +20,7 @@ public class UserService(ILogger<UserService> logger,
     RoleManager<IdentityRole<Guid>> roleManager,
     IMultiplayerGameDbContext dbContext,
     UserCustomizationMapper customizationMapper,
+    ILocalizationService localizationService,
     IImageService imageService) : IUserService
 {
 
@@ -27,10 +28,10 @@ public class UserService(ILogger<UserService> logger,
     {
         logger.LogInformation("Assigning user role: {@Request}", dto);
         var user = await userManager.FindByIdAsync(userId.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+                   ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
 
         var role = await roleManager.FindByNameAsync(dto.RoleName)
-                   ?? throw new NotFoundException(nameof(IdentityRole), nameof(IdentityRole.Name), "Name", dto.RoleName);
+                   ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.RoleNotFound));
 
         await userManager.AddToRoleAsync(user, role.Name!);
     }
@@ -39,10 +40,10 @@ public class UserService(ILogger<UserService> logger,
     {
         logger.LogInformation("Unassigning user role: {@Request}", dto);
         var user = await userManager.FindByIdAsync(userId.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+                   ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
 
         var role = await roleManager.FindByNameAsync(dto.RoleName)
-                   ?? throw new NotFoundException(nameof(IdentityRole), nameof(IdentityRole.Name), "Name", dto.RoleName);
+                   ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.RoleNotFound));
 
         await userManager.RemoveFromRoleAsync(user, role.Name!);
     }
@@ -50,7 +51,7 @@ public class UserService(ILogger<UserService> logger,
     public async Task<UserGameInfoDto> GetCurrentUserGameInfo(Guid userId, bool includeCustomization, bool includeUserItems, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByIdAsync(userId.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+                   ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
         
         ReadUserCustomizationDto? customizationDto = null;
         
@@ -118,7 +119,7 @@ public class UserService(ILogger<UserService> logger,
     {
         // Verify user exists
         _ = await userManager.FindByIdAsync(userId.ToString())
-            ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+            ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
 
         // Check if user already has customization
         var existingCustomization = await dbContext.UserCustomizations
@@ -147,7 +148,7 @@ public class UserService(ILogger<UserService> logger,
     public async Task<string> UploadProfilePicture(Guid userId, Stream imageStream, string fileName, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByIdAsync(userId.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+                   ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
 
         // Delete old profile picture if exists
         if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
@@ -167,10 +168,10 @@ public class UserService(ILogger<UserService> logger,
     public async Task DeleteProfilePicture(Guid userId, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByIdAsync(userId.ToString())
-                   ?? throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+                   ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
 
         if (string.IsNullOrEmpty(user.ProfilePictureUrl))
-            throw new NotFoundException(nameof(User.ProfilePictureUrl), "ProfilePictureUrl", "Profile Picture URL", "not set");
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.ProfilePictureNotSet));
         
         await imageService.DeleteProfilePictureAsync(user.ProfilePictureUrl, cancellationToken);
         

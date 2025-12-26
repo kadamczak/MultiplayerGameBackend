@@ -13,7 +13,8 @@ namespace MultiplayerGameBackend.Application.UserItemOffers;
 
 public class UserItemOfferService(ILogger<UserItemOfferService> logger,
     IMultiplayerGameDbContext dbContext,
-    UserItemOfferMapper userItemOfferMapper) : IUserItemOfferService
+    UserItemOfferMapper userItemOfferMapper,
+    ILocalizationService localizationService) : IUserItemOfferService
 {
     public async Task<PagedResult<ReadUserItemOfferDto>> GetOffers(GetOffersDto dto, CancellationToken cancellationToken)
     {
@@ -72,21 +73,25 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         if (userItem is null)
         {
             logger.LogWarning("UserItem {UserItemId} not found", dto.UserItemId);
-            throw new NotFoundException(nameof(UserItem), nameof(UserItem.Id), "ID", dto.UserItemId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserItemNotFound));
         }
         
         // Check if the user owns this UserItem
         if (userItem.UserId != userId)
         {
             logger.LogWarning("User {UserId} attempted to create offer for UserItem {UserItemId} that doesn't belong to them", userId, dto.UserItemId);
-            throw new ForbidException("You do not own this Item.");
+            throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.DoNotOwnItem));
         }
         
         // Check if an active offer already exists for this UserItem
         if (userItem.Offers.Any(o => o.BuyerId is null))
         {
             logger.LogWarning("Active offer already exists for UserItem {UserItemId}", dto.UserItemId);
-            throw new ConflictException(nameof(UserItemOffer), nameof(dto.UserItemId), "UserItem", dto.UserItemId.ToString());
+            var errors = new Dictionary<string, string[]>
+            {
+                { nameof(dto.UserItemId), new[] { localizationService.GetString(LocalizationKeys.Errors.UserItemOfferAlreadyExists) } }
+            };
+            throw new ConflictException(errors);
         }
         
         var offer = new UserItemOffer
@@ -115,13 +120,13 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         if (offer is null)
         {
             logger.LogWarning("Offer {OfferId} not found", offerId);
-            throw new NotFoundException(nameof(UserItemOffer), nameof(UserItemOffer.Id), "ID", offerId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserItemOfferNotFound));
         }
         
         if (offer.UserItem?.UserId != userId)
         {
             logger.LogWarning("User {UserId} attempted to delete offer {OfferId} that doesn't belong to them", userId, offerId);
-            throw new ForbidException("You do not own this offer.");
+            throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.DoNotOwnOffer));
         }
         
         dbContext.UserItemOffers.Remove(offer);
@@ -141,7 +146,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         if (offer is null)
         {
             logger.LogWarning("Offer {OfferId} not found", offerId);
-            throw new NotFoundException(nameof(UserItemOffer), nameof(UserItemOffer.Id), "ID", offerId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserItemOfferNotFound));
         }
         
         // Check if user is trying to buy their own item
@@ -158,7 +163,7 @@ public class UserItemOfferService(ILogger<UserItemOfferService> logger,
         if (buyer is null)
         {
             logger.LogWarning("Buyer {BuyerId} not found", buyerId);
-            throw new NotFoundException(nameof(User), nameof(User.Id), "ID", buyerId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
         }
         
         // Check if buyer has sufficient balance

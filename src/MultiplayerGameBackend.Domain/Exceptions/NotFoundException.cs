@@ -15,4 +15,14 @@ public class NotFoundException : Exception
         PropertyDisplayName = propertyDisplayName;
         IdentifierValue = identifierValue;
     }
+    
+    // Constructor for already localized messages
+    public NotFoundException(string message) : base(message)
+    {
+        ResourceType = string.Empty;
+        PropertyName = string.Empty;
+        PropertyDisplayName = string.Empty;
+        IdentifierValue = string.Empty;
+    }
 }
+

@@ -1,4 +1,4 @@
-namespace MultiplayerGameBackend.Infrastructure.Localization;
+namespace MultiplayerGameBackend.Infrastructure.Resources;
 
 /// <summary>
 /// Dummy class to serve as a placeholder for shared resources.

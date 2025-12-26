@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Identity.Requests;
 using MultiplayerGameBackend.Application.Identity.Responses;
 using MultiplayerGameBackend.Application.Interfaces;
@@ -20,18 +21,31 @@ public class IdentityService(ILogger<IdentityService> logger,
     UserManager<User> userManager,
     IMultiplayerGameDbContext dbContext,
     IConfiguration configuration,
-    IEmailService emailService) : IIdentityService
+    IEmailService emailService,
+    ILocalizationService localizationService) : IIdentityService
 {
     public async Task RegisterUser(RegisterDto dto)
     {
         // Check if duplicate username or email
         var userSameName = await userManager.FindByNameAsync(dto.UserName);
         if (userSameName is not null)
-            throw new ConflictException(nameof(User),  nameof(User.UserName), "Username", dto.UserName);
+        {
+            var errors = new Dictionary<string, string[]>
+            {
+                { nameof(User.UserName), new[] { localizationService.GetString(LocalizationKeys.Errors.UsernameAlreadyExists) } }
+            };
+            throw new ConflictException(errors);
+        }
 
         var userSameEmail = await userManager.FindByEmailAsync(dto.Email);
         if (userSameEmail is not null)
-            throw new ConflictException(nameof(User), nameof(dto.Email), "Email", dto.Email);
+        {
+            var errors = new Dictionary<string, string[]>
+            {
+                { nameof(dto.Email), new[] { localizationService.GetString(LocalizationKeys.Errors.EmailAlreadyExists) } }
+            };
+            throw new ConflictException(errors);
+        }
 
         var user = new User
         {
@@ -64,15 +78,15 @@ public class IdentityService(ILogger<IdentityService> logger,
         // Check if username and password are correct
         var user = await userManager.FindByNameAsync(dto.UserName);
         if (user is null)
-            throw new NotFoundException(nameof(User), nameof(User.UserName), "Username", dto.UserName);
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
 
         var isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
         if (!isPasswordValid)
-            throw new ForbidException("Invalid username or password.");
+            throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.InvalidCredentials));
         
         // Check if email is confirmed
         if (!user.EmailConfirmed)
-            throw new ForbidException("Email is not confirmed. Please check your email and activate your account.");
+            throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.EmailNotConfirmed));
         
         // If client type is "Game", revoke existing refresh tokens for game clients
         if (clientType == ClientTypes.Game)
@@ -155,11 +169,11 @@ public class IdentityService(ILogger<IdentityService> logger,
     {
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null)
-            throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
         
         var isCurrentPasswordValid = await userManager.CheckPasswordAsync(user, dto.CurrentPassword);
         if (!isCurrentPasswordValid)
-            throw new ForbidException("Password is incorrect.");
+            throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.PasswordIncorrect));
         
         var result = await userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
         if (!result.Succeeded)
@@ -182,12 +196,12 @@ public class IdentityService(ILogger<IdentityService> logger,
     {
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null)
-            throw new NotFoundException(nameof(User), nameof(User.Id), "Id", userId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
         
         // Verify password before deletion
         var isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
         if (!isPasswordValid)
-            throw new ForbidException("Password is incorrect.");
+            throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.PasswordIncorrect));
         
         // Delete the user (database constraints will handle related entities)
         var result = await userManager.DeleteAsync(user);
@@ -221,7 +235,7 @@ public class IdentityService(ILogger<IdentityService> logger,
     {
         var user = await userManager.FindByEmailAsync(dto.Email);
         if (user is null)
-            throw new NotFoundException(nameof(User), nameof(User.Email), "Email", dto.Email);
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
         
         var result = await userManager.ResetPasswordAsync(user, dto.ResetToken, dto.NewPassword);
         if (!result.Succeeded)
@@ -243,7 +257,7 @@ public class IdentityService(ILogger<IdentityService> logger,
     {
         var user = await userManager.FindByEmailAsync(dto.Email);
         if (user is null)
-            throw new NotFoundException(nameof(User), nameof(User.Email), "Email", dto.Email);
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
         
         if (user.EmailConfirmed)
         {

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Application.UserItems;
 using MultiplayerGameBackend.Application.UserItems.Requests;
@@ -14,11 +15,17 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
 {
     private readonly DatabaseFixture _fixture;
     private readonly ILogger<UserItemService> _logger;
+    private readonly ILocalizationService _localizationService;
 
     public UserItemServiceTests(DatabaseFixture fixture)
     {
         _fixture = fixture;
         _logger = Substitute.For<ILogger<UserItemService>>();
+        _localizationService = Substitute.For<ILocalizationService>();
+        
+        // Setup localization service to return the key as the value (for testing)
+        _localizationService.GetString(Arg.Any<string>()).Returns(ci => ci.ArgAt<string>(0));
+        _localizationService.GetString(Arg.Any<string>(), Arg.Any<object[]>()).Returns(ci => ci.ArgAt<string>(0));
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -32,7 +39,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -59,7 +66,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
 
         var userId = Guid.NewGuid();
         var query = new PagedQuery { PageNumber = 1, PageSize = 10 };
@@ -79,7 +86,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user1 = await DatabaseHelper.CreateAndSaveUser(userManager, "user1", "user1@example.com", "Password123!");
@@ -108,7 +115,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -136,7 +143,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -171,7 +178,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -206,7 +213,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -236,7 +243,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -264,7 +271,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -296,7 +303,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -322,7 +329,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -348,7 +355,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -380,7 +387,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -411,7 +418,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -433,7 +440,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -455,7 +462,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -482,7 +489,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -509,7 +516,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -536,7 +543,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
@@ -563,7 +570,7 @@ public class UserItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new UserItemService(_logger, context);
+        var service = new UserItemService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");

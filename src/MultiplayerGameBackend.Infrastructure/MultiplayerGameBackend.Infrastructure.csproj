@@ -33,8 +33,11 @@
     </ItemGroup>
     
     <ItemGroup>
-      <EmbeddedResource Update="Resources\**\*.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
+      <EmbeddedResource Update="Resources\SharedResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\SharedResources.pl.resx">
+        <DependentUpon>SharedResources.resx</DependentUpon>
       </EmbeddedResource>
     </ItemGroup>
 </Project>

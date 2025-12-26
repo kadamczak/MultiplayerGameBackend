@@ -98,6 +98,9 @@
   <data name="Error.PasswordDoesNotMeetRequirements" xml:space="preserve">
     <value>Password does not meet requirements.</value>
   </data>
+  <data name="Error.PasswordIncorrect" xml:space="preserve">
+    <value>Password is incorrect.</value>
+  </data>
   
   <!-- Friend Request Errors -->
   <data name="Error.CannotSendFriendRequestToYourself" xml:space="preserve">
@@ -130,6 +133,9 @@
   <data name="Error.CanOnlyCancelPendingRequests" xml:space="preserve">
     <value>You can only cancel pending friend requests.</value>
   </data>
+  <data name="Error.CanOnlyCancelOwnRequests" xml:space="preserve">
+    <value>You can only cancel friend requests that you sent.</value>
+  </data>
   <data name="Error.InvalidFriendUserId" xml:space="preserve">
     <value>Invalid friend user ID.</value>
   </data>
@@ -137,6 +143,9 @@
   <!-- Item Errors -->
   <data name="Error.NoFileUploaded" xml:space="preserve">
     <value>No file uploaded.</value>
+  </data>
+  <data name="Error.CannotEquipItemsNotOwned" xml:space="preserve">
+    <value>Cannot equip items that don't belong to you.</value>
   </data>
   
   <!-- User Item Offer Errors -->
@@ -152,6 +161,12 @@
   <data name="Error.CannotCancelSoldOffer" xml:space="preserve">
     <value>Cannot cancel an offer that has already been sold.</value>
   </data>
+  <data name="Error.DoNotOwnItem" xml:space="preserve">
+    <value>You do not own this item.</value>
+  </data>
+  <data name="Error.DoNotOwnOffer" xml:space="preserve">
+    <value>You do not own this offer.</value>
+  </data>
   
   <!-- Merchant Item Offer Errors -->
   <data name="Error.CannotAffordMerchantOffer" xml:space="preserve">
@@ -162,11 +177,50 @@
   <data name="Error.NotFound" xml:space="preserve">
     <value>{0} with {1} '{2}' was not found.</value>
   </data>
+  <data name="Error.Conflict.EntityExists" xml:space="preserve">
+    <value>{0} with this {1} already exists.</value>
+  </data>
+  <data name="Error.UsernameAlreadyExists" xml:space="preserve">
+    <value>This username already exists.</value>
+  </data>
+  <data name="Error.EmailAlreadyExists" xml:space="preserve">
+    <value>This email already exists.</value>
+  </data>
+  <data name="Error.UserItemOfferAlreadyExists" xml:space="preserve">
+    <value>An active offer already exists for this item.</value>
+  </data>
   <data name="Error.UserNotFound" xml:space="preserve">
     <value>User not found.</value>
   </data>
   <data name="Error.ReceiverNotFound" xml:space="preserve">
     <value>Receiver not found.</value>
+  </data>
+  <data name="Error.ItemNotFound" xml:space="preserve">
+    <value>Item not found.</value>
+  </data>
+  <data name="Error.UserItemNotFound" xml:space="preserve">
+    <value>User item not found.</value>
+  </data>
+  <data name="Error.UserItemOfferNotFound" xml:space="preserve">
+    <value>User item offer not found.</value>
+  </data>
+  <data name="Error.MerchantItemOfferNotFound" xml:space="preserve">
+    <value>Merchant item offer not found.</value>
+  </data>
+  <data name="Error.MerchantNotFound" xml:space="preserve">
+    <value>Merchant not found.</value>
+  </data>
+  <data name="Error.FriendRequestNotFound" xml:space="preserve">
+    <value>Friend request not found.</value>
+  </data>
+  <data name="Error.RoleNotFound" xml:space="preserve">
+    <value>Role not found.</value>
+  </data>
+  <data name="Error.UserCustomizationNotFound" xml:space="preserve">
+    <value>User customization not found.</value>
+  </data>
+  <data name="Error.ProfilePictureNotSet" xml:space="preserve">
+    <value>Profile picture is not set.</value>
   </data>
   
   <!-- Validation Errors -->
@@ -190,6 +244,32 @@
   </data>
   <data name="Validation.InvalidValue" xml:space="preserve">
     <value>Invalid value for {0}.</value>
+  </data>
+  
+  <!-- Entity Names -->
+  <data name="Entity.User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="Entity.Item" xml:space="preserve">
+    <value>Item</value>
+  </data>
+  <data name="Entity.UserItem" xml:space="preserve">
+    <value>User Item</value>
+  </data>
+  <data name="Entity.UserItemOffer" xml:space="preserve">
+    <value>User Item Offer</value>
+  </data>
+  <data name="Entity.MerchantItemOffer" xml:space="preserve">
+    <value>Merchant Item Offer</value>
+  </data>
+  <data name="Entity.InGameMerchant" xml:space="preserve">
+    <value>Merchant</value>
+  </data>
+  <data name="Entity.FriendRequest" xml:space="preserve">
+    <value>Friend Request</value>
+  </data>
+  <data name="Entity.Role" xml:space="preserve">
+    <value>Role</value>
   </data>
 </root>
 

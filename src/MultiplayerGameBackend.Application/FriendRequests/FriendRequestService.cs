@@ -29,7 +29,7 @@ public class FriendRequestService(
             .FirstOrDefaultAsync(u => u.Id == dto.ReceiverId, cancellationToken);
 
         if (receiver is null)
-            throw new NotFoundException(nameof(User), nameof(User.Id), "ID", dto.ReceiverId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.ReceiverNotFound));
 
         // Check if already friends
         var existingAcceptedRequest = await dbContext.FriendRequests
@@ -100,7 +100,7 @@ public class FriendRequestService(
             .FirstOrDefaultAsync(fr => fr.Id == requestId, cancellationToken);
 
         if (friendRequest is null)
-            throw new NotFoundException(nameof(FriendRequest), nameof(FriendRequest.Id), "ID", requestId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.FriendRequestNotFound));
 
         if (friendRequest.ReceiverId != userId)
             throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.CanOnlyAcceptRequestsSentToYou));
@@ -137,7 +137,7 @@ public class FriendRequestService(
             .FirstOrDefaultAsync(fr => fr.Id == requestId, cancellationToken);
 
         if (friendRequest is null)
-            throw new NotFoundException(nameof(FriendRequest), nameof(FriendRequest.Id), "ID", requestId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.FriendRequestNotFound));
 
         if (friendRequest.ReceiverId != userId)
             throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.CanOnlyRejectRequestsSentToYou));
@@ -158,10 +158,10 @@ public class FriendRequestService(
             .FirstOrDefaultAsync(fr => fr.Id == requestId, cancellationToken);
 
         if (friendRequest is null)
-            throw new NotFoundException(nameof(FriendRequest), nameof(FriendRequest.Id), "ID", requestId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.FriendRequestNotFound));
 
         if (friendRequest.RequesterId != userId)
-            throw new ForbidException("You can only cancel friend requests that you sent.");
+            throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.CanOnlyCancelOwnRequests));
 
         if (friendRequest.Status != FriendRequestStatuses.Pending)
             throw new BadRequest(localizationService.GetString(LocalizationKeys.Errors.CanOnlyCancelPendingRequests));
@@ -182,7 +182,7 @@ public class FriendRequestService(
             .FirstOrDefaultAsync(FriendRequestSpecifications.AreFriends(userId, friendUserId), cancellationToken);
 
         if (friendRequest is null)
-            throw new NotFoundException(nameof(User), nameof(User.Id), "user ID", friendUserId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
 
         dbContext.FriendRequests.Remove(friendRequest);
         await dbContext.SaveChangesAsync(cancellationToken);

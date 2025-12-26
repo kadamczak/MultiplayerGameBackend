@@ -14,10 +14,16 @@ public class ConflictException : Exception
         };
     }
 
-    // Constructor for custom field-level errors
+    // Constructor for custom field-level errors (errors already localized)
     public ConflictException(Dictionary<string, string[]> errors) 
         : base("Conflict occurred.")
     {
         Errors = errors;
     }
+    
+    // Constructor for already localized simple message
+    public ConflictException(string message) : base(message)
+    {
+    }
 }
+

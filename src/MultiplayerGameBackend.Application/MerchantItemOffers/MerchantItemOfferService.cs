@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.MerchantItemOffers.Responses;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Items.Responses;
@@ -9,7 +10,8 @@ using MultiplayerGameBackend.Domain.Exceptions;
 namespace MultiplayerGameBackend.Application.MerchantItemOffers;
 
 public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
-    IMultiplayerGameDbContext dbContext) : IMerchantItemOfferService
+    IMultiplayerGameDbContext dbContext,
+    ILocalizationService localizationService) : IMerchantItemOfferService
 {
     public async Task<IEnumerable<ReadMerchantOfferDto>> GetOffers(int merchantId, CancellationToken cancellationToken)
     {
@@ -22,7 +24,7 @@ public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
         if (!merchantExists)
         {
             logger.LogWarning("Merchant {MerchantId} not found", merchantId);
-            throw new NotFoundException(nameof(InGameMerchant), nameof(InGameMerchant.Id), "ID", merchantId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.MerchantNotFound));
         }
         
         // Retrieve all offers for the specified merchant from the database
@@ -60,10 +62,7 @@ public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
         if (offer is null)
         {
             logger.LogWarning("Offer {OfferId} not found", offerId);
-            throw new NotFoundException(nameof(MerchantItemOffer),
-                nameof(MerchantItemOffer.Id),
-                "ID",
-                offerId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.MerchantItemOfferNotFound));
         }
 
         // Fetch the user with balance
@@ -72,7 +71,7 @@ public class MerchantItemOfferService(ILogger<MerchantItemOfferService> logger,
         if (user is null)
         {
             logger.LogWarning("User {UserId} not found", userId);
-            throw new NotFoundException(nameof(User), nameof(User.Id), "ID", userId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
         }
 
         // Check if user has sufficient balance

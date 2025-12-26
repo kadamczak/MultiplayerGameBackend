@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Items.Responses;
@@ -11,7 +12,8 @@ namespace MultiplayerGameBackend.Application.Items;
 
 public class ItemService(ILogger<ItemService> logger,
     IMultiplayerGameDbContext dbContext,
-    ItemMapper itemMapper) : IItemService
+    ItemMapper itemMapper,
+    ILocalizationService localizationService) : IItemService
 {
     public async Task<ReadItemDto?> GetById(int id, CancellationToken cancellationToken)
     {
@@ -65,7 +67,7 @@ public class ItemService(ILogger<ItemService> logger,
         logger.LogInformation("Updating Item with id {itemId}", id);
         
         var item = await dbContext.Items.FindAsync([id], cancellationToken)
-            ?? throw new NotFoundException(nameof(Item), nameof(Item.Id), "Id", id.ToString());
+            ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.ItemNotFound));
         
         item.Name = dto.Name.Trim();
         item.Description = dto.Description.Trim();
