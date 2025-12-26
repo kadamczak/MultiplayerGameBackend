@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
@@ -12,11 +13,16 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
 {
     private readonly DatabaseFixture _fixture;
     private readonly ILogger<MerchantItemOfferService> _logger;
+    private readonly ILocalizationService _localizationService;
 
     public MerchantItemOfferServiceTests(DatabaseFixture fixture)
     {
         _fixture = fixture;
         _logger = Substitute.For<ILogger<MerchantItemOfferService>>();
+        _localizationService = Substitute.For<ILocalizationService>();
+        
+        _localizationService.GetString(Arg.Any<string>()).Returns(ci => ci.ArgAt<string>(0));
+        _localizationService.GetString(Arg.Any<string>(), Arg.Any<object[]>()).Returns(ci => ci.ArgAt<string>(0));
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -30,7 +36,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
 
         var merchant = await DatabaseHelper.CreateAndSaveMerchant(context);
         var item1 = await DatabaseHelper.CreateAndSaveItem(context, "Health Potion", ItemTypes.Consumable, "Restores 50 HP", "assets/health_potion.png");
@@ -55,7 +61,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
 
         var merchant = await DatabaseHelper.CreateAndSaveMerchant(context);
 
@@ -72,7 +78,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<NotFoundException>(
@@ -87,7 +93,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
 
         var merchant1 = await DatabaseHelper.CreateAndSaveMerchant(context);
         var merchant2 = await DatabaseHelper.CreateAndSaveMerchant(context);
@@ -117,7 +123,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!", balance: 500);
@@ -141,7 +147,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
 
         var userId = Guid.NewGuid();
 
@@ -158,7 +164,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
 
         var (merchant, item, offer) = await DatabaseHelper.CreateAndSaveMerchantWithOffer(context, 100);
 
@@ -177,7 +183,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "pooruser", "poor@example.com", "Password123!", balance: 50);
@@ -197,7 +203,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "exactuser", "exact@example.com", "Password123!", balance: 100);
@@ -220,7 +226,7 @@ public class MerchantItemOfferServiceTests : IClassFixture<DatabaseFixture>, IAs
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new MerchantItemOfferService(_logger, context);
+        var service = new MerchantItemOfferService(_logger, context, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "collector", "collector@example.com", "Password123!", balance: 500);

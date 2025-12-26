@@ -17,6 +17,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     private readonly ILogger<UserService> _logger;
     private readonly IImageService _imageService;
     private readonly UserCustomizationMapper _customizationMapper;
+    private readonly ILocalizationService _localizationService;
 
     public UserServiceTests(DatabaseFixture fixture)
     {
@@ -24,6 +25,10 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         _logger = Substitute.For<ILogger<UserService>>();
         _imageService = Substitute.For<IImageService>();
         _customizationMapper = new UserCustomizationMapper();
+        _localizationService = Substitute.For<ILocalizationService>();
+        
+        _localizationService.GetString(Arg.Any<string>()).Returns(ci => ci.ArgAt<string>(0));
+        _localizationService.GetString(Arg.Any<string>(), Arg.Any<object[]>()).Returns(ci => ci.ArgAt<string>(0));
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -40,7 +45,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
         await DatabaseHelper.CreateAndSaveRole(roleManager, "Admin");
@@ -62,7 +67,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper,_localizationService, _imageService);
 
         await DatabaseHelper.CreateAndSaveRole(roleManager, "Admin");
 
@@ -81,7 +86,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper,_localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -104,7 +109,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper,_localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUserWithRole(userManager, roleManager, "testuser", "test@example.com", "Password123!", "Admin");
 
@@ -125,7 +130,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper,_localizationService, _imageService);
 
         await DatabaseHelper.CreateAndSaveRole(roleManager, "Admin");
 
@@ -148,7 +153,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper,_localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!", balance: 500);
 
@@ -171,7 +176,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper,_localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!", balance: 500);
         await DatabaseHelper.CreateAndSaveUserCustomization(context, user.Id);
@@ -194,7 +199,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!", balance: 500);
         var item = await DatabaseHelper.CreateAndSaveItem(context, "Cool Helmet", ItemTypes.EquippableOnHead, "A very cool helmet", "assets/helmet.png");
@@ -218,7 +223,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(
@@ -237,7 +242,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
 
@@ -269,7 +274,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
         await DatabaseHelper.CreateAndSaveUserCustomization(context, user.Id,
@@ -315,7 +320,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
 
@@ -340,7 +345,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         var oldUrl = "/uploads/profiles/old.jpg";
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
@@ -373,7 +378,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         var pictureUrl = "/uploads/profiles/test.jpg";
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
@@ -396,7 +401,7 @@ public class UserServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManager(context);
         var roleManager = IdentityHelper.CreateRoleManager(context);
-        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _imageService);
+        var service = new UserService(_logger, userManager, roleManager, context, _customizationMapper, _localizationService, _imageService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "gamer123", "gamer@example.com", "Password123!");
         user.ProfilePictureUrl = null;

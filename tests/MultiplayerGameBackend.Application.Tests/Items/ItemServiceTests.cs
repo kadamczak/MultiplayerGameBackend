@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common.Mappings;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Items;
 using MultiplayerGameBackend.Application.Items.Requests;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
@@ -15,12 +16,17 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     private readonly DatabaseFixture _fixture;
     private readonly ILogger<ItemService> _logger;
     private readonly ItemMapper _mapper;
+    private readonly ILocalizationService _localizationService;
 
     public ItemServiceTests(DatabaseFixture fixture)
     {
         _fixture = fixture;
         _logger = Substitute.For<ILogger<ItemService>>();
         _mapper = new ItemMapper();
+        _localizationService = Substitute.For<ILocalizationService>();
+        
+        _localizationService.GetString(Arg.Any<string>()).Returns(ci => ci.ArgAt<string>(0));
+        _localizationService.GetString(Arg.Any<string>(), Arg.Any<object[]>()).Returns(ci => ci.ArgAt<string>(0));
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -33,7 +39,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Sword", ItemTypes.EquippableOnBody, "A powerful sword", "assets/sword.png");
 
@@ -54,7 +60,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         // Act
         var result = await service.GetById(99999, CancellationToken.None);
@@ -72,7 +78,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         await DatabaseHelper.CreateAndSaveItem(context, "Item 1", ItemTypes.EquippableOnHead, "Desc 1", "url1.png");
         await DatabaseHelper.CreateAndSaveItem(context, "Item 2", ItemTypes.EquippableOnBody, "Desc 2", "url2.png");
@@ -95,7 +101,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         // Act
         var result = await service.GetAll(CancellationToken.None);
@@ -114,7 +120,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var dto = new CreateUpdateItemDto
         {
@@ -143,7 +149,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var dto = new CreateUpdateItemDto
         {
@@ -168,7 +174,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         await DatabaseHelper.CreateAndSaveItem(context, "Duplicate Item", ItemTypes.EquippableOnHead, "First one", "assets/dup.png");
 
@@ -198,7 +204,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var item = await DatabaseHelper.CreateAndSaveItem(context, "Original Name", ItemTypes.EquippableOnHead, "Original Description", "assets/original.png");
 
@@ -227,7 +233,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var item = await DatabaseHelper.CreateAndSaveItem(context, "Test Item", ItemTypes.EquippableOnHead, "Test Description", "assets/test.png");
 
@@ -256,7 +262,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var updateDto = new CreateUpdateItemDto
         {
@@ -281,7 +287,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var item = await DatabaseHelper.CreateAndSaveItem(context, "Item to Delete", ItemTypes.EquippableOnHead, "Will be deleted", "assets/delete.png");
 
@@ -299,7 +305,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         // Act
         var result = await service.Delete(99999, CancellationToken.None);
@@ -313,7 +319,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var item = await DatabaseHelper.CreateAndSaveItem(context, "Double Delete Test", ItemTypes.EquippableOnHead, "Test double deletion", "assets/double.png");
         var itemId = item.Id;
@@ -337,7 +343,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
 
         var dto = new CreateUpdateItemDto
         {
@@ -362,7 +368,7 @@ public class ItemServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifetime
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var service = new ItemService(_logger, context, _mapper);
+        var service = new ItemService(_logger, context, _mapper, _localizationService);
         var cts = new CancellationTokenSource();
         await cts.CancelAsync();
 
