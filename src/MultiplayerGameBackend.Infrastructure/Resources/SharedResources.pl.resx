@@ -231,19 +231,36 @@
     <value>Nieprawidłowy adres email.</value>
   </data>
   <data name="Validation.StringLength" xml:space="preserve">
-    <value>{0} musi mieć długość od {2} do {1} znaków.</value>
+    <value>Pole {0} musi mieć długość od {2} do {1} znaków.</value>
   </data>
   <data name="Validation.MinLength" xml:space="preserve">
-    <value>{0} musi mieć co najmniej {1} znaków.</value>
+    <value>Pole {0} musi mieć co najmniej {1} znaków.</value>
   </data>
   <data name="Validation.MaxLength" xml:space="preserve">
-    <value>{0} może mieć maksymalnie {1} znaków.</value>
+    <value>Pole {0} może mieć maksymalnie {1} znaków.</value>
+  </data>
+  
+  <!-- Standard Data Annotations Keys (ASP.NET Core expects these exact names) -->
+  <data name="RequiredAttribute_ValidationError" xml:space="preserve">
+    <value>Pole jest wymagane.</value>
+  </data>
+  <data name="EmailAddressAttribute_Invalid" xml:space="preserve">
+    <value>Pole nie jest prawidłowym adresem email.</value>
+  </data>
+  <data name="StringLengthAttribute_ValidationError" xml:space="preserve">
+    <value>Pole musi być tekstem o minimalnej długości {2} i maksymalnej długości {1}.</value>
+  </data>
+  <data name="MaxLengthAttribute_ValidationError" xml:space="preserve">
+    <value>Pole musi być tekstem lub tablicą o maksymalnej długości '{1}'.</value>
+  </data>
+  <data name="RangeAttribute_ValidationError" xml:space="preserve">
+    <value>Wartość musi być pomiędzy {1} a {2}.</value>
   </data>
   <data name="Validation.Range" xml:space="preserve">
-    <value>{0} musi być w zakresie od {1} do {2}.</value>
+    <value>Wartość musi być w zakresie od {1} do {2}.</value>
   </data>
   <data name="Validation.InvalidValue" xml:space="preserve">
-    <value>Nieprawidłowa wartość dla {0}.</value>
+    <value>Nieprawidłowa wartość.</value>
   </data>
   <data name="Validation.SortByMustBeOneOf" xml:space="preserve">
     <value>Sortowanie musi być jedną z wartości: {0}.</value>
@@ -311,8 +328,14 @@
   <data name="Validation.TypeRequired" xml:space="preserve">
     <value>Typ jest wymagany.</value>
   </data>
-  <data name="Validation.SortDirectionRequired" xml:space="preserve">
-    <value>Kierunek sortowania musi być 'Rosnący' lub 'Malejący'.</value>
+  <data name="Validation.ReceiverIdRequired" xml:space="preserve">
+    <value>Identyfikator odbiorcy jest wymagany.</value>
+  </data>
+  <data name="Validation.ConfirmationTokenRequired" xml:space="preserve">
+    <value>Token potwierdzenia jest wymagany.</value>
+  </data>
+  <data name="Validation.PriceRange" xml:space="preserve">
+    <value>Cena musi być pomiędzy {0} a {1}.</value>
   </data>
   
   <!-- Entity Names -->

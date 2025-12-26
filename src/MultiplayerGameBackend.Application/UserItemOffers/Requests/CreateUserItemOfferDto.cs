@@ -8,7 +8,6 @@ public class CreateUserItemOfferDto
     public Guid UserItemId { get; set; }
     
     [Range(UserItemOffer.Constraints.MinPrice,
-        UserItemOffer.Constraints.MaxPrice,
-        ErrorMessage = "Price must be in {1} to {2} range.")]
+        UserItemOffer.Constraints.MaxPrice)]
     public int Price  { get; set; }
 }

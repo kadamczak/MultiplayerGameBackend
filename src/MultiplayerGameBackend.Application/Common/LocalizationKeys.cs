@@ -106,6 +106,9 @@ public static class LocalizationKeys
         public const string DescriptionLength = "Validation.DescriptionLength";
         public const string TypeRequired = "Validation.TypeRequired";
         public const string SortDirectionRequired = "Validation.SortDirectionRequired";
+        public const string ReceiverIdRequired = "Validation.ReceiverIdRequired";
+        public const string ConfirmationTokenRequired = "Validation.ConfirmationTokenRequired";
+        public const string PriceRange = "Validation.PriceRange";
     }
     
     public static class Entities

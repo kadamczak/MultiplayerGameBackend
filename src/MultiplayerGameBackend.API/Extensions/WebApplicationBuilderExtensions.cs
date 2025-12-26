@@ -4,12 +4,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Text;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Localization;
 using MultiplayerGameBackend.API.Middleware;
+using MultiplayerGameBackend.API.Providers;
 using MultiplayerGameBackend.API.Services;
-using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Domain.Entities;
 using MultiplayerGameBackend.Infrastructure.Persistence;
-using MultiplayerGameBackend.Infrastructure.Localization;
+using MultiplayerGameBackend.Infrastructure.Resources;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -78,7 +79,20 @@ public static class WebApplicationBuilderExtensions
         
         builder.Services.AddAuthorization();
         
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddDataAnnotationsLocalization(options =>
+            {
+                // Use SharedResources for all Data Annotations validation messages
+                options.DataAnnotationLocalizerProvider = (type, factory) =>
+                    factory.Create(typeof(SharedResources));
+            });
+        
+        // Configure MVC to use our custom validation metadata provider
+        builder.Services.AddOptions<Microsoft.AspNetCore.Mvc.MvcOptions>()
+            .Configure<IStringLocalizerFactory>((options, factory) =>
+            {
+                options.ModelMetadataDetailsProviders.Add(new LocalizedValidationMetadataProvider(factory));
+            });
 
         // Add Swagger/OpenAPI
         builder.Services.AddEndpointsApiExplorer();

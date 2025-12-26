@@ -239,6 +239,23 @@
   <data name="Validation.MaxLength" xml:space="preserve">
     <value>The {0} must be at most {1} characters.</value>
   </data>
+  
+  <!-- Standard Data Annotations Keys (ASP.NET Core expects these exact names) -->
+  <data name="RequiredAttribute_ValidationError" xml:space="preserve">
+    <value>The {0} field is required.</value>
+  </data>
+  <data name="EmailAddressAttribute_Invalid" xml:space="preserve">
+    <value>The {0} field is not a valid email address.</value>
+  </data>
+  <data name="StringLengthAttribute_ValidationError" xml:space="preserve">
+    <value>The field {0} must be a string with a minimum length of {2} and a maximum length of {1}.</value>
+  </data>
+  <data name="MaxLengthAttribute_ValidationError" xml:space="preserve">
+    <value>The field {0} must be a string or array type with a maximum length of '{1}'.</value>
+  </data>
+  <data name="RangeAttribute_ValidationError" xml:space="preserve">
+    <value>The field {0} must be between {1} and {2}.</value>
+  </data>
   <data name="Validation.Range" xml:space="preserve">
     <value>The {0} must be between {1} and {2}.</value>
   </data>
@@ -311,8 +328,14 @@
   <data name="Validation.TypeRequired" xml:space="preserve">
     <value>Type is required.</value>
   </data>
-  <data name="Validation.SortDirectionRequired" xml:space="preserve">
-    <value>Sort Direction needs to be either 'Ascending' or 'Descending'.</value>
+  <data name="Validation.ReceiverIdRequired" xml:space="preserve">
+    <value>Receiver ID is required.</value>
+  </data>
+  <data name="Validation.ConfirmationTokenRequired" xml:space="preserve">
+    <value>Confirmation token is required.</value>
+  </data>
+  <data name="Validation.PriceRange" xml:space="preserve">
+    <value>Price must be between {0} and {1}.</value>
   </data>
   
   <!-- Entity Names -->

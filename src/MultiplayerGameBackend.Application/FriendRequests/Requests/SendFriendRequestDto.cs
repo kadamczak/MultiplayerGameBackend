@@ -4,7 +4,6 @@ namespace MultiplayerGameBackend.Application.FriendRequests.Requests;
 
 public class SendFriendRequestDto
 {
-    [Required(ErrorMessage = "Receiver ID is required.")]
+    [Required]
     public Guid ReceiverId { get; set; }
 }
-
