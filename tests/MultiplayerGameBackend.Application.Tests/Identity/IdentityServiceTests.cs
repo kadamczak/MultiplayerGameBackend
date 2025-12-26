@@ -19,12 +19,18 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
     private readonly ILogger<IdentityService> _logger;
     private readonly IConfiguration _configuration;
     private readonly IEmailService _emailService;
+    private readonly ILocalizationService _localizationService;
 
     public IdentityServiceTests(DatabaseFixture fixture)
     {
         _fixture = fixture;
         _logger = Substitute.For<ILogger<IdentityService>>();
         _emailService = Substitute.For<IEmailService>();
+        _localizationService = Substitute.For<ILocalizationService>();
+        
+        // Setup localization service to return the key as the value (for testing)
+        _localizationService.GetString(Arg.Any<string>()).Returns(ci => ci.ArgAt<string>(0));
+        _localizationService.GetString(Arg.Any<string>(), Arg.Any<object[]>()).Returns(ci => ci.ArgAt<string>(0));
         
         // Setup configuration for JWT
         var inMemorySettings = new Dictionary<string, string>
@@ -51,7 +57,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         // First, create the User role
         var roleManager = IdentityHelper.CreateRoleManager(context);
@@ -89,7 +95,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         await DatabaseHelper.CreateAndSaveUser(userManager, "existinguser", "existing@example.com", "Password123!");
 
@@ -112,7 +118,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         await DatabaseHelper.CreateAndSaveUser(userManager, "existinguser", "existing@example.com", "Password123!");
 
@@ -139,7 +145,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
         var dto = new LoginDto
@@ -168,7 +174,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var dto = new LoginDto
         {
@@ -188,7 +194,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -210,7 +216,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
         user.EmailConfirmed = false; // Not confirmed
@@ -234,7 +240,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -275,7 +281,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -310,7 +316,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         // Act
         var result = await service.Refresh(ClientTypes.Browser, IPAddress.Parse("127.0.0.1"), "invalidtoken", CancellationToken.None);
@@ -325,7 +331,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -351,7 +357,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -373,7 +379,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         // Act - Should not throw
         await service.Logout("nonexistenttoken", CancellationToken.None);
@@ -392,7 +398,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "OldPassword123!");
 
@@ -420,7 +426,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -456,7 +462,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -485,7 +491,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
         var userId = user.Id;
@@ -506,7 +512,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -528,7 +534,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -551,7 +557,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var dto = new ForgotPasswordDto { Email = "nonexistent@example.com" };
 
@@ -576,7 +582,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var dto = new ResetPasswordDto
         {
@@ -601,7 +607,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "testuser", "test@example.com", "Password123!");
 
@@ -624,7 +630,7 @@ public class IdentityServiceTests : IClassFixture<DatabaseFixture>, IAsyncLifeti
         // Arrange
         await using var context = _fixture.CreateDbContext();
         var userManager = IdentityHelper.CreateUserManagerWithTokenProvider(context);
-        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService);
+        var service = new IdentityService(_logger, userManager, context, _configuration, _emailService, _localizationService);
 
         var dto = new ConfirmEmailDto
         {

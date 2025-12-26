@@ -1,6 +1,7 @@
+using MultiplayerGameBackend.Application.Common.Validators;
+using MultiplayerGameBackend.Application.Common;
 using FluentValidation;
 using MultiplayerGameBackend.Domain.Constants;
-using MultiplayerGameBackend.Domain.Entities;
 
 namespace MultiplayerGameBackend.Application.Users.Requests.Validators;
 
@@ -9,8 +10,10 @@ public class ModifyUserRoleDtoValidator : AbstractValidator<ModifyUserRoleDto>
     public ModifyUserRoleDtoValidator()
     {
         RuleFor(x => x.RoleName)
-            .NotEmpty().WithMessage("Role is required.")
+            .NotEmpty().WithMessage(ValidatorLocalizer.GetString(LocalizationKeys.Validation.RoleNameRequired))
             .Must(UserRoles.IsValidRole)
-            .WithMessage($"Role must be one of the following: {string.Join(", ", UserRoles.AllRoles)}");
+            .WithMessage(ValidatorLocalizer.GetString(
+                LocalizationKeys.Validation.InvalidValue,
+                string.Join(", ", UserRoles.AllRoles)));
     }
 }

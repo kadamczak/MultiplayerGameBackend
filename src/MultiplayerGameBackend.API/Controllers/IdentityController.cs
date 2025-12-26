@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.API.Services;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Extensions;
 using MultiplayerGameBackend.Application.Identity;
 using MultiplayerGameBackend.Application.Identity.Requests;
 using MultiplayerGameBackend.Application.Identity.Requests.Validators;
 using MultiplayerGameBackend.Application.Identity.Responses;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Exceptions;
 
@@ -13,10 +15,12 @@ namespace MultiplayerGameBackend.API.Controllers;
 
 [ApiController]
 [Route("v1/identity")]
-public class IdentityController(IIdentityService identityService,
+public class IdentityController(
+    IIdentityService identityService,
     RegisterDtoValidator registerDtoValidator,
     ChangePasswordDtoValidator changePasswordDtoValidator,
-    IUserContext userContext) : ControllerBase
+    IUserContext userContext,
+    ILocalizationService localizationService) : ControllerBase
 {
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -156,7 +160,7 @@ public class IdentityController(IIdentityService identityService,
         if (string.IsNullOrWhiteSpace(tokenToUse))
             return BadRequest("Refresh token was not present.");
         
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         await identityService.ChangePassword(userId, dto, tokenToUse, cancellationToken);
@@ -176,7 +180,7 @@ public class IdentityController(IIdentityService identityService,
         if (string.IsNullOrWhiteSpace(clientType) || !ClientTypes.IsValidClientType(clientType))
             return BadRequest("Invalid or missing X-Client-Type header.");
         
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         await identityService.DeleteAccount(userId, dto, cancellationToken);

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- General Error Messages -->
+  <data name="Error.SomethingWentWrong" xml:space="preserve">
+    <value>Coś poszło nie tak.</value>
+  </data>
+  <data name="Error.OneOrMoreConflicts" xml:space="preserve">
+    <value>Wystąpił jeden lub więcej konfliktów.</value>
+  </data>
+  <data name="Error.OneOrMoreErrors" xml:space="preserve">
+    <value>Wystąpił jeden lub więcej błędów.</value>
+  </data>
+  
+  <!-- Authentication/Authorization Errors -->
+  <data name="Error.UserMustBeAuthenticated" xml:space="preserve">
+    <value>Użytkownik musi być uwierzytelniony.</value>
+  </data>
+  <data name="Error.InvalidCredentials" xml:space="preserve">
+    <value>Nieprawidłowe dane uwierzytelniające.</value>
+  </data>
+  <data name="Error.InvalidToken" xml:space="preserve">
+    <value>Nieprawidłowy token.</value>
+  </data>
+  <data name="Error.RefreshTokenExpired" xml:space="preserve">
+    <value>Token odświeżania wygasł.</value>
+  </data>
+  <data name="Error.UserAlreadyExists" xml:space="preserve">
+    <value>Użytkownik już istnieje.</value>
+  </data>
+  <data name="Error.EmailAlreadyConfirmed" xml:space="preserve">
+    <value>Email jest już potwierdzony.</value>
+  </data>
+  <data name="Error.EmailNotConfirmed" xml:space="preserve">
+    <value>Email nie jest potwierdzony.</value>
+  </data>
+  <data name="Error.TwoFactorNotEnabled" xml:space="preserve">
+    <value>Uwierzytelnianie dwuskładnikowe nie jest włączone.</value>
+  </data>
+  <data name="Error.PasswordDoesNotMeetRequirements" xml:space="preserve">
+    <value>Hasło nie spełnia wymagań.</value>
+  </data>
+  <data name="Error.PasswordIncorrect" xml:space="preserve">
+    <value>Hasło jest nieprawidłowe.</value>
+  </data>
+  
+  <!-- Friend Request Errors -->
+  <data name="Error.CannotSendFriendRequestToYourself" xml:space="preserve">
+    <value>Nie możesz wysłać zaproszenia do znajomych do samego siebie.</value>
+  </data>
+  <data name="Error.AlreadyFriends" xml:space="preserve">
+    <value>Jesteś już znajomym z tym użytkownikiem.</value>
+  </data>
+  <data name="Error.PendingFriendRequestExists" xml:space="preserve">
+    <value>Istnieje już oczekujące zaproszenie do znajomych między tobą a tym użytkownikiem.</value>
+  </data>
+  <data name="Error.MaxPendingRequestsReached" xml:space="preserve">
+    <value>Osiągnąłeś maksymalną liczbę oczekujących zaproszeń do znajomych ({0}).</value>
+  </data>
+  <data name="Error.MaxFriendsReached" xml:space="preserve">
+    <value>Osiągnąłeś maksymalną liczbę znajomych ({0}).</value>
+  </data>
+  <data name="Error.RequesterMaxFriendsReached" xml:space="preserve">
+    <value>Wysyłający osiągnął maksymalną liczbę znajomych ({0}).</value>
+  </data>
+  <data name="Error.FriendRequestAlreadyResponded" xml:space="preserve">
+    <value>Na to zaproszenie do znajomych już udzielono odpowiedzi.</value>
+  </data>
+  <data name="Error.CanOnlyAcceptRequestsSentToYou" xml:space="preserve">
+    <value>Możesz zaakceptować tylko zaproszenia wysłane do ciebie.</value>
+  </data>
+  <data name="Error.CanOnlyRejectRequestsSentToYou" xml:space="preserve">
+    <value>Możesz odrzucić tylko zaproszenia wysłane do ciebie.</value>
+  </data>
+  <data name="Error.CanOnlyCancelPendingRequests" xml:space="preserve">
+    <value>Możesz anulować tylko oczekujące zaproszenia do znajomych.</value>
+  </data>
+  <data name="Error.CanOnlyCancelOwnRequests" xml:space="preserve">
+    <value>Możesz anulować tylko zaproszenia, które sam wysłałeś.</value>
+  </data>
+  <data name="Error.InvalidFriendUserId" xml:space="preserve">
+    <value>Nieprawidłowy identyfikator użytkownika znajomego.</value>
+  </data>
+  
+  <!-- Item Errors -->
+  <data name="Error.NoFileUploaded" xml:space="preserve">
+    <value>Nie przesłano pliku.</value>
+  </data>
+  <data name="Error.CannotEquipItemsNotOwned" xml:space="preserve">
+    <value>Nie możesz założyć przedmiotów, które do ciebie nie należą.</value>
+  </data>
+  
+  <!-- User Item Offer Errors -->
+  <data name="Error.CannotBuyOwnOffer" xml:space="preserve">
+    <value>Nie możesz kupić własnej oferty.</value>
+  </data>
+  <data name="Error.InsufficientBalance" xml:space="preserve">
+    <value>Niewystarczające środki.</value>
+  </data>
+  <data name="Error.CannotUpdateSoldOffer" xml:space="preserve">
+    <value>Nie można zaktualizować oferty, która została już sprzedana.</value>
+  </data>
+  <data name="Error.CannotCancelSoldOffer" xml:space="preserve">
+    <value>Nie można anulować oferty, która została już sprzedana.</value>
+  </data>
+  <data name="Error.DoNotOwnItem" xml:space="preserve">
+    <value>Nie jesteś właścicielem tego przedmiotu.</value>
+  </data>
+  <data name="Error.DoNotOwnOffer" xml:space="preserve">
+    <value>Nie jesteś właścicielem tej oferty.</value>
+  </data>
+  
+  <!-- Merchant Item Offer Errors -->
+  <data name="Error.CannotAffordMerchantOffer" xml:space="preserve">
+    <value>Nie stać cię na tę ofertę.</value>
+  </data>
+  
+  <!-- Not Found Errors -->
+  <data name="Error.NotFound" xml:space="preserve">
+    <value>{0} z {1} '{2}' nie został znaleziony.</value>
+  </data>
+  <data name="Error.Conflict.EntityExists" xml:space="preserve">
+    <value>{0} z tym {1} już istnieje.</value>
+  </data>
+  <data name="Error.UsernameAlreadyExists" xml:space="preserve">
+    <value>Ta nazwa użytkownika już istnieje.</value>
+  </data>
+  <data name="Error.EmailAlreadyExists" xml:space="preserve">
+    <value>Ten adres email już istnieje.</value>
+  </data>
+  <data name="Error.UserItemOfferAlreadyExists" xml:space="preserve">
+    <value>Aktywna oferta dla tego przedmiotu już istnieje.</value>
+  </data>
+  <data name="Error.UserNotFound" xml:space="preserve">
+    <value>Użytkownik nie został znaleziony.</value>
+  </data>
+  <data name="Error.ReceiverNotFound" xml:space="preserve">
+    <value>Odbiorca nie został znaleziony.</value>
+  </data>
+  <data name="Error.ItemNotFound" xml:space="preserve">
+    <value>Przedmiot nie został znaleziony.</value>
+  </data>
+  <data name="Error.UserItemNotFound" xml:space="preserve">
+    <value>Przedmiot użytkownika nie został znaleziony.</value>
+  </data>
+  <data name="Error.UserItemOfferNotFound" xml:space="preserve">
+    <value>Oferta przedmiotu użytkownika nie została znaleziona.</value>
+  </data>
+  <data name="Error.MerchantItemOfferNotFound" xml:space="preserve">
+    <value>Oferta kupca nie została znaleziona.</value>
+  </data>
+  <data name="Error.MerchantNotFound" xml:space="preserve">
+    <value>Kupiec nie został znaleziony.</value>
+  </data>
+  <data name="Error.FriendRequestNotFound" xml:space="preserve">
+    <value>Zaproszenie do znajomych nie zostało znalezione.</value>
+  </data>
+  <data name="Error.RoleNotFound" xml:space="preserve">
+    <value>Rola nie została znaleziona.</value>
+  </data>
+  <data name="Error.UserCustomizationNotFound" xml:space="preserve">
+    <value>Personalizacja użytkownika nie została znaleziona.</value>
+  </data>
+  <data name="Error.ProfilePictureNotSet" xml:space="preserve">
+    <value>Zdjęcie profilowe nie jest ustawione.</value>
+  </data>
+  
+  <!-- Validation Errors -->
+  <data name="Validation.Required" xml:space="preserve">
+    <value>Pole {0} jest wymagane.</value>
+  </data>
+  <data name="Validation.InvalidEmail" xml:space="preserve">
+    <value>Nieprawidłowy adres email.</value>
+  </data>
+  <data name="Validation.StringLength" xml:space="preserve">
+    <value>Pole {0} musi mieć długość od {2} do {1} znaków.</value>
+  </data>
+  <data name="Validation.MinLength" xml:space="preserve">
+    <value>Pole {0} musi mieć co najmniej {1} znaków.</value>
+  </data>
+  <data name="Validation.MaxLength" xml:space="preserve">
+    <value>Pole {0} może mieć maksymalnie {1} znaków.</value>
+  </data>
+  
+  <!-- Standard Data Annotations Keys (ASP.NET Core expects these exact names) -->
+  <data name="RequiredAttribute_ValidationError" xml:space="preserve">
+    <value>Pole jest wymagane.</value>
+  </data>
+  <data name="EmailAddressAttribute_Invalid" xml:space="preserve">
+    <value>Pole nie jest prawidłowym adresem email.</value>
+  </data>
+  <data name="StringLengthAttribute_ValidationError" xml:space="preserve">
+    <value>Pole musi być tekstem o minimalnej długości {2} i maksymalnej długości {1}.</value>
+  </data>
+  <data name="MaxLengthAttribute_ValidationError" xml:space="preserve">
+    <value>Pole musi być tekstem lub tablicą o maksymalnej długości '{1}'.</value>
+  </data>
+  <data name="RangeAttribute_ValidationError" xml:space="preserve">
+    <value>Wartość musi być pomiędzy {1} a {2}.</value>
+  </data>
+  <data name="Validation.Range" xml:space="preserve">
+    <value>Wartość musi być w zakresie od {1} do {2}.</value>
+  </data>
+  <data name="Validation.InvalidValue" xml:space="preserve">
+    <value>Nieprawidłowa wartość.</value>
+  </data>
+  <data name="Validation.SortByMustBeOneOf" xml:space="preserve">
+    <value>Sortowanie musi być jedną z wartości: {0}.</value>
+  </data>
+  <data name="Validation.PageSizeMustBeOneOf" xml:space="preserve">
+    <value>Rozmiar strony musi być jedną z wartości: {0}.</value>
+  </data>
+  <data name="Validation.SearchPhraseTooLong" xml:space="preserve">
+    <value>Hasło wyszukiwania nie może przekraczać {0} znaków.</value>
+  </data>
+  <data name="Validation.PasswordsDoNotMatch" xml:space="preserve">
+    <value>Hasła nie są zgodne.</value>
+  </data>
+  <data name="Validation.InvalidPageNumber" xml:space="preserve">
+    <value>PageNumber musi być większy niż 0.</value>
+  </data>
+  <data name="Validation.CurrentPasswordRequired" xml:space="preserve">
+    <value>Obecne hasło jest wymagane.</value>
+  </data>
+  <data name="Validation.NewPasswordRequired" xml:space="preserve">
+    <value>Nowe hasło jest wymagane.</value>
+  </data>
+  <data name="Validation.PasswordLength" xml:space="preserve">
+    <value>Hasło musi mieć długość od {0} do {1} znaków.</value>
+  </data>
+  <data name="Validation.PasswordMustContainUppercase" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną wielką literę.</value>
+  </data>
+  <data name="Validation.PasswordMustContainLowercase" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną małą literę.</value>
+  </data>
+  <data name="Validation.PasswordMustContainDigit" xml:space="preserve">
+    <value>Hasło musi zawierać co najmniej jedną cyfrę.</value>
+  </data>
+  <data name="Validation.UsernameRequired" xml:space="preserve">
+    <value>Nazwa użytkownika jest wymagana.</value>
+  </data>
+  <data name="Validation.UsernameLength" xml:space="preserve">
+    <value>Nazwa użytkownika musi mieć długość od {0} do {1} znaków.</value>
+  </data>
+  <data name="Validation.EmailRequired" xml:space="preserve">
+    <value>Email jest wymagany.</value>
+  </data>
+  <data name="Validation.PasswordRequired" xml:space="preserve">
+    <value>Hasło jest wymagane.</value>
+  </data>
+  <data name="Validation.ConfirmPasswordRequired" xml:space="preserve">
+    <value>Potwierdzenie hasła jest wymagane.</value>
+  </data>
+  <data name="Validation.RoleNameRequired" xml:space="preserve">
+    <value>Nazwa roli jest wymagana.</value>
+  </data>
+  <data name="Validation.NameRequired" xml:space="preserve">
+    <value>Nazwa jest wymagana.</value>
+  </data>
+  <data name="Validation.NameLength" xml:space="preserve">
+    <value>Nazwa musi mieć długość od {0} do {1} znaków.</value>
+  </data>
+  <data name="Validation.DescriptionRequired" xml:space="preserve">
+    <value>Opis jest wymagany.</value>
+  </data>
+  <data name="Validation.DescriptionLength" xml:space="preserve">
+    <value>Opis musi mieć długość od {0} do {1} znaków.</value>
+  </data>
+  <data name="Validation.TypeRequired" xml:space="preserve">
+    <value>Typ jest wymagany.</value>
+  </data>
+  <data name="Validation.ReceiverIdRequired" xml:space="preserve">
+    <value>Identyfikator odbiorcy jest wymagany.</value>
+  </data>
+  <data name="Validation.ConfirmationTokenRequired" xml:space="preserve">
+    <value>Token potwierdzenia jest wymagany.</value>
+  </data>
+  <data name="Validation.PriceRange" xml:space="preserve">
+    <value>Cena musi być pomiędzy {0} a {1}.</value>
+  </data>
+  
+  <!-- Entity Names -->
+  <data name="Entity.User" xml:space="preserve">
+    <value>Użytkownik</value>
+  </data>
+  <data name="Entity.Item" xml:space="preserve">
+    <value>Przedmiot</value>
+  </data>
+  <data name="Entity.UserItem" xml:space="preserve">
+    <value>Przedmiot użytkownika</value>
+  </data>
+  <data name="Entity.UserItemOffer" xml:space="preserve">
+    <value>Oferta przedmiotu użytkownika</value>
+  </data>
+  <data name="Entity.MerchantItemOffer" xml:space="preserve">
+    <value>Oferta kupca</value>
+  </data>
+  <data name="Entity.InGameMerchant" xml:space="preserve">
+    <value>Kupiec</value>
+  </data>
+  <data name="Entity.FriendRequest" xml:space="preserve">
+    <value>Zaproszenie do znajomych</value>
+  </data>
+  <data name="Entity.Role" xml:space="preserve">
+    <value>Rola</value>
+  </data>
+</root>
+

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.FriendRequests;
 using MultiplayerGameBackend.Application.FriendRequests.Requests;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.Tests.TestHelpers;
 using MultiplayerGameBackend.Domain.Constants;
 using MultiplayerGameBackend.Domain.Exceptions;
@@ -16,12 +17,18 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     private readonly DatabaseFixture _fixture;
     private readonly ILogger<FriendRequestService> _logger;
     private readonly FriendRequestMapper _friendRequestMapper;
+    private readonly ILocalizationService _localizationService;
 
     public FriendRequestServiceTests(DatabaseFixture fixture)
     {
         _fixture = fixture;
         _logger = Substitute.For<ILogger<FriendRequestService>>();
         _friendRequestMapper = new FriendRequestMapper();
+        _localizationService = Substitute.For<ILocalizationService>();
+        
+        // Setup localization service to return the key as the value (for testing)
+        _localizationService.GetString(Arg.Any<string>()).Returns(ci => ci.ArgAt<string>(0));
+        _localizationService.GetString(Arg.Any<string>(), Arg.Any<object[]>()).Returns(ci => ci.ArgAt<string>(0));
     }
 
     public async Task InitializeAsync() => await _fixture.InitializeAsync();
@@ -34,7 +41,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -59,7 +66,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -75,7 +82,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -91,7 +98,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user1 = await DatabaseHelper.CreateAndSaveUser(userManager, "user1", "user1@test.com");
@@ -110,7 +117,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user1 = await DatabaseHelper.CreateAndSaveUser(userManager, "user1", "user1@test.com");
@@ -129,7 +136,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user1 = await DatabaseHelper.CreateAndSaveUser(userManager, "user1", "user1@test.com");
@@ -158,7 +165,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -180,7 +187,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -195,7 +202,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -213,7 +220,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -235,7 +242,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -255,7 +262,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -270,7 +277,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -292,7 +299,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -312,7 +319,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -327,7 +334,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -345,7 +352,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var requester = await DatabaseHelper.CreateAndSaveUser(userManager, "requester", "requester@test.com");
@@ -367,7 +374,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user1 = await DatabaseHelper.CreateAndSaveUser(userManager, "user1", "user1@test.com");
@@ -388,7 +395,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user1 = await DatabaseHelper.CreateAndSaveUser(userManager, "user1", "user1@test.com");
@@ -409,7 +416,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -424,7 +431,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user1 = await DatabaseHelper.CreateAndSaveUser(userManager, "user1", "user1@test.com");
@@ -444,7 +451,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -472,7 +479,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -502,7 +509,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -534,7 +541,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -563,7 +570,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -589,7 +596,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");
@@ -625,7 +632,7 @@ public class FriendRequestServiceTests : IClassFixture<DatabaseFixture>, IAsyncL
     {
         // Arrange
         await using var context = _fixture.CreateDbContext();
-        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper);
+        var friendService = new FriendRequestService(_logger, context, _friendRequestMapper, _localizationService);
         var userManager = IdentityHelper.CreateUserManager(context);
         
         var user = await DatabaseHelper.CreateAndSaveUser(userManager, "user", "user@test.com");

@@ -1,4 +1,5 @@
 using FluentValidation;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Common.Validators;
 
 namespace MultiplayerGameBackend.Application.UserItemOffers.Requests.Validators;
@@ -24,7 +25,9 @@ public class GetOffersDtoValidator : AbstractValidator<GetOffersDto>
             .WithMessage((query, sortBy) => 
             {
                 var validValues = query.ShowActive ? ActiveOffersSortByValues : InactiveOffersSortByValues;
-                return $"SortBy must be one of: {string.Join(", ", validValues)}.";
+                return ValidatorLocalizer.GetString(
+                    LocalizationKeys.Validation.SortByMustBeOneOf, 
+                    string.Join(", ", validValues));
             });
     }
 

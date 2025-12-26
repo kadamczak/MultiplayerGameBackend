@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.API.Services;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Extensions;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.UserItems;
 using MultiplayerGameBackend.Application.UserItems.Requests;
 using MultiplayerGameBackend.Application.UserItems.Requests.Validators;
@@ -13,9 +15,11 @@ namespace MultiplayerGameBackend.API.Controllers;
 [ApiController]
 [Route("v1/users")]
 [Authorize]
-public class UserItemController(IUserItemService userItemService,
+public class UserItemController(
+    IUserItemService userItemService,
     GetUserItemsDtoValidator getUserItemsDtoValidator,
-    IUserContext userContext) : ControllerBase
+    IUserContext userContext,
+    ILocalizationService localizationService) : ControllerBase
 {
     [HttpGet("me/items")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -27,7 +31,7 @@ public class UserItemController(IUserItemService userItemService,
         if (!validationResult.IsValid)
             return ValidationProblem(new ValidationProblemDetails(validationResult.FormatErrors()));
         
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         var userItems = await userItemService.GetUserItems(userId, dto, cancellationToken);
@@ -42,7 +46,7 @@ public class UserItemController(IUserItemService userItemService,
     public async Task<IActionResult> UpdateEquippedUserItems([FromBody] UpdateEquippedUserItemsDto dto,
         CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         await userItemService.UpdateEquippedUserItems(userId, dto, cancellationToken);

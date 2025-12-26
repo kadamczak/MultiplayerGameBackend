@@ -14,7 +14,8 @@ using MultiplayerGameBackend.Domain.Exceptions;
 namespace MultiplayerGameBackend.Application.UserItems;
 
 public class UserItemService(ILogger<UserItemService> logger,
-    IMultiplayerGameDbContext dbContext) : IUserItemService
+    IMultiplayerGameDbContext dbContext,
+    ILocalizationService localizationService) : IUserItemService
 {
     public async Task<PagedResult<ReadUserItemDto>> GetUserItems(Guid userId,  GetUserItemsDto dto, CancellationToken cancellationToken)
     {
@@ -89,10 +90,10 @@ public class UserItemService(ILogger<UserItemService> logger,
                 .FirstOrDefaultAsync(ui => ui.Id == dto.EquippedHeadUserItemId.Value, cancellationToken);
             
             if (headUserItem is null)
-                throw new NotFoundException(nameof(UserItem), nameof(UserItem.Id), "ID", dto.EquippedHeadUserItemId.Value.ToString());
+                throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserItemNotFound));
             
             if (headUserItem.UserId != userId)
-                throw new ForbidException("Cannot equip items that don't belong to you.");
+                throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.CannotEquipItemsNotOwned));
             
             if (headUserItem.Item?.Type != ItemTypes.EquippableOnHead)
                 throw new UnprocessableEntityException(new Dictionary<string, string[]>
@@ -109,10 +110,10 @@ public class UserItemService(ILogger<UserItemService> logger,
                 .FirstOrDefaultAsync(ui => ui.Id == dto.EquippedBodyUserItemId.Value, cancellationToken);
             
             if (bodyUserItem is null)
-                throw new NotFoundException(nameof(UserItem), nameof(UserItem.Id), "ID", dto.EquippedBodyUserItemId.Value.ToString());
+                throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserItemNotFound));
             
             if (bodyUserItem.UserId != userId)
-                throw new ForbidException("Cannot equip items that don't belong to you.");
+                throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.CannotEquipItemsNotOwned));
             
             if (bodyUserItem.Item?.Type != ItemTypes.EquippableOnBody)
                 throw new UnprocessableEntityException(new Dictionary<string, string[]>
@@ -126,7 +127,7 @@ public class UserItemService(ILogger<UserItemService> logger,
             .FirstOrDefaultAsync(uc => uc.UserId == userId, cancellationToken);
 
         if (customization is null)
-            throw new NotFoundException(nameof(UserCustomization), nameof(UserCustomization.UserId), "User ID", userId.ToString());
+            throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserCustomizationNotFound));
 
         // Update the equipped items
         customization.EquippedHeadUserItemId = dto.EquippedHeadUserItemId;

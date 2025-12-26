@@ -5,10 +5,8 @@ namespace MultiplayerGameBackend.Application.Identity.Requests;
 
 public class ForgotPasswordDto
 {
-    [Required(ErrorMessage = "Email is required.")]
-    [EmailAddress(ErrorMessage = "Invalid email address.")]
-    [MaxLength(User.Constraints.EmailMaxLength,
-        ErrorMessage = "Email cannot exceed {1} characters.")]
+    [Required]
+    [EmailAddress]
+    [MaxLength(User.Constraints.EmailMaxLength)]
     public required string Email { get; set; }
 }
-

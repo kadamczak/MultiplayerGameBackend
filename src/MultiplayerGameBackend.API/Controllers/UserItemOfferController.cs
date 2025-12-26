@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiplayerGameBackend.API.Services;
+using MultiplayerGameBackend.Application.Common;
 using MultiplayerGameBackend.Application.Extensions;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests;
 using MultiplayerGameBackend.Application.UserItemOffers.Requests.Validators;
@@ -13,9 +15,11 @@ namespace MultiplayerGameBackend.API.Controllers;
 [ApiController]
 [Route("v1/users")]
 [Authorize]
-public class UserItemOfferController(IUserItemOfferService userItemOfferService,
+public class UserItemOfferController(
+    IUserItemOfferService userItemOfferService,
     GetOffersDtoValidator getOffersDtoValidator,
-    IUserContext userContext) : ControllerBase
+    IUserContext userContext,
+    ILocalizationService localizationService) : ControllerBase
 {
     [HttpGet("offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -37,7 +41,7 @@ public class UserItemOfferController(IUserItemOfferService userItemOfferService,
     [ProducesResponseType(StatusCodes.Status409Conflict)] // in case offer already exists for this useritem
     public async Task<IActionResult> CreateOffer([FromBody] CreateUserItemOfferDto dto, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         await userItemOfferService.CreateOffer(userId, dto, cancellationToken);
@@ -49,7 +53,7 @@ public class UserItemOfferController(IUserItemOfferService userItemOfferService,
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteOffer([FromRoute] Guid offerId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var userId = Guid.Parse(currentUser.Id);
         
         await userItemOfferService.DeleteOffer(userId, offerId, cancellationToken);
@@ -62,7 +66,7 @@ public class UserItemOfferController(IUserItemOfferService userItemOfferService,
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PurchaseOffer([FromRoute] Guid offerId, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException("User must be authenticated.");
+        var currentUser = userContext.GetCurrentUser() ?? throw new ForbidException(localizationService.GetString(LocalizationKeys.Errors.UserMustBeAuthenticated));
         var buyerId = Guid.Parse(currentUser.Id);
         
         await userItemOfferService.PurchaseOffer(buyerId, offerId, cancellationToken);
