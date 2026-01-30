@@ -15,7 +15,7 @@ public class Item
     }
    
     public int Id { get; set; }
-    
+        
     // unique
     [StringLength(Constraints.NameMaxLength, MinimumLength = Constraints.NameMinLength)]
     public required string Name { get; set; }

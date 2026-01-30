@@ -92,7 +92,7 @@ public class IdentityService(ILogger<IdentityService> logger,
         if (clientType == ClientTypes.Game)
         {
             await RevokePreviousGameRefreshTokensOfUser(user, cancellationToken);
-            // Todo: use signalR to notify other game clients about logout
+            // Todo: notify other game clients about logout
         }
 
         // Create access token
