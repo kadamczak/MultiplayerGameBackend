@@ -6,6 +6,7 @@ namespace MultiplayerGameBackend.Application.Users;
 
 public interface IUserService
 {
+    Task<UserSearchResultDto> GetUserById(Guid userId, CancellationToken cancellationToken);
     Task AssignUserRole(Guid userId, ModifyUserRoleDto dto, CancellationToken cancellationToken);
     Task UnassignUserRole(Guid userId, ModifyUserRoleDto dto, CancellationToken cancellationToken);
     Task<UserGameInfoDto> GetCurrentUserGameInfo(Guid userId, bool includeCustomization, bool includeUserItems, CancellationToken cancellationToken);

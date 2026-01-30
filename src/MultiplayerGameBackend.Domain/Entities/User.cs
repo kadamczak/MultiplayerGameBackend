@@ -42,6 +42,8 @@ public class User : IdentityUser<Guid>
     public List<UserItemOffer> BoughtItemOffers { get; set; } = [];
     public List<FriendRequest> SentFriendRequests { get; set; } = [];
     public List<FriendRequest> ReceivedFriendRequests { get; set; } = [];
+    public List<Message> SentMessages { get; set; } = [];
+    public List<Message> ReceivedMessages { get; set; } = [];
     
     public UserCustomization? Customization { get; set; }
 }

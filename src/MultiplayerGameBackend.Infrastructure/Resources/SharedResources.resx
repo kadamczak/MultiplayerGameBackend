@@ -140,6 +140,11 @@
     <value>Invalid friend user ID.</value>
   </data>
   
+  <!-- Message Errors -->
+  <data name="Error.CannotSendMessageToYourself" xml:space="preserve">
+    <value>You cannot send a message to yourself.</value>
+  </data>
+  
   <!-- Item Errors -->
   <data name="Error.NoFileUploaded" xml:space="preserve">
     <value>No file uploaded.</value>
@@ -362,6 +367,9 @@
   </data>
   <data name="Entity.Role" xml:space="preserve">
     <value>Role</value>
+  </data>
+  <data name="Entity.Message" xml:space="preserve">
+    <value>Message</value>
   </data>
 </root>
 

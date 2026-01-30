@@ -23,6 +23,7 @@ public class MultiplayerGameDbContext
     public DbSet<MerchantItemOffer> MerchantItemOffers { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<FriendRequest> FriendRequests { get; set; }
+    public DbSet<Message> Messages { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,6 +38,7 @@ public class MultiplayerGameDbContext
         ConfigureMerchantItemOfferEntities(modelBuilder);
         ConfigureRefreshTokenEntities(modelBuilder);
         ConfigureFriendRequestEntities(modelBuilder);
+        ConfigureMessageEntities(modelBuilder);
     }
 
     private static void ConfigureItemEntities(ModelBuilder modelBuilder)
@@ -114,13 +116,13 @@ public class MultiplayerGameDbContext
         {
             entity.HasKey(e => e.Id);
 
-            entity.HasOne(ui => ui.User)
-                .WithMany(u => u.UserItems)
-                .HasForeignKey(ui => ui.UserId);
-
-            entity.HasOne(e => e.Item)
-                .WithMany(e => e.UserItems)
-                .HasForeignKey(e => e.ItemId);
+            // entity.HasOne(ui => ui.User)
+            //     .WithMany(u => u.UserItems)
+            //     .HasForeignKey(ui => ui.UserId);
+            //
+            // entity.HasOne(e => e.Item)
+            //     .WithMany(e => e.UserItems)
+            //     .HasForeignKey(e => e.ItemId);
         });
     }
     
@@ -222,6 +224,27 @@ public class MultiplayerGameDbContext
                 .OnDelete(DeleteBehavior.Cascade);
             
             entity.HasIndex(e => new { e.RequesterId, e.ReceiverId, e.Status });
+        });
+    }
+    
+    private static void ConfigureMessageEntities(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasOne(m => m.Sender)
+                .WithMany(u => u.SentMessages)
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasOne(m => m.Receiver)
+                .WithMany(u => u.ReceivedMessages)
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => new { e.SenderId, e.ReceiverId, e.SentAt });
+            entity.HasIndex(e => new { e.ReceiverId, e.IsRead });
         });
     }
 }

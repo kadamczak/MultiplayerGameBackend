@@ -20,9 +20,19 @@ public class UserService(ILogger<UserService> logger,
     RoleManager<IdentityRole<Guid>> roleManager,
     IMultiplayerGameDbContext dbContext,
     UserCustomizationMapper customizationMapper,
+    UserMapper userMapper,
     ILocalizationService localizationService,
     IImageService imageService) : IUserService
 {
+    public async Task<UserSearchResultDto> GetUserById(Guid userId, CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Getting user with id: {@UserId}", userId);
+        
+        var user = await userManager.FindByIdAsync(userId.ToString())
+                   ?? throw new NotFoundException(localizationService.GetString(LocalizationKeys.Errors.UserNotFound));
+
+        return userMapper.MapToSearchResultDto(user);
+    }
 
     public async Task AssignUserRole(Guid userId, ModifyUserRoleDto dto, CancellationToken cancellationToken)
     {
@@ -219,12 +229,7 @@ public class UserService(ILogger<UserService> logger,
             .ApplyPaging(dto.PagedQuery);
 
         var users = await dataQuery
-            .Select(u => new UserSearchResultDto
-            {
-                Id = u.Id,
-                UserName = u.UserName!,
-                ProfilePictureUrl = u.ProfilePictureUrl
-            })
+            .Select(user => userMapper.MapToSearchResultDto(user))
             .ToListAsync(cancellationToken);
 
         return new PagedResult<UserSearchResultDto>(users, totalCount, dto.PagedQuery.PageSize, dto.PagedQuery.PageNumber);

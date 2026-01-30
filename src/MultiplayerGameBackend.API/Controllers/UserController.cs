@@ -23,6 +23,15 @@ public class UserController(
     IUserContext userContext,
     ILocalizationService localizationService) : ControllerBase
 {
+    [HttpGet("{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUserById(Guid userId, CancellationToken cancellationToken)
+    {
+        var userDto = await userService.GetUserById(userId, cancellationToken);
+        return Ok(userDto);
+    }
+    
     [HttpPost("{userId:guid}/roles")]
     [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

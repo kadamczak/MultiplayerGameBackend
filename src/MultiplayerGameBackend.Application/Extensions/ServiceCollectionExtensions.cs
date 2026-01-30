@@ -3,8 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using MultiplayerGameBackend.Application.Common.Mappings;
 using MultiplayerGameBackend.Application.FriendRequests;
 using MultiplayerGameBackend.Application.Identity;
+using MultiplayerGameBackend.Application.Interfaces;
 using MultiplayerGameBackend.Application.MerchantItemOffers;
 using MultiplayerGameBackend.Application.Items;
+using MultiplayerGameBackend.Application.Messages;
 using MultiplayerGameBackend.Application.UserItemOffers;
 using MultiplayerGameBackend.Application.UserItems;
 using MultiplayerGameBackend.Application.Users;
@@ -25,11 +27,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserItemOfferService, UserItemOfferService>();
         services.AddScoped<IMerchantItemOfferService, MerchantItemOfferService>();
         services.AddScoped<IFriendRequestService, FriendRequestService>();
+        services.AddScoped<IMessageService, MessageService>();
         
         services.AddScoped<ItemMapper>();
         services.AddScoped<UserCustomizationMapper>();
         services.AddScoped<FriendRequestMapper>();
         services.AddScoped<UserItemMapper>();
         services.AddScoped<UserItemOfferMapper>();
+        services.AddScoped<MessageMapper>();
+        services.AddScoped<UserMapper>();
     }
 }

@@ -1,4 +1,5 @@
 using MultiplayerGameBackend.API.Extensions;
+using MultiplayerGameBackend.API.Hubs;
 using MultiplayerGameBackend.API.Middleware;
 using Serilog;
 using MultiplayerGameBackend.Application.Extensions;
@@ -64,6 +65,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+    app.MapHub<ChatHub>("/hubs/chat");
     
     Log.Information("Application started");
     app.Run();

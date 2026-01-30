@@ -140,6 +140,11 @@
     <value>Nieprawidłowy identyfikator użytkownika znajomego.</value>
   </data>
   
+  <!-- Message Errors -->
+  <data name="Error.CannotSendMessageToYourself" xml:space="preserve">
+    <value>Nie możesz wysłać wiadomości do siebie.</value>
+  </data>
+  
   <!-- Item Errors -->
   <data name="Error.NoFileUploaded" xml:space="preserve">
     <value>Nie przesłano pliku.</value>
@@ -362,6 +367,9 @@
   </data>
   <data name="Entity.Role" xml:space="preserve">
     <value>Rola</value>
+  </data>
+  <data name="Entity.Message" xml:space="preserve">
+    <value>Wiadomość</value>
   </data>
 </root>
 

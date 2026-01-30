@@ -39,6 +39,9 @@ public static class LocalizationKeys
         public const string CanOnlyCancelOwnRequests = "Error.CanOnlyCancelOwnRequests";
         public const string InvalidFriendUserId = "Error.InvalidFriendUserId";
         
+        // Messages
+        public const string CannotSendMessageToYourself = "Error.CannotSendMessageToYourself";
+        
         // Items
         public const string NoFileUploaded = "Error.NoFileUploaded";
         public const string CannotEquipItemsNotOwned = "Error.CannotEquipItemsNotOwned";
@@ -121,6 +124,7 @@ public static class LocalizationKeys
         public const string InGameMerchant = "Entity.InGameMerchant";
         public const string FriendRequest = "Entity.FriendRequest";
         public const string Role = "Entity.Role";
+        public const string Message = "Entity.Message";
     }
 }
 

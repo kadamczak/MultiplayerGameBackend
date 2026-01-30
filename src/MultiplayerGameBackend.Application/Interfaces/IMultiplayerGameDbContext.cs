@@ -16,9 +16,9 @@ public interface IMultiplayerGameDbContext
     DbSet<InGameMerchant> InGameMerchants { get; }
     DbSet<MerchantItemOffer> MerchantItemOffers { get; }
     DbSet<FriendRequest> FriendRequests { get; }
+    DbSet<Message> Messages { get; }
     
-    // DatabaseFacade Database { get; }
-    // EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
+    EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
